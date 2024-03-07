@@ -4,8 +4,9 @@ export default () => ({
   dbName: process.env.DB_NAME,
   link: process.env.LINK,
 
-  nodemailerPort: process.env.nodemailerPort,
-  nodemailerUser: process.env.nodemailerUser,
-  nodemailerPass: process.env.nodemailerPass,
-  nodemailerHost: process.env.nodemailerHost,
+  mailerPort: process.env.mailerPort, 
+  mailerUser: process.env.mailerUser,
+  mailerPass: process.env.mailerPass,
+  mailerHost: process.env.mailerHost,
+  mailerSender: process.env.mailerSender,
 })

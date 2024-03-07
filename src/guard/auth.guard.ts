@@ -8,12 +8,13 @@ import { Reflector } from '@nestjs/core';
 
 import * as jwt from 'jsonwebtoken';
 import appConfig from 'src/config/app.config';
-// import { UserService } from 'src/resources/user/user.service';
+import { UserService } from 'src/resource/user/user.service';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
+ 
   constructor(
-    // private userService: UserService,
+    private userService: UserService,
     private reflector: Reflector,
   ) {}
   logger = new Logger();
@@ -36,10 +37,10 @@ export class AuthGuard implements CanActivate {
       const decoded = jwt.verify(token, appConfig().appSecret) as any;
 
 
-      // const user = await this.userService.findOne(decoded.email);
+      const user = await this.userService.getUserByEmailOrPhone(decoded.email);
 
 
-      // request.user = user;
+      request.user = user;
    
 
       return true;

@@ -70,6 +70,7 @@ export class AuthService {
 
   async login(dto: LoginUser) {
     try {
+      dto.email = dto.email.toLowerCase()
       if (dto.email != null) {
         let user = await this.model.findOne({ email: dto.email });
 

@@ -28,8 +28,10 @@ export class UserService {
 
   async getUserByEmailOrPhone(email: string,) {
     try {
-     
-        return await this.model.findOne({email})
+   
+        const res = await this.model.findOne({email: email})
+    
+        return res
     } catch (error) {
       throw new HttpException('server error', 500)
     }

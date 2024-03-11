@@ -39,20 +39,22 @@ import {
   
     async getAllCategories(estimate: boolean) {
       try {
+      
         let categories = await this.model
-          .find({ estimate: estimate ? estimate : { $ne: true } })
+          .find({ estimate: estimate ? estimate : { $ne: true }})
           .where('isParent')
-          .equals(true)
-          .populate(
-            'subCategory',
-            'id name subCategory filters  href english viewFilters',
-            this.model,
-          )
+          // .equals(true)
+          // .populate(
+          //   'subCategory',
+          //   'id name subCategory filters  href english viewFilters',
+          //   this.model,
+          // )
           .exec();
         if (!categories) throw new ForbiddenException('not found');
   
         return categories;
       } catch (error) {
+        console.log(error);
         throw new HttpException('server error', 500);
       }
     }

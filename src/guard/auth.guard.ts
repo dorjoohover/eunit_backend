@@ -12,7 +12,6 @@ import { UserService } from 'src/resource/user/user.service';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
- 
   constructor(
     private userService: UserService,
     private reflector: Reflector,
@@ -36,12 +35,9 @@ export class AuthGuard implements CanActivate {
 
       const decoded = jwt.verify(token, appConfig().appSecret) as any;
 
-
-      const user = await this.userService.getUserByEmailOrPhone(decoded.email);
-
+      const user = await this.userService.getUserByEmailOrPhone(decoded);
 
       request.user = user;
-   
 
       return true;
     } catch (e) {

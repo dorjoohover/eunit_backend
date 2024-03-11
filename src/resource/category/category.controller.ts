@@ -15,21 +15,20 @@ export class CategoryController {
     return this.service.createCategory(dto);
   }
 
-  @Get()
+  @Get('all')
+  @ApiParam({ name: 'estimate' })
   @ApiOperation({ description: 'buh category g awah' })
-  getAllCategories() {
-    return this.service.getAllCategories(false);
+  getAllCategories(@Param('estimate') estimate: boolean) {
+    console.log(estimate);
+    return this.service.getAllCategories(estimate);
   }
 
-  @Get('estimate')
-  getAllEstimates() {
-    return this.service.getAllCategories(true);
-  }
+
   @ApiParam({ name: 'id' })
-  @Get(':id')
+  @Get('get/:id')
   @ApiOperation({ description: 'category g id gaar ni awah ' })
-  getCategoryById(@Param() params) {
-    return this.service.getCategoryById(params.id);
+  getCategoryById(@Param("id") id: string) {
+    return this.service.getCategoryById(id);
   }
 
   @ApiParam({ name: 'id' })

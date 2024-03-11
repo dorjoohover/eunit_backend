@@ -29,6 +29,6 @@ export class LoginUser {
   profileImg: string;
 
   @ApiProperty()
-  @IsEmail()
+  // @IsEmail()
   email: string;
 }

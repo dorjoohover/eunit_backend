@@ -39,6 +39,7 @@ import { AuthGuard } from 'src/guard/auth.guard';
     @ApiBearerAuth('access-token')
     @Get('me')
     async getUserByEmail(@Request() { user }) {
+    
       if (!user) return null;
   
       let res = await this.model
@@ -49,7 +50,7 @@ import { AuthGuard } from 'src/guard/auth.guard';
       return res;
     }
   
-    @Get(':id')
+    @Get('get/:id')
     @ApiParam({ name: 'id' })
     async getUserById(@Param('id') id: string) {
       return this.service.getUserById(id);

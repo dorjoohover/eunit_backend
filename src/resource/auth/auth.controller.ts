@@ -72,6 +72,7 @@ export class AuthController {
   @Post('login')
   @ApiOperation({ description: 'login hiih' })
   async login(@Body() dto: LoginUser) {
+    
     const user = await this.service.login(dto);
     if (user.status) {
       const token = await this.service.signPayload(user.user.email);

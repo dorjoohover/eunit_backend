@@ -26,7 +26,7 @@ export class AppController {
     };
   }
 
-  @Get(':file')
+  @Get('/file/:file')
   @ApiParam({ name: 'file' })
   getFile(@Param('file') filename: string): StreamableFile {
     const file = createReadStream(

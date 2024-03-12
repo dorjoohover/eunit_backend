@@ -9,7 +9,6 @@ import {
   ItemTypes,
 } from 'src/utils/enum';
 
-
 export type AdDocument = Document & Ad;
 
 export class AdItems {

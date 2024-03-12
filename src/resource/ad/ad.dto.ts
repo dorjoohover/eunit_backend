@@ -69,6 +69,10 @@ export class AdDto {
   title: string;
 
   @ApiProperty()
+  unitPrice: number;
+  @ApiProperty()
+  area: number;
+  @ApiProperty()
   @IsArray()
   images: [];
 

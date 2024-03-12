@@ -19,15 +19,13 @@ export class CategoryController {
   @ApiParam({ name: 'estimate' })
   @ApiOperation({ description: 'buh category g awah' })
   getAllCategories(@Param('estimate') estimate: boolean) {
-    console.log(estimate);
     return this.service.getAllCategories(estimate);
   }
-
 
   @ApiParam({ name: 'id' })
   @Get('get/:id')
   @ApiOperation({ description: 'category g id gaar ni awah ' })
-  getCategoryById(@Param("id") id: string) {
+  getCategoryById(@Param('id') id: string) {
     return this.service.getCategoryById(id);
   }
 

@@ -34,6 +34,7 @@ export class ItemsService {
   async findAll() {
     try {
       let items = await this.model.find();
+
       return items;
     } catch (error) {
       throw new HttpException(error, 500);
@@ -61,7 +62,7 @@ export class ItemsService {
     }
   }
 
-  async updateItemById(id: string , dto: ItemDto) {
+  async updateItemById(id: string, dto: ItemDto) {
     try {
       let item = await this.model.findByIdAndUpdate(id, dto);
       return item;

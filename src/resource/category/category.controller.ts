@@ -45,6 +45,7 @@ export class CategoryController {
   updateCategoryId(@Param('id') id: string, @Body() dto: CategoryDto) {
     return this.service.updateCategoryById(id, dto);
   }
+
   // @Delete()
   // deleteAllCategory() {
   //     return this.service.deleteAllCategory()

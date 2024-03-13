@@ -167,18 +167,18 @@ export class AdController {
   @ApiParam({ name: 'self' })
   @ApiOperation({ description: 'images by multi ids' })
   async manyAdById(
-    @Body() dto: [],
+    @Body()
+    dto: {
+      dto: string[];
+      cateId?: string;
+    },
     @Param('num') num: number,
-    @Param('self') self: string,
+    @Param('self') self: boolean,
     @Param('limit') limit: number,
     @Param('status') status: AdStatus,
     @Param('type') type: AdTypes,
   ) {
-    if (self == 'true') {
-      return this.service.getManyAds(dto, num, type, true, limit, status);
-    } else {
-      return this.service.getManyAds(dto, num, type, false, limit, status);
-    }
+    return this.service.getManyAds(dto, num, type, self, limit, status);
   }
 
   @Get('adType/:id/:type/:message/')
@@ -252,19 +252,57 @@ export class AdController {
   }
 
   @ApiOperation({ description: 'filter ad' })
-  @Post('filter/:num')
+  @Post('filter/:num/:type')
   @ApiParam({ name: 'num' })
-  async getFilterAd(@Param('num') num: number, @Body() dto: FilterDto) {
-    let defaultAds = await this.service.filterAd(
-      dto,
-      num,
-      10,
-      AdTypes.default,
-      dto.cateId,
-    );
-    let special = await this.service.filterAd(dto, num, 4, AdTypes.special, '');
-    return { defaultAds: defaultAds, specialAds: special };
+  @ApiParam({ name: 'type' })
+  async getFilterAd(
+    @Param('num') num: number,
+    @Param('type') type: AdTypes,
+    @Body() dto: FilterDto,
+  ) {
+    if (type == AdTypes.all) {
+      let defaultAds = await this.service.filterAd(
+        dto,
+        num,
+        10,
+        AdTypes.default,
+        dto.cateId,
+      );
+      let special = await this.service.filterAd(
+        dto,
+        num,
+        4,
+        AdTypes.special,
+        '',
+      );
+      return { defaultAds: defaultAds, specialAds: special };
+    }
+    if (type == AdTypes.any) {
+      return await this.service.filterAd(dto, num, 12, AdTypes.all, dto.cateId);
+    } else {
+      return await this.service.filterAd(
+        dto,
+        num,
+        type == AdTypes.default ? 10 : 4,
+        type,
+        type == AdTypes.default ? dto.cateId : '',
+      );
+    }
   }
+  // @ApiOperation({ description: 'filter ad' })
+  // @Post('filter/:num')
+  // @ApiParam({ name: 'num' })
+  // async getFilterAd(@Param('num') num: number, @Body() dto: FilterDto) {
+  //   let defaultAds = await this.service.filterAd(
+  //     dto,
+  //     num,
+  //     10,
+  //     AdTypes.default,
+  //     dto.cateId,
+  //   );
+  //   let special = await this.service.filterAd(dto, num, 4, AdTypes.special, '');
+  //   return { defaultAds: defaultAds, specialAds: special };
+  // }
 
   @ApiOperation({ description: 'filter and suggest ad by value ' })
   @Post('/category/filter/:cateId/:num')

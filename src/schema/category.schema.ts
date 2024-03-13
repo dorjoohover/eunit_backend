@@ -2,7 +2,6 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { Document } from 'mongoose';
 import { CreateAdSteps } from 'src/utils/enum';
 
-
 export type CategoryDocument = Document & Category;
 export class CategorySteps {
   @Prop({ type: String, enum: CreateAdSteps })
@@ -20,10 +19,10 @@ export class Category {
   @Prop()
   english: string;
 
-  @Prop({ default: null, type: mongoose.Types.ObjectId, ref: 'categories' })
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'categories' })
   parent?: string;
 
-  @Prop({type: Array<CategorySteps>})
+  @Prop({ type: Array<CategorySteps> })
   steps: CategorySteps[];
 
   @Prop()

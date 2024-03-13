@@ -5,7 +5,7 @@ import {
   Injectable,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import mongoose, { Model } from 'mongoose';
+import mongoose, { Model, Types } from 'mongoose';
 
 import { Category, CategoryDocument, Item, ItemDocument } from 'src/schema';
 import { CategoryDto } from './category.dto';
@@ -40,7 +40,10 @@ export class CategoryService {
   async getAllCategories(estimate: boolean) {
     try {
       let categories = await this.model
-        .find({ estimate: estimate ? estimate : { $ne: true }, parent: null })
+        .find({
+          estimate: estimate ? estimate : { $ne: true },
+          parent: null,
+        })
         .where('isParent')
         // .equals(true)
         .populate(
@@ -49,6 +52,7 @@ export class CategoryService {
           this.model,
         )
         .exec();
+
       if (!categories) throw new ForbiddenException('not found');
 
       return categories;

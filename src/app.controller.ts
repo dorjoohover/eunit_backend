@@ -3,6 +3,7 @@ import {
   Get,
   Param,
   Post,
+  Res,
   StreamableFile,
   UploadedFile,
   UploadedFiles,
@@ -11,9 +12,11 @@ import {
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { ApiParam } from '@nestjs/swagger';
 import * as path from 'path';
-import { diskStorage } from 'multer';
 import { createReadStream } from 'fs';
+import { join } from 'path';
 import { multerOptions } from './multer.config';
+import type { Response } from 'express';
+
 @Controller()
 export class AppController {
   constructor() {}
@@ -44,12 +47,10 @@ export class AppController {
     };
   }
 
-  @Get('/file/:file')
+  @Get(':file')
   @ApiParam({ name: 'file' })
   getFile(@Param('file') filename: string): StreamableFile {
-    const file = createReadStream(
-      path.join(__dirname, '../uploads/' + filename),
-    );
+    const file = createReadStream(path.join('./uploads/' + filename));
     return new StreamableFile(file);
   }
 }

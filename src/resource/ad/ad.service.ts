@@ -5,7 +5,7 @@ import {
   Injectable,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import mongoose, { Model, Types } from 'mongoose';
 import { AdStatus, AdTypes, AdView } from 'src/utils/enum';
 import {
   Ad,
@@ -34,15 +34,19 @@ export class AdService {
     let adNum = 1;
     if (prevAd) adNum = prevAd?.num + 1;
     try {
+      let cateId = new Types.ObjectId(dto.category);
+      let subCateId = new Types.ObjectId(dto.subCategory);
+      let u = new Types.ObjectId(user);
+
       let ad = await this.model.create({
         num: adNum,
-        user: user,
+        user: u,
         images: dto.images,
         title: dto.title,
         description: dto.description,
         location: dto.location,
-        category: dto.category,
-        subCategory: dto.subCategory,
+        category: cateId,
+        subCategory: subCateId,
         sellType: dto.sellType,
         items: dto.items,
         adType: dto.adType,
@@ -74,80 +78,80 @@ export class AdService {
     isType: boolean,
     status: AdStatus,
   ) {
-    let ads = await this.model.find();
-    // let ads = await this.model
-    //   .find(
-    //     isType && view
-    //       ? {
-    //           view: AdView.show,
-    //           adType:
-    //             type == AdTypes.default
-    //               ? { $in: [AdTypes.default, AdTypes.sharing] }
-    //               : type,
-    //           adStatus:
-    //             status == AdStatus.all
-    //               ? {
-    //                   $nin: [
-    //                     AdStatus.deleted,
-    //                     AdStatus.sold,
-    //                     AdStatus.timed,
-    //                     AdStatus.checking,
-    //                     AdStatus.returned,
-    //                   ],
-    //                 }
-    //               : status,
-    //         }
-    //       : isType
-    //         ? {
-    //             adStatus:
-    //               status == AdStatus.all
-    //                 ? {
-    //                     $nin: [
-    //                       AdStatus.deleted,
-    //                       AdStatus.sold,
-    //                       AdStatus.timed,
-    //                       AdStatus.checking,
-    //                       AdStatus.returned,
-    //                     ],
-    //                   }
-    //                 : status,
-    //             adType: type,
-    //           }
-    //         : view
-    //           ? {
-    //               view: AdView.show,
-    //               adStatus:
-    //                 status == AdStatus.all
-    //                   ? {
-    //                       $nin: [
-    //                         AdStatus.deleted,
-    //                         AdStatus.sold,
-    //                         AdStatus.timed,
-    //                         AdStatus.checking,
-    //                       ],
-    //                     }
-    //                   : status,
-    //             }
-    //           : {
-    //               adStatus:
-    //                 status == AdStatus.all
-    //                   ? {
-    //                       $nin: [
-    //                         AdStatus.deleted,
-    //                         AdStatus.sold,
-    //                         AdStatus.timed,
-    //                       ],
-    //                     }
-    //                   : status,
-    //               adType: { $ne: AdTypes.sharing },
-    //             },
-    //   )
-    //   .populate('user', 'id phone email username profileImg', this.userModel)
-    //   .populate('category', 'id name', this.categoryModel)
-    //   .populate('subCategory', 'id name', this.categoryModel)
-    //   .limit(limit)
-    //   .skip(num * limit)
-    //   .sort({ updatedAt: 'desc' });
+    // let all = await this.model.find();
+    let ads = await this.model
+      .find(
+        isType && view
+          ? {
+              view: AdView.show,
+              adType:
+                type == AdTypes.default
+                  ? { $in: [AdTypes.default, AdTypes.sharing] }
+                  : type,
+              adStatus:
+                status == AdStatus.all
+                  ? {
+                      $nin: [
+                        AdStatus.deleted,
+                        AdStatus.sold,
+                        AdStatus.timed,
+                        AdStatus.checking,
+                        AdStatus.returned,
+                      ],
+                    }
+                  : status,
+            }
+          : isType
+            ? {
+                adStatus:
+                  status == AdStatus.all
+                    ? {
+                        $nin: [
+                          AdStatus.deleted,
+                          AdStatus.sold,
+                          AdStatus.timed,
+                          AdStatus.checking,
+                          AdStatus.returned,
+                        ],
+                      }
+                    : status,
+                adType: type,
+              }
+            : view
+              ? {
+                  view: AdView.show,
+                  adStatus:
+                    status == AdStatus.all
+                      ? {
+                          $nin: [
+                            AdStatus.deleted,
+                            AdStatus.sold,
+                            AdStatus.timed,
+                            AdStatus.checking,
+                          ],
+                        }
+                      : status,
+                }
+              : {
+                  adStatus:
+                    status == AdStatus.all
+                      ? {
+                          $nin: [
+                            AdStatus.deleted,
+                            AdStatus.sold,
+                            AdStatus.timed,
+                          ],
+                        }
+                      : status,
+                  adType: { $ne: AdTypes.sharing },
+                },
+      )
+      .populate('user', 'id phone email username profileImg', this.userModel)
+      .populate('category', 'id name', this.categoryModel)
+      .populate('subCategory', 'id name', this.categoryModel)
+      .limit(limit)
+      .skip(num * limit)
+      .sort({ updatedAt: 'desc' });
 
     if (!ads) throw new HttpException('not found ads', HttpStatus.BAD_REQUEST);
     return { ads: ads, limit: ads.length };
@@ -355,7 +359,10 @@ export class AdService {
   }
 
   async getManyAds(
-    dto: [],
+    dto: {
+      dto: string[];
+      cateId?: string;
+    },
     num: number,
     type: AdTypes,
     isView: boolean,
@@ -364,16 +371,34 @@ export class AdService {
   ) {
     let ads = [],
       limit = 0;
+
     try {
-      ads = await this.model
-        .find(
-          isView
-            ? {
-                _id: { $in: dto },
-                view: { $ne: AdView.end },
-                adType: type == 'all' ? { $nin: [AdTypes.all] } : type,
+      let body = isView
+        ? {
+            $and: [
+              {
+                $or: [
+                  {
+                    subCategory:
+                      dto.cateId == undefined
+                        ? { $ne: '641c932bf60152dbf901c070' }
+                        : dto.cateId,
+                  },
+                  {
+                    category:
+                      dto.cateId == undefined
+                        ? { $ne: '641c932bf60152dbf901c070' }
+                        : dto.cateId,
+                  },
+                ],
+              },
+              { _id: { $in: dto.dto } },
+              { view: { $ne: AdView.end } },
+              { adType: type == AdTypes.all ? { $nin: [AdTypes.all] } : type },
+
+              {
                 adStatus:
-                  status == 'all'
+                  status == AdStatus.all
                     ? {
                         $nin: [
                           AdStatus.deleted,
@@ -384,11 +409,34 @@ export class AdService {
                         ],
                       }
                     : status,
-              }
-            : {
+              },
+            ],
+          }
+        : {
+            $and: [
+              {
                 _id: { $in: dto },
-                view: AdView.show,
-                adType: type == 'all' ? { $nin: [AdTypes.sharing] } : type,
+              },
+              {
+                $or: [
+                  {
+                    subCategory:
+                      dto.cateId == undefined
+                        ? { $ne: '641c932bf60152dbf901c070' }
+                        : dto.cateId,
+                  },
+                  {
+                    category:
+                      dto.cateId == undefined
+                        ? { $ne: '641c932bf60152dbf901c070' }
+                        : dto.cateId,
+                  },
+                ],
+              },
+
+              { view: AdView.show },
+              { adType: type == 'all' ? { $nin: [AdTypes.sharing] } : type },
+              {
                 adStatus:
                   status == 'all'
                     ? {
@@ -402,14 +450,18 @@ export class AdService {
                       }
                     : status,
               },
-        )
+            ],
+          };
+      ads = await this.model
+        .find(body)
         .populate('category', 'id name', this.categoryModel)
         .populate('subCategory', 'id name', this.categoryModel)
         .limit((num + 1) * l)
         .skip(num * l)
         .sort({ updatedAt: 'desc' });
-      limit = ads.length;
+      limit = await this.model.find(body).countDocuments();
     } catch (error) {
+      console.log(error);
       throw new HttpException(error, 500);
     }
 
@@ -537,36 +589,38 @@ export class AdService {
     cateId: string,
   ) {
     try {
+      const body = {
+        $or:
+          dto.items?.length > 0
+            ? dto.items.map((d) => ({
+                'items.id': d.id,
+                'items.value':
+                  d.value != undefined ? d.value : { $gte: d.min, $lte: d.max },
+              }))
+            : [{ 'items.id': { $ne: '' } }],
+        view: AdView.show,
+        adStatus: {
+          $nin: [
+            AdStatus.deleted,
+            AdStatus.sold,
+            AdStatus.timed,
+            AdStatus.checking,
+          ],
+        },
+        adType: type == AdTypes.all ? { $ne: AdTypes.all } : type,
+        subCategory:
+          cateId == '' ? { $ne: '641c932bf60152dbf901c070' } : cateId,
+        category: cateId == '' ? { $ne: '641c932bf60152dbf901c070' } : cateId,
+        sellType: dto.types.length > 0 ? { $in: dto.types } : { $nin: [] },
+      };
       let ads = await this.model
-        .find({
-          $or:
-            dto.items?.length > 0
-              ? dto.items.map((d) => ({
-                  'items.id': d.id,
-                  'items.value':
-                    d.value != undefined
-                      ? d.value
-                      : { $gte: d.min, $lte: d.max },
-                }))
-              : [{ 'items.id': { $ne: '' } }],
-          view: AdView.show,
-          adStatus: {
-            $nin: [
-              AdStatus.deleted,
-              AdStatus.sold,
-              AdStatus.timed,
-              AdStatus.checking,
-            ],
-          },
-          adType: type == AdTypes.all ? { $ne: AdTypes.all } : type,
-          subCategory:
-            cateId == '' ? { $ne: '641c932bf60152dbf901c070' } : cateId,
-          sellType: dto.types.length > 0 ? { $in: dto.types } : { $nin: [] },
-        })
+        .find(body)
         .limit(num * limit)
         .skip((num == 0 ? 0 : num - 1) * limit)
         .sort({ updatedAt: 'desc' });
-      return { ads: ads, limit: ads.length };
+      let l = await this.model.find(body).countDocuments();
+
+      return { ads: ads, limit: l };
     } catch (error) {
       throw new HttpException(error.message, 500);
     }

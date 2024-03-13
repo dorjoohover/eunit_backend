@@ -33,6 +33,7 @@ export enum AdTypes {
   default = 'default',
   poster = 'poster',
   all = 'all',
+  any = 'any',
 }
 
 export enum AdView {

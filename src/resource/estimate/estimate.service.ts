@@ -61,7 +61,8 @@ export class EstimateService {
 
   async deleteEstimate(id: string) {
     try {
-      return await this.model.deleteOne({ _id: id });
+      await this.model.deleteOne({ _id: id });
+      return true;
     } catch (error) {
       throw new HttpException(error.message, 500);
     }

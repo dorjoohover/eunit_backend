@@ -17,6 +17,7 @@ import {
 } from 'src/schema';
 import { CategoryService } from '../category/category.service';
 import { AdDto, FilterDto } from './ad.dto';
+import { ObjectId } from 'mongodb';
 
 @Injectable()
 export class AdService {
@@ -29,24 +30,22 @@ export class AdService {
 
   async createAd(dto: AdDto, user: string) {
     let prevAd = await this.model
-      .findOne({ user: user })
-      .sort({ createdAt: 'desc' });
-    let adNum = 1;
-    if (prevAd) adNum = prevAd?.num + 1;
-    try {
-      let cateId = new Types.ObjectId(dto.category);
-      let subCateId = new Types.ObjectId(dto.subCategory);
-      let u = new Types.ObjectId(user);
+      .find({}, null, { sort: { num: -1 } })
+      .limit(1);
 
+    let adNum = 1;
+
+    if (prevAd) adNum = prevAd?.[0]?.num + 1;
+    try {
       let ad = await this.model.create({
         num: adNum,
-        user: u,
+        user: user,
         images: dto.images,
         title: dto.title,
         description: dto.description,
         location: dto.location,
-        category: cateId,
-        subCategory: subCateId,
+        category: dto.category,
+        subCategory: dto.subCategory,
         sellType: dto.sellType,
         items: dto.items,
         adType: dto.adType,
@@ -78,16 +77,29 @@ export class AdService {
     isType: boolean,
     status: AdStatus,
   ) {
-    // let all = await this.model.find();
-    let ads = await this.model
-      .find(
-        isType && view
+    const body =
+      isType && view
+        ? {
+            view: AdView.show,
+            adType:
+              type == AdTypes.default
+                ? { $in: [AdTypes.default, AdTypes.sharing] }
+                : type,
+            adStatus:
+              status == AdStatus.all
+                ? {
+                    $nin: [
+                      AdStatus.deleted,
+                      AdStatus.sold,
+                      AdStatus.timed,
+                      AdStatus.checking,
+                      AdStatus.returned,
+                    ],
+                  }
+                : status,
+          }
+        : isType
           ? {
-              view: AdView.show,
-              adType:
-                type == AdTypes.default
-                  ? { $in: [AdTypes.default, AdTypes.sharing] }
-                  : type,
               adStatus:
                 status == AdStatus.all
                   ? {
@@ -100,9 +112,11 @@ export class AdService {
                       ],
                     }
                   : status,
+              adType: type,
             }
-          : isType
+          : view
             ? {
+                view: AdView.show,
                 adStatus:
                   status == AdStatus.all
                     ? {
@@ -111,50 +125,29 @@ export class AdService {
                           AdStatus.sold,
                           AdStatus.timed,
                           AdStatus.checking,
-                          AdStatus.returned,
                         ],
                       }
                     : status,
-                adType: type,
               }
-            : view
-              ? {
-                  view: AdView.show,
-                  adStatus:
-                    status == AdStatus.all
-                      ? {
-                          $nin: [
-                            AdStatus.deleted,
-                            AdStatus.sold,
-                            AdStatus.timed,
-                            AdStatus.checking,
-                          ],
-                        }
-                      : status,
-                }
-              : {
-                  adStatus:
-                    status == AdStatus.all
-                      ? {
-                          $nin: [
-                            AdStatus.deleted,
-                            AdStatus.sold,
-                            AdStatus.timed,
-                          ],
-                        }
-                      : status,
-                  adType: { $ne: AdTypes.sharing },
-                },
-      )
+            : {
+                adStatus:
+                  status == AdStatus.all
+                    ? {
+                        $nin: [AdStatus.deleted, AdStatus.sold, AdStatus.timed],
+                      }
+                    : status,
+                adType: { $ne: AdTypes.sharing },
+              };
+    let ads = await this.model
+      .find(body, null, { sort: { updatedAt: -1 } })
       .populate('user', 'id phone email username profileImg', this.userModel)
       .populate('category', 'id name', this.categoryModel)
       .populate('subCategory', 'id name', this.categoryModel)
       .limit(limit)
-      .skip(num * limit)
-      .sort({ updatedAt: 'desc' });
-
+      .skip(num * limit);
+    let l = await this.model.find(body).countDocuments();
     if (!ads) throw new HttpException('not found ads', HttpStatus.BAD_REQUEST);
-    return { ads: ads, limit: ads.length };
+    return { ads: ads, limit: l };
   }
 
   async getAdsExcel(type: AdTypes) {
@@ -589,15 +582,25 @@ export class AdService {
     cateId: string,
   ) {
     try {
+      let cate = [
+        {
+          subCategory:
+            cateId == '' ? { $ne: '641c932bf60152dbf901c070' } : cateId,
+        },
+        {
+          category: cateId == '' ? { $ne: '641c932bf60152dbf901c070' } : cateId,
+        },
+      ];
+      let items =
+        dto.items?.length > 0
+          ? dto.items.map((d) => ({
+              'items.id': d.id,
+              'items.value':
+                d.value != undefined ? d.value : { $gte: d.min, $lte: d.max },
+            }))
+          : [...[{ 'items.id': { $ne: '' } }]];
       const body = {
-        $or:
-          dto.items?.length > 0
-            ? dto.items.map((d) => ({
-                'items.id': d.id,
-                'items.value':
-                  d.value != undefined ? d.value : { $gte: d.min, $lte: d.max },
-              }))
-            : [{ 'items.id': { $ne: '' } }],
+        $and: [{ $or: cate }, { $or: items }],
         view: AdView.show,
         adStatus: {
           $nin: [
@@ -608,9 +611,7 @@ export class AdService {
           ],
         },
         adType: type == AdTypes.all ? { $ne: AdTypes.all } : type,
-        subCategory:
-          cateId == '' ? { $ne: '641c932bf60152dbf901c070' } : cateId,
-        category: cateId == '' ? { $ne: '641c932bf60152dbf901c070' } : cateId,
+
         sellType: dto.types.length > 0 ? { $in: dto.types } : { $nin: [] },
       };
       let ads = await this.model

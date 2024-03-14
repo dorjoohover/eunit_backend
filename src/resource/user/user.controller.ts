@@ -50,7 +50,7 @@ export class UserController {
           'id username phone email',
           this.model,
         );
-      console.log(res);
+  
 
       return res;
     } catch (error) {
@@ -205,12 +205,20 @@ export class UserController {
   }
   @UseGuards(AuthGuard)
   @ApiBearerAuth('access-token')
-  @Patch('bookmark')
-  async bookmark(@Request() { user }, @Body() dto: string) {
+  @ApiParam({name: 'id'})
+  @Patch('bookmark/:id')
+  async bookmark(@Request() { user }:{user: User}, @Param('id') id: number) {
     try {
-      return this.model.findByIdAndUpdate(user['_id'], {
-        bookmarks: dto,
-      });
+      const body = user.bookmarks.includes(id) ? {
+        $pull: {
+          bookmarks: id
+        }
+      } : {
+        $push: {
+          bookmarks: id
+        }
+      }
+      return this.model.findByIdAndUpdate(user['_id'],body);
     } catch (error) {
       throw new HttpException(error.message, 500);
     }

@@ -36,11 +36,8 @@ export class AdService {
     let adNum = 1;
 
     if (prevAd) adNum = prevAd?.[0]?.num + 1;
-<<<<<<< HEAD
 
     if(isNaN(adNum)) adNum = 1
-=======
->>>>>>> 94514662ffe0731313ff7352d05320b9fd2a98de
     try {
       let ad = await this.model.create({
         num: adNum,

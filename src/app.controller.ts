@@ -42,7 +42,6 @@ export class AppController {
   @UseInterceptors(FilesInterceptor('files', 8, multerOptions))
   async multiFileUpload(@UploadedFiles() file: Array<Express.Multer.File>) {
     const files = file.map((f) => f.filename);
-
     return {
       file: files,
     };

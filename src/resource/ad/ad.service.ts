@@ -5,7 +5,7 @@ import {
   Injectable,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import mongoose, { Model, Types } from 'mongoose';
+import mongoose, { Model, Types, isValidObjectId } from 'mongoose';
 import { AdStatus, AdTypes, AdView } from 'src/utils/enum';
 import {
   Ad,
@@ -37,7 +37,7 @@ export class AdService {
 
     if (prevAd) adNum = prevAd?.[0]?.num + 1;
 
-    if(isNaN(adNum)) adNum = 1
+    if (isNaN(adNum)) adNum = 1;
     try {
       let ad = await this.model.create({
         num: adNum,
@@ -58,7 +58,6 @@ export class AdService {
       });
       await this.userModel.findByIdAndUpdate(user, {
         $push: { ads: ad._id },
-        
       });
       if (ad.adType == AdTypes.sharing) {
         await this.userModel.findByIdAndUpdate(user, {
@@ -367,7 +366,9 @@ export class AdService {
   ) {
     let ads = [],
       limit = 0;
-
+    let isNum = false;
+    if (!isValidObjectId(dto.dto?.[0])) isNum = true;
+    
     try {
       let body = isView
         ? {
@@ -388,7 +389,7 @@ export class AdService {
                   },
                 ],
               },
-              { _id: { $in: dto.dto } },
+             isNum ?{ num: { $in: dto.dto }}  : { _id: { $in: dto.dto } },
               { view: { $ne: AdView.end } },
               { adType: type == AdTypes.all ? { $nin: [AdTypes.all] } : type },
 
@@ -456,6 +457,10 @@ export class AdService {
         .skip(num * l)
         .sort({ updatedAt: 'desc' });
       limit = await this.model.find(body).countDocuments();
+      return {
+        ads: ads,
+        limit: limit,
+      };
     } catch (error) {
       console.log(error);
       throw new HttpException(error, 500);

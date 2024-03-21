@@ -9,6 +9,10 @@ async function bootstrap() {
   app.enableCors();
   app.useGlobalPipes(new ValidationPipe());
   setupSwagger(app)
+<<<<<<< HEAD
   await app.listen(5050, 'localhost');
+=======
+  await app.listen(5050, '0.0.0.0');
+>>>>>>> 1be88f271c48753360190e298cd7b0e0d36d945d
 }
 bootstrap();

@@ -355,7 +355,7 @@ export class AdService {
 
   async getManyAds(
     dto: {
-      dto: string[];
+      dto?: string[];
       cateId?: string;
     },
     num: number,
@@ -368,7 +368,7 @@ export class AdService {
       limit = 0;
     let isNum = false;
     if (!isValidObjectId(dto.dto?.[0])) isNum = true;
-    
+
     try {
       let body = isView
         ? {
@@ -389,9 +389,16 @@ export class AdService {
                   },
                 ],
               },
-             isNum ?{ num: { $in: dto.dto }}  : { _id: { $in: dto.dto } },
+              isNum
+                ? { num: { $in: dto.dto } }
+                : { _id: { $in: dto.dto ?? [] } },
               { view: { $ne: AdView.end } },
-              { adType: type == AdTypes.all ? { $nin: [AdTypes.all] } : type },
+              {
+                adType:
+                  type == AdTypes.all
+                    ? { $nin: [AdTypes.all, AdTypes.sharing] }
+                    : type,
+              },
 
               {
                 adStatus:
@@ -457,6 +464,7 @@ export class AdService {
         .skip(num * l)
         .sort({ updatedAt: 'desc' });
       limit = await this.model.find(body).countDocuments();
+
       return {
         ads: ads,
         limit: limit,

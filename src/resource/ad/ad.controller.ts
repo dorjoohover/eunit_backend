@@ -184,7 +184,7 @@ export class AdController {
   @Get('adType/:id/:type/:message/')
   @ApiParam({ name: 'id' })
   @ApiParam({ name: 'type' })
-  @ApiQuery({ name: 'message' })
+@ApiQuery({ name: 'message' })
   @UseGuards(AuthGuard)
   @ApiBearerAuth('access-token')
   @ApiOperation({ description: 'change ad type' })

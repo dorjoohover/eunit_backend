@@ -50,7 +50,6 @@ export class UserController {
           'id username phone email',
           this.model,
         );
-  
 
       return res;
     } catch (error) {
@@ -143,38 +142,49 @@ export class UserController {
     @Param('type') type,
     @Query('message') message: string,
   ) {
-    if (!user) throw new HttpException('user not found', 400);
-    let receiver = await this.service.getUserById(id);
-    if (!receiver) return { message: 'not found receiver', status: 400 };
-    if (user.point >= point) {
-      user.point =
-        Number.parseFloat(user.point.toString()) -
-        Number.parseFloat(point.toString());
-      user.pointHistory.splice(0, 0, {
-        point: point,
-        sender: user['_id'],
-        receiver: receiver._id,
-        type: PointSendType.sender,
-        title: type,
-        message: message ?? '',
-      });
-      await user.save();
-      receiver.point =
-        Number.parseFloat(receiver.point.toString()) +
-        Number.parseFloat(point.toString());
-      receiver.pointHistory.push({
-        point: point,
-        sender: user['_id'],
-        receiver: receiver._id,
-        type: PointSendType.receiver,
-        title: type,
-        message: message ?? '',
-      });
-      await receiver.save();
+    try {
+      if (!user) throw new HttpException('user not found', 400);
+      let receiver = await this.service.getUserById(id);
+      if (!receiver) return { message: 'not found receiver', status: 400 };
 
-      return { message: 'success', status: 200 };
+      if (user.point >= point) {
+        await this.service.updatePointHistory(
+          user['_id'],
+          {
+            point: point,
+            sender: user['_id'],
+            receiver: receiver._id,
+            type: PointSendType.sender,
+            title: type,
+            message: message ?? '',
+          },
+          Number.parseFloat(user.point.toString()) -
+            Number.parseFloat(point.toString()),
+        );
+        user.point =
+          Number.parseFloat(user.point.toString()) -
+          Number.parseFloat(point.toString());
+        await this.service.updatePointHistory(
+          receiver._id,
+          {
+            point: point,
+            sender: user['_id'],
+            receiver: receiver._id,
+            type: PointSendType.receiver,
+            title: type,
+            message: message ?? '',
+          },
+
+          Number.parseFloat(receiver.point.toString()) +
+            Number.parseFloat(point.toString()),
+        );
+
+        return { message: 'success', status: 200 };
+      }
+      return { message: 'not enough points', status: 400 };
+    } catch (error) {
+      console.log(error);
     }
-    return { message: 'not enough points', status: 400 };
   }
 
   @UseGuards(AuthGuard)
@@ -205,20 +215,22 @@ export class UserController {
   }
   @UseGuards(AuthGuard)
   @ApiBearerAuth('access-token')
-  @ApiParam({name: 'id'})
+  @ApiParam({ name: 'id' })
   @Patch('bookmark/:id')
-  async bookmark(@Request() { user }:{user: User}, @Param('id') id: number) {
+  async bookmark(@Request() { user }: { user: User }, @Param('id') id: number) {
     try {
-      const body = user.bookmarks.includes(id) ? {
-        $pull: {
-          bookmarks: id
-        }
-      } : {
-        $push: {
-          bookmarks: id
-        }
-      }
-      return this.model.findByIdAndUpdate(user['_id'],body);
+      const body = user.bookmarks.includes(id)
+        ? {
+            $pull: {
+              bookmarks: id,
+            },
+          }
+        : {
+            $push: {
+              bookmarks: id,
+            },
+          };
+      return this.model.findByIdAndUpdate(user['_id'], body);
     } catch (error) {
       throw new HttpException(error.message, 500);
     }

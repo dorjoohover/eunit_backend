@@ -3,7 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import mongoose, { Model } from 'mongoose';
 import { UserType } from 'src/utils/enum';
 import { User, UserDocument } from 'src/schema';
-import { UpdateUserDto } from './user.dto';
+import { PointHistory, UpdateUserDto } from './user.dto';
 
 @Injectable()
 export class UserService {
@@ -22,6 +22,18 @@ export class UserService {
   async getUserById(id: string) {
     if (mongoose.Types.ObjectId.isValid(id)) {
       return await this.model.findById(id);
+    } else {
+      return await this.model.findOne({ email: id });
+    }
+  }
+  async updatePointHistory(id: string, body: PointHistory, point: number) {
+    if (mongoose.Types.ObjectId.isValid(id)) {
+      return await this.model.findByIdAndUpdate(id, {
+        $push: {
+          pointHistory: body
+        }, 
+        point: point
+      })
     } else {
       return await this.model.findOne({ email: id });
     }

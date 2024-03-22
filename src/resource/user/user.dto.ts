@@ -1,129 +1,125 @@
-import { ApiProperty } from "@nestjs/swagger";
-import { IsEmail, IsNotEmpty, IsString } from "class-validator";
-import { PointSendType, UserStatus, UserType } from "src/utils/enum";
-import { AdLocation } from "../ad/ad.dto";
-
+import { ApiProperty } from '@nestjs/swagger';
+import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
+import {
+  PointSendType,
+  PointTitle,
+  UserStatus,
+  UserType,
+} from 'src/utils/enum';
+import { AdLocation } from '../ad/ad.dto';
 
 export class AgentAdditionDto {
-    @ApiProperty()
-    organizationName: string
-    @ApiProperty()
-    organizationContract: string
-    @ApiProperty()
-    identityCardFront: string
-    @ApiProperty()
-    identityCardBack: string
-    @ApiProperty()
-    location: AdLocation
-    @ApiProperty()
-    firstName: string
-    @ApiProperty()
-    lastName: string
-    @ApiProperty()
-    registerNumber: string
-
+  @ApiProperty()
+  organizationName: string;
+  @ApiProperty()
+  organizationContract: string;
+  @ApiProperty()
+  identityCardFront: string;
+  @ApiProperty()
+  identityCardBack: string;
+  @ApiProperty()
+  location: AdLocation;
+  @ApiProperty()
+  firstName: string;
+  @ApiProperty()
+  lastName: string;
+  @ApiProperty()
+  registerNumber: string;
 }
 export class OrganizationAdditionDto {
-    @ApiProperty()
-    organizationName: string
-    @ApiProperty()
-    organizationCertificationCopy: string
-    @ApiProperty()
-    location: AdLocation
-    @ApiProperty()
-    organizationRegisterNumber: string
+  @ApiProperty()
+  organizationName: string;
+  @ApiProperty()
+  organizationCertificationCopy: string;
+  @ApiProperty()
+  location: AdLocation;
+  @ApiProperty()
+  organizationRegisterNumber: string;
 }
 
 export class CreateUserDto {
-    @IsEmail()
-    @IsString()
-    @IsNotEmpty()
-    @ApiProperty()
-    email: string
+  @IsEmail()
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty()
+  email: string;
 
-    @IsString()
-    @IsNotEmpty()
-    @ApiProperty()
-    username: string
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty()
+  username: string;
 
-    @IsString()
-    @IsNotEmpty()
-    @ApiProperty()
-    phone: string
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty()
+  phone: string;
 
-    @IsString()
-    @IsNotEmpty()
-    @ApiProperty()
-    password: string
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty()
+  password: string;
 
-    @ApiProperty({enum: UserType, default: UserType.default})
-    userType: UserType
-
-
+  @ApiProperty({ enum: UserType, default: UserType.default })
+  userType: UserType;
 }
 export class UpdateUserDto {
+  @ApiProperty()
+  username?: string;
 
+  @ApiProperty()
+  phone?: string;
+  @ApiProperty()
+  birthday?: string;
 
-    @ApiProperty()
-    username?: string
+  @ApiProperty()
+  password?: string;
 
-    @ApiProperty()
-    phone?: string
-    @ApiProperty()
-    birthday?: string
+  @ApiProperty({ enum: UserType, default: UserType.default })
+  userType?: UserType;
+  @ApiProperty({ enum: UserStatus, default: UserStatus.active })
+  status?: UserStatus;
 
-    @ApiProperty()
-    password?: string
+  @ApiProperty()
+  socials?: any;
 
-    @ApiProperty({enum: UserType, default: UserType.default})
-    userType?: UserType
-    @ApiProperty({enum: UserStatus, default: UserStatus.active})
-    status?: UserStatus
+  @ApiProperty()
+  profileImg?: string;
 
-    @ApiProperty()
-    socials?: any
-
-    @ApiProperty()
-    profileImg?: string
-    
-    @ApiProperty()
-    agentAddition?: any
-    @ApiProperty()
-    organizationAddition?:  any
-    
+  @ApiProperty()
+  agentAddition?: any;
+  @ApiProperty()
+  organizationAddition?: any;
 }
 
 export class AddBookmarkDto {
-
-    @IsNotEmpty()
-    @ApiProperty()
-    adId: string
-
+  @IsNotEmpty()
+  @ApiProperty()
+  adId: string;
 }
 
 export class PointHistory {
-    @ApiProperty()
-    point?: number
+  @ApiProperty()
+  point?: number;
 
-    @ApiProperty()
-    sender?: string
-    @ApiProperty()
-    receiver?: string
+  @ApiProperty()
+  sender?: string;
+  @ApiProperty()
+  receiver?: string;
 
-    @ApiProperty({enum: PointSendType,})
-    type?: PointSendType
-    
-   
+  @ApiProperty({ enum: PointSendType })
+  type?: PointSendType;
 
+  @ApiProperty({ enum: PointTitle })
+  title?: PointTitle;
+
+  @ApiProperty()
+  message: string;
 }
 
-
 export class FeedbackDto {
-    
-    @ApiProperty()
-    title: string
-    @ApiProperty()
-    @IsString()
-    message: string
-
+  @ApiProperty()
+  title: string;
+  @ApiProperty()
+  @IsString()
+  message: string;
 }

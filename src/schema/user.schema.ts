@@ -113,7 +113,7 @@ export class User {
   @Prop({ type: OrganizationAddition })
   organizationAddition: OrganizationAddition;
 
-  @Prop({ type: Array<PointHistory> })
+  @Prop({ type: Array<PointHistory>, default: [] })
   pointHistory: PointHistory[];
   @Prop()
   code: string;

@@ -20,6 +20,8 @@ export class AgentAdditionDto {
   @ApiProperty()
   location: AdLocation;
   @ApiProperty()
+  address: string;
+  @ApiProperty()
   firstName: string;
   @ApiProperty()
   lastName: string;
@@ -86,9 +88,9 @@ export class UpdateUserDto {
   profileImg?: string;
 
   @ApiProperty()
-  agentAddition?: any;
+  agentAddition?: AgentAdditionDto;
   @ApiProperty()
-  organizationAddition?: any;
+  organizationAddition?: OrganizationAdditionDto;
 }
 
 export class AddBookmarkDto {

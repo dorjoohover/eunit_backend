@@ -50,7 +50,9 @@ export class UserService {
   }
 
   async editUser(user: UserDocument, dto: UpdateUserDto) {
+    
     try {
+ 
       return await this.model.findByIdAndUpdate(user['_id'], {
         phone: dto.phone ?? user.phone,
         userType: dto.userType ?? user.userType,
@@ -59,11 +61,11 @@ export class UserService {
         profileImg: dto.profileImg ?? user.profileImg,
         status: dto.status,
         agentAddition:
-          dto.userType == UserType.agent ? dto.agentAddition[0] : {},
+          dto.userType == UserType.agent ? dto.agentAddition : null,
         organizationAddition:
           dto.userType == UserType.organization
-            ? dto.organizationAddition[0]
-            : {},
+            ? dto.organizationAddition
+            : null,
       });
     } catch (error) {
       throw new HttpException('server error', 500);

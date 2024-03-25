@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import mongoose, { Model, Types, isValidObjectId } from 'mongoose';
-import { AdStatus, AdTypes, AdView } from 'src/utils/enum';
+import { AdSellType, AdStatus, AdTypes, AdView } from 'src/utils/enum';
 import {
   Ad,
   AdDocument,
@@ -588,7 +588,47 @@ export class AdService {
       throw new HttpException(error, 500);
     }
   }
+  async suggestAd(
+    id: string,
+    suggest: {
+      id: string;
+      value: string;
 
+    },
+    l: number,
+    page: number,
+  ) {
+    try {
+      let ad = await this.model.findById(id);
+      let ads = [];
+      let body = {};
+      let limit = 0;
+      let sellType = ad.sellType == AdSellType.sellRent ? [AdSellType.rent, AdSellType.sell, AdSellType.sellRent] : [ad.sellType]
+      if (suggest.id == 'map') {
+        body = {
+          view: AdView.show,
+          subCategory: ad.subCategory,
+        };
+      } else {
+        body = {
+          view: AdView.show,
+          items: { $elemMatch: { id: suggest.id, value: suggest.value } },
+        };
+      }
+      body = {
+        ...body, 
+        adStatus: AdStatus.created,
+        sellType: sellType,
+        adType: {$nin: [AdTypes.sharing]}
+      }
+      ads = await this.model.find(body).limit(l).skip(page);
+      limit = await this.model.find(body).countDocuments();
+      return {
+        ads: ads,
+        limit: limit,
+      };
+    } catch (error) {}
+  }
   // filter
   async filterAd(
     dto: FilterDto,

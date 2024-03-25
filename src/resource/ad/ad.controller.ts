@@ -24,7 +24,7 @@ import {
 } from '@nestjs/swagger';
 import mongoose from 'mongoose';
 
-import { AdStatus, AdTypes, PointSendType, UserType } from 'src/utils/enum';
+import { AdSellType, AdStatus, AdTypes, PointSendType, UserType } from 'src/utils/enum';
 
 import { AdDto, FilterDto } from './ad.dto';
 import { AdService } from './ad.service';
@@ -331,15 +331,20 @@ export class AdController {
   }
 
   @ApiOperation({ description: 'suggest ad by enum' })
-  @Post('suggestion/:cateId/:num')
-  @ApiParam({ name: 'cateId' })
+  @Post('suggestion/:id/:num/:page')
+  @ApiParam({ name: 'id' })
   @ApiParam({ name: 'num' })
+  @ApiParam({ name: 'page' })
   async getSuggestion(
-    @Body() dto: FilterDto,
+    @Body() dto: {
+      id: string;
+      value: string;
+    },
+    @Param('page') page: number,
     @Param('num') num: number,
-    @Param('cateId') cateId: string,
+    @Param('id') id: string,
   ) {
-    return await this.service.filterAd(dto, num, 4, AdTypes.all, cateId);
+    return await this.service.suggestAd(id,  dto, num, page);
   }
 
   @Get('id/:id')

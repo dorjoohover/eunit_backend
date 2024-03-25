@@ -326,14 +326,14 @@ export class AdService {
   async searchAd(value: string) {
     try {
       let defaultAds = await this.model.find({
-        $text: { $search: value },
-        isView: true,
+        title: { $regex: value, $options: 'i' },
+        view: AdView.show,
         adType: AdTypes.default,
       });
 
       let specialAds = await this.model.find({
-        $text: { $search: value },
-        isView: true,
+        title: { $regex: value, $options: 'i' },
+        view: AdView.show,
         adType: AdTypes.special,
       });
 

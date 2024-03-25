@@ -613,10 +613,12 @@ export class AdService {
         body = {
           view: AdView.show,
           items: { $elemMatch: { id: suggest.id, value: suggest.value } },
+          
         };
       }
       body = {
         ...body, 
+        _id: {$ne: ad._id},
         adStatus: AdStatus.created,
         sellType: sellType,
         adType: {$nin: [AdTypes.sharing]}

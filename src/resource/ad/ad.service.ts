@@ -603,7 +603,7 @@ export class AdService {
       let ads = [];
       let body = {};
       let limit = 0;
-      let sellType = ad.sellType == AdSellType.sellRent ? [AdSellType.rent, AdSellType.sell, AdSellType.sellRent] : [ad.sellType]
+      let sellType = ad.sellType == AdSellType.sellRent ? [AdSellType.rent, AdSellType.sell, AdSellType.sellRent] : [ad.sellType, AdSellType.sellRent]
       if (suggest.id == 'map') {
         body = {
           view: AdView.show,
@@ -616,6 +616,7 @@ export class AdService {
           
         };
       }
+      
       body = {
         ...body, 
         _id: {$ne: ad._id},

@@ -7,7 +7,7 @@ import {
   AdView,
   ItemPosition,
   ItemTypes,
-} from 'src/utils/enum';
+} from '../utils/enum';
 
 export type AdDocument = Document & Ad;
 

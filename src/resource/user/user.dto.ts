@@ -5,8 +5,8 @@ import {
   PointTitle,
   UserStatus,
   UserType,
-} from 'src/utils/enum';
-import { AdLocation } from '../ad/ad.dto';
+} from '../../utils/enum';
+import { AdLocation } from '../ad/dto/ad.dto';
 
 export class AgentAdditionDto {
   @ApiProperty()

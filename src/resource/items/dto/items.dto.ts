@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNumber, IsString } from 'class-validator';
-import { ItemPosition, ItemTypes } from 'src/utils/enum';
+import { ItemPosition, ItemTypes } from '../../../utils/enum';
 
 export class ItemDetailDto {
   @ApiProperty()
@@ -10,11 +10,23 @@ export class ItemDetailDto {
   value: string;
 
   @ApiProperty()
-  parentId: string;
+  parentId?: string;
 
   @ApiProperty()
-  parent: string;
+  parent?: string;
 }
+
+export const ItemRequired = (dto: ItemDto) => {
+  return (
+    dto.index &&
+    dto.name &&
+    dto.position &&
+    dto.type &&
+    dto.types &&
+    dto.value &&
+    dto.value.length > 0
+  );
+};
 export class ItemDto {
   @ApiProperty()
   @IsString()
@@ -30,9 +42,9 @@ export class ItemDto {
   @ApiProperty({ enum: ItemTypes })
   types: ItemTypes;
 
-  @ApiProperty() 
+  @ApiProperty()
   @IsString()
-  type: string
+  type: string;
   @ApiProperty()
   parentId?: string;
 
@@ -40,7 +52,7 @@ export class ItemDto {
   position: ItemPosition;
 
   @ApiProperty()
-  other: boolean;
+  other?: boolean;
 
   @ApiProperty({ default: false })
   isSearch: boolean;

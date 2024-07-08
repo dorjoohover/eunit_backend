@@ -4,9 +4,9 @@ import { InjectModel } from '@nestjs/mongoose';
 // import * as bcrypt from 'bcrypt';
 import { sign } from 'jsonwebtoken';
 import { Model } from 'mongoose';
-import appConfig from 'src/config/app.config';
-import { UserStatus, UserType } from 'src/utils/enum';
-import { User, UserDocument } from 'src/schema';
+import appConfig from '../../config/app.config';
+import { UserStatus, UserType } from '../../utils/enum';
+import { User, UserDocument } from '../../schema';
 import { UserService } from '../user/user.service';
 import { LoginUser, RegisterUser } from './auth.dto';
 

@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { Document } from 'mongoose';
-import { ItemPosition, ItemTypes } from 'src/utils/enum';
+import { ItemPosition, ItemTypes } from '../utils/enum';
 
 export type ItemDocument = Item & Document;
 
@@ -18,7 +18,7 @@ export class ItemDetail {
   parent?: ItemTypes;
 }
 @Schema()
-export class Item {
+export class Item extends Document {
   @Prop({ required: true })
   name: string;
 
@@ -49,3 +49,4 @@ export class Item {
 }
 
 export const ItemSchema = SchemaFactory.createForClass(Item);
+export const ItemModel = mongoose.model('Items', ItemSchema)

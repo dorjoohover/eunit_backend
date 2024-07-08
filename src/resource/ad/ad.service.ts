@@ -5,8 +5,14 @@ import {
   Injectable,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import mongoose, { Model, Types, isValidObjectId } from 'mongoose';
-import { AdSellType, AdStatus, AdTypes, AdView } from 'src/utils/enum';
+import { Model, isValidObjectId } from 'mongoose';
+import {
+  ActionMessage,
+  AdSellType,
+  AdStatus,
+  AdTypes,
+  AdView,
+} from '../../utils/enum';
 import {
   Ad,
   AdDocument,
@@ -14,10 +20,16 @@ import {
   CategoryDocument,
   User,
   UserDocument,
-} from 'src/schema';
+} from '../../schema';
 import { CategoryService } from '../category/category.service';
-import { AdDto, FilterDto } from './ad.dto';
+import { AdDto, AdRequired, FilterDto } from './dto/ad.dto';
+import {
+  AdAlreadyExists,
+  AdNotFound,
+  AdWrongExists,
+} from './ad.exists.exception';
 import { ObjectId } from 'mongodb';
+import { CategoryNotFound } from '../category/category.exits.exception';
 
 @Injectable()
 export class AdService {
@@ -25,10 +37,10 @@ export class AdService {
     @InjectModel(Ad.name) private model: Model<AdDocument>,
     @InjectModel(Category.name) private categoryModel: Model<CategoryDocument>,
     @InjectModel(User.name) private userModel: Model<UserDocument>,
-    private categoryService: CategoryService,
   ) {}
 
   async createAd(dto: AdDto, user: string) {
+    if (!AdRequired(dto)) throw new AdWrongExists();
     let prevAd = await this.model
       .find({}, null, { sort: { num: -1 } })
       .limit(1);
@@ -38,37 +50,55 @@ export class AdService {
     if (prevAd) adNum = prevAd?.[0]?.num + 1;
 
     if (isNaN(adNum)) adNum = 1;
-    try {
-      let ad = await this.model.create({
-        num: adNum,
-        user: user,
-        images: dto.images,
-        title: dto.title,
-        description: dto.description,
-        location: dto.location,
-        category: dto.category,
-        subCategory: dto.subCategory,
-        sellType: dto.sellType,
-        items: dto.items,
-        adType: dto.adType,
-        adStatus: dto.adStatus,
-        image: dto.image,
-        file: dto.file,
-        view: dto.view,
-      });
+    let ad = await this.model.findOne({
+      $or: [
+        {
+          num: adNum,
+        },
+        {
+          $and: [
+            {
+              title: dto.title,
+              description: dto.description,
+              location: dto.location,
+            },
+          ],
+        },
+      ],
+    });
+    if (ad) throw new AdAlreadyExists();
+    ad = await this.model.create({
+      num: adNum,
+      user: user,
+      images: dto.images,
+      title: dto.title,
+      description: dto.description,
+      location: dto.location,
+      category: dto.category,
+      subCategory: dto.subCategory,
+      sellType: dto.sellType,
+      items: dto.items,
+      adType: dto.adType,
+      adStatus: dto.adStatus,
+      image: dto.image,
+      file: dto.file,
+      view: dto.view,
+    });
+    await this.userModel.findByIdAndUpdate(user, {
+      $push: { ads: ad._id },
+    });
+    if (ad.adType == AdTypes.sharing) {
       await this.userModel.findByIdAndUpdate(user, {
-        $push: { ads: ad._id },
+        $inc: { point: 10000 },
       });
-      if (ad.adType == AdTypes.sharing) {
-        await this.userModel.findByIdAndUpdate(user, {
-          $inc: { point: 10000 },
-        });
-      }
-    } catch (error) {
-      console.log(error);
-      throw new HttpException(error, 500);
     }
-    return true;
+
+    return {
+      success: true,
+      status: 201,
+      id: ad._id,
+      message: ActionMessage.success,
+    };
   }
 
   async getAds(
@@ -78,6 +108,7 @@ export class AdService {
     type: AdTypes,
     isType: boolean,
     status: AdStatus,
+    length: number,
   ) {
     const body =
       isType && view
@@ -147,8 +178,8 @@ export class AdService {
       .populate('subCategory', 'id name', this.categoryModel)
       .limit(limit)
       .skip(num * limit);
-    let l = await this.model.find(body).countDocuments();
-    if (!ads) throw new HttpException('not found ads', HttpStatus.BAD_REQUEST);
+    let l = length == 0 ? await this.model.find(body).countDocuments() : length;
+    if (!ads) throw new AdNotFound();
     return { ads: ads, limit: l };
   }
 
@@ -189,6 +220,8 @@ export class AdService {
           }
         });
       });
+
+    if (ads.length == 0 || !ads) throw new AdNotFound();
     return ads;
   }
   async updateStatusTimed() {
@@ -282,36 +315,58 @@ export class AdService {
     isAdmin: boolean,
     message?: string,
   ) {
-    try {
-      if (isAdmin) {
-        if (status == AdStatus.returned) {
-          let ad = await this.model.findByIdAndUpdate(id, {
-            adStatus: status,
-            view: view,
-            returnMessage: message ?? '',
-          });
-          return ad;
-        } else {
-          let ad = await this.model.findByIdAndUpdate(id, {
-            adStatus: status,
-            view: view,
-          });
-          return ad;
-        }
+    if (
+      !(
+        id &&
+        Object.values(AdStatus).includes(status) &&
+        Object.values(AdView).includes(view)
+      )
+    )
+      throw new AdWrongExists();
+    if (isAdmin) {
+      if (status == AdStatus.returned) {
+        let ad = await this.model.findByIdAndUpdate(id, {
+          adStatus: status,
+          view: view,
+          returnMessage: message ?? '',
+        });
+
+        return {
+          success: true,
+          id: ad._id,
+          status: 201,
+          message: ActionMessage.success,
+        };
       } else {
-        let ad = await this.model.findOne({ _id: id, user: user });
-        ad.adStatus = status;
-        ad.view = view;
-        ad.save();
-        return ad;
+        let ad = await this.model.findByIdAndUpdate(id, {
+          adStatus: status,
+          view: view,
+        });
+
+        return {
+          success: true,
+          id: ad._id,
+          status: 201,
+          message: ActionMessage.success,
+        };
       }
-    } catch (error) {
-      throw new HttpException('server error', 500);
+    } else {
+      let ad = await this.model.findOne({ _id: id, user: user });
+      ad.adStatus = status;
+      ad.view = view;
+      ad.save();
+      return {
+        success: true,
+        id: ad._id,
+        status: 201,
+        message: ActionMessage.success,
+      };
     }
   }
 
   async addAdView(id: string, userId: string) {
     let ad = await this.model.findById(id);
+    if (!ad) throw new AdNotFound();
     if (
       ad.views.find((a) => a.toString() == userId) == undefined &&
       ad.user.toString() != userId
@@ -319,38 +374,43 @@ export class AdService {
       await this.model.findByIdAndUpdate(ad._id, {
         $push: { views: userId },
       });
-      return ad.views.length + 1;
+      return {
+        success: true,
+        id: id,
+        length: ad.views.length + 1,
+        messagse: ActionMessage.success,
+      };
     }
+    return {
+      success: false,
+      message: 'Already registered',
+    };
   }
 
-  async searchAd(value: string) {
-    try {
-      let defaultAds = await this.model.find({
-        title: { $regex: value, $options: 'i' },
-        view: AdView.show,
-        adType: AdTypes.default,
-      });
+  async searchAd(
+    value: string,
+    type: AdTypes,
+    limit: number,
+    page: number,
+    length: number,
+  ) {
+    const body = {
+      title: { $regex: value, $options: 'i' },
+      view: AdView.show,
+      adType: type,
+    };
+    let ads = await this.model
+      .find(body, null, { sort: -1 })
+      .limit(limit)
+      .skip(page * limit);
+    const l =
+      length == 0 ? await this.model.find(body).countDocuments() : length;
+    if (!ads || ads.length == 0) throw new AdNotFound();
 
-      let specialAds = await this.model.find({
-        title: { $regex: value, $options: 'i' },
-        view: AdView.show,
-        adType: AdTypes.special,
-      });
-
-      if (!defaultAds || !specialAds) throw new HttpException('not found', 403);
-      return {
-        defaultAds: {
-          ads: defaultAds,
-          limit: defaultAds.length,
-        },
-        specialAds: {
-          ads: specialAds,
-          limit: specialAds.length,
-        },
-      };
-    } catch (error) {
-      throw new HttpException(error.message, 500);
-    }
+    return {
+      ads: ads,
+      length: l,
+    };
   }
 
   async getManyAds(
@@ -363,274 +423,229 @@ export class AdService {
     isView: boolean,
     l: number,
     status: AdStatus,
+    length: number,
   ) {
     let ads = [],
       limit = 0;
     let isNum = false;
     if (!isValidObjectId(dto.dto?.[0])) isNum = true;
+    let body = isView
+      ? {
+          $and: [
+            {
+              $or: [
+                {
+                  subCategory:
+                    dto.cateId == undefined
+                      ? { $ne: '641c932bf60152dbf901c070' }
+                      : dto.cateId,
+                },
+                {
+                  category:
+                    dto.cateId == undefined
+                      ? { $ne: '641c932bf60152dbf901c070' }
+                      : dto.cateId,
+                },
+              ],
+            },
+            isNum ? { num: { $in: dto.dto } } : { _id: { $in: dto.dto ?? [] } },
+            { view: { $ne: AdView.end } },
+            {
+              adType:
+                type == AdTypes.all
+                  ? { $nin: [AdTypes.all, AdTypes.sharing] }
+                  : type,
+            },
 
-    try {
-      let body = isView
-        ? {
-            $and: [
-              {
-                $or: [
-                  {
-                    subCategory:
-                      dto.cateId == undefined
-                        ? { $ne: '641c932bf60152dbf901c070' }
-                        : dto.cateId,
-                  },
-                  {
-                    category:
-                      dto.cateId == undefined
-                        ? { $ne: '641c932bf60152dbf901c070' }
-                        : dto.cateId,
-                  },
-                ],
-              },
-              isNum
-                ? { num: { $in: dto.dto } }
-                : { _id: { $in: dto.dto ?? [] } },
-              { view: { $ne: AdView.end } },
-              {
-                adType:
-                  type == AdTypes.all
-                    ? { $nin: [AdTypes.all, AdTypes.sharing] }
-                    : type,
-              },
+            {
+              adStatus:
+                status == AdStatus.all
+                  ? {
+                      $nin: [
+                        AdStatus.deleted,
+                        AdStatus.sold,
+                        AdStatus.timed,
+                        AdStatus.checking,
+                        AdStatus.returned,
+                      ],
+                    }
+                  : status,
+            },
+          ],
+        }
+      : {
+          $and: [
+            {
+              _id: { $in: dto },
+            },
+            {
+              $or: [
+                {
+                  subCategory:
+                    dto.cateId == undefined
+                      ? { $ne: '641c932bf60152dbf901c070' }
+                      : dto.cateId,
+                },
+                {
+                  category:
+                    dto.cateId == undefined
+                      ? { $ne: '641c932bf60152dbf901c070' }
+                      : dto.cateId,
+                },
+              ],
+            },
 
-              {
-                adStatus:
-                  status == AdStatus.all
-                    ? {
-                        $nin: [
-                          AdStatus.deleted,
-                          AdStatus.sold,
-                          AdStatus.timed,
-                          AdStatus.checking,
-                          AdStatus.returned,
-                        ],
-                      }
-                    : status,
-              },
-            ],
-          }
-        : {
-            $and: [
-              {
-                _id: { $in: dto },
-              },
-              {
-                $or: [
-                  {
-                    subCategory:
-                      dto.cateId == undefined
-                        ? { $ne: '641c932bf60152dbf901c070' }
-                        : dto.cateId,
-                  },
-                  {
-                    category:
-                      dto.cateId == undefined
-                        ? { $ne: '641c932bf60152dbf901c070' }
-                        : dto.cateId,
-                  },
-                ],
-              },
-
-              { view: AdView.show },
-              { adType: type == 'all' ? { $nin: [AdTypes.sharing] } : type },
-              {
-                adStatus:
-                  status == 'all'
-                    ? {
-                        $nin: [
-                          AdStatus.deleted,
-                          AdStatus.sold,
-                          AdStatus.timed,
-                          AdStatus.checking,
-                          AdStatus.returned,
-                        ],
-                      }
-                    : status,
-              },
-            ],
-          };
-      ads = await this.model
-        .find(body)
-        .populate('category', 'id name', this.categoryModel)
-        .populate('subCategory', 'id name', this.categoryModel)
-        .limit((num + 1) * l)
-        .skip(num * l)
-        .sort({ updatedAt: 'desc' });
-      limit = await this.model.find(body).countDocuments();
-
-      return {
-        ads: ads,
-        limit: limit,
-      };
-    } catch (error) {
-      console.log(error);
-      throw new HttpException(error, 500);
-    }
-
-    if (!ads) throw new HttpException('not found', HttpStatus.NOT_FOUND);
-    return { ads, limit };
+            { view: AdView.show },
+            { adType: type == 'all' ? { $nin: [AdTypes.sharing] } : type },
+            {
+              adStatus:
+                status == 'all'
+                  ? {
+                      $nin: [
+                        AdStatus.deleted,
+                        AdStatus.sold,
+                        AdStatus.timed,
+                        AdStatus.checking,
+                        AdStatus.returned,
+                      ],
+                    }
+                  : status,
+            },
+          ],
+        };
+    ads = await this.model
+      .find(body)
+      .populate('category', 'id name', this.categoryModel)
+      .populate('subCategory', 'id name', this.categoryModel)
+      .limit((num + 1) * l)
+      .skip(num * l)
+      .sort({ updatedAt: 'desc' });
+    limit = length == 0 ? await this.model.find(body).countDocuments() : length;
+    if (!ads || ads.length == 0) throw new AdNotFound();
+    return {
+      ads: ads,
+      limit: limit,
+    };
   }
   async getAdById(id: string) {
-    try {
-      let ad = await this.model
-        // .findOne({ num: id, isView: true })
-        .findOne({ num: id })
-        .populate(
-          'subCategory',
-          'id name subCategory href english  suggestionItem isSearch',
-          this.categoryModel,
-        )
-        .populate(
-          'user',
-          'phone username email profileImg userType',
-          this.userModel,
-        );
-      if (!ad) throw new ForbiddenException('not found ad');
-      return ad;
-    } catch (error) {
-      console.log(error);
-      throw new HttpException('server error', 500);
-    }
+    let ad = await this.model
+      // .findOne({ num: id, isView: true })
+      .findOne({ num: id })
+      .populate(
+        'subCategory',
+        'id name subCategory href english  suggestionItem isSearch',
+        this.categoryModel,
+      )
+      .populate(
+        'user',
+        'phone username email profileImg userType',
+        this.userModel,
+      );
+    if (!ad) throw new AdNotFound();
+    return ad;
   }
   async getAdsCount(dto: string[]) {
-    try {
-      return await this.model
-        .find({
-          _id: { $in: dto },
-          adStatus: { $nin: [AdStatus.sold, AdStatus.timed] },
-        })
-        .countDocuments();
-    } catch (error) {
-      throw new HttpException(error, 500);
-    }
+    let ads = await this.model
+      .find({
+        _id: { $in: dto },
+        adStatus: { $nin: [AdStatus.sold, AdStatus.timed] },
+      })
+      .countDocuments();
+    if (!ads || ads == 0) throw new AdNotFound();
+    return ads;
   }
 
-  async getAdByCategoryId(id: string, num: number) {
-    try {
-      let category = await this.categoryModel.findOne({ href: id });
-
-      let defaultAds = await this.model
-        .find({
-          $or: [
-            {
-              subCategory: category._id,
-            },
-            { category: category._id },
-          ],
-          view: AdView.show,
-          adType: { $in: [AdTypes.default, AdTypes.sharing] },
-          adStatus: {
-            $nin: [
-              AdStatus.deleted,
-              AdStatus.sold,
-              AdStatus.timed,
-              AdStatus.checking,
-            ],
-          },
-        })
-        .populate('category', 'id name', this.categoryModel)
-        .populate('subCategory', 'id name', this.categoryModel)
-        .populate(
-          'user',
-          'phone username email profileImg userType',
-          this.userModel,
-        )
-        .limit((num + 1) * 20)
-        .skip(num * 20)
-        .sort({ updatedAt: 'desc' });
-
-      let specialAds = await this.model
-        .find({
-          $or: [{ subCategory: category._id }, { category: category._id }],
-          view: AdView.show,
-          adType: AdTypes.special,
-          adStatus: {
-            $nin: [
-              AdStatus.deleted,
-              AdStatus.sold,
-              AdStatus.timed,
-              AdStatus.checking,
-            ],
-          },
-        })
-        .populate('category', 'id name', this.categoryModel)
-        .populate('subCategory', 'id name', this.categoryModel)
-        .populate(
-          'user',
-          'phone username email profileImg userType',
-          this.userModel,
-        )
-        .limit((num + 1) * 20)
-        .skip(num * 20)
-        .sort({ updatedAt: 'desc' });
-
-      if (!defaultAds) throw new ForbiddenException('not found default ad');
-      if (!specialAds) throw new ForbiddenException('not found special ad');
-
-      return {
-        defaultAds: {
-          ads: defaultAds,
-          limit: defaultAds.length,
+  async getAdByCategoryId(
+    id: string,
+    num: number,
+    limit: number,
+    type: AdTypes,
+    length: number,
+  ) {
+    let category = await this.categoryModel.findOne({ href: id });
+    if (!category) throw new CategoryNotFound();
+    const body = {
+      $or: [
+        {
+          subCategory: category._id,
         },
-        specialAds: {
-          ads: specialAds,
-          limit: specialAds.length,
-        },
-      };
-    } catch (error) {
-      throw new HttpException(error, 500);
-    }
+        { category: category._id },
+      ],
+      view: AdView.show,
+      adType:
+        type == AdTypes.default
+          ? { $in: [AdTypes.default, AdTypes.sharing] }
+          : AdTypes.special,
+      adStatus: {
+        $nin: [
+          AdStatus.deleted,
+          AdStatus.sold,
+          AdStatus.timed,
+          AdStatus.checking,
+        ],
+      },
+    };
+    const ads = await this.model
+      .find(body)
+      .populate('category', 'id name', this.categoryModel)
+      .populate('subCategory', 'id name', this.categoryModel)
+      .populate(
+        'user',
+        'phone username email profileImg userType',
+        this.userModel,
+      )
+      .limit((num + 1) * limit)
+      .skip(num * limit)
+      .sort({ updatedAt: 'desc' });
+
+    if (!ads) throw new AdNotFound();
+    const l =
+      length == 0 ? await this.model.find(body).countDocuments() : length;
+    return { ads: ads, limit: l };
   }
   async suggestAd(
     id: string,
     suggest: {
       id: string;
       value: string;
-
     },
     l: number,
     page: number,
   ) {
-    try {
-      let ad = await this.model.findById(id);
-      let ads = [];
-      let body = {};
-      let limit = 0;
-      let sellType = ad.sellType == AdSellType.sellRent ? [AdSellType.rent, AdSellType.sell, AdSellType.sellRent] : [ad.sellType, AdSellType.sellRent]
-      if (suggest.id == 'map') {
-        body = {
-          view: AdView.show,
-          subCategory: ad.subCategory,
-        };
-      } else {
-        body = {
-          view: AdView.show,
-          items: { $elemMatch: { id: suggest.id, value: suggest.value } },
-          
-        };
-      }
-      
+    let ad = await this.model.findById(id);
+    if (!ad) throw new AdNotFound();
+    let ads = [];
+    let body = {};
+    let limit = 0;
+    let sellType =
+      ad.sellType == AdSellType.sellRent
+        ? [AdSellType.rent, AdSellType.sell, AdSellType.sellRent]
+        : [ad.sellType, AdSellType.sellRent];
+    if (suggest.id == 'map') {
       body = {
-        ...body, 
-        _id: {$ne: ad._id},
-        adStatus: AdStatus.created,
-        sellType: sellType,
-        adType: {$nin: [AdTypes.sharing]}
-      }
-      ads = await this.model.find(body).limit(l).skip(page);
-      limit = await this.model.find(body).countDocuments();
-      return {
-        ads: ads,
-        limit: limit,
+        view: AdView.show,
+        subCategory: ad.subCategory,
       };
-    } catch (error) {}
+    } else {
+      body = {
+        view: AdView.show,
+        items: { $elemMatch: { id: suggest.id, value: suggest.value } },
+      };
+    }
+
+    body = {
+      ...body,
+      _id: { $ne: ad._id },
+      adStatus: AdStatus.created,
+      sellType: sellType,
+      adType: { $nin: [AdTypes.sharing] },
+    };
+    ads = await this.model.find(body).limit(l).skip(page);
+
+    return {
+      ads: ads,
+      limit: l,
+    };
   }
   // filter
   async filterAd(
@@ -638,52 +653,64 @@ export class AdService {
     num: number,
     limit: number,
     type: AdTypes,
-    cateId: string,
+    length: number,
   ) {
-    try {
-      let cate = [
-        {
-          subCategory:
-            cateId == '' ? { $ne: '641c932bf60152dbf901c070' } : cateId,
-        },
-        {
-          category: cateId == '' ? { $ne: '641c932bf60152dbf901c070' } : cateId,
-        },
-      ];
-      let items =
-        dto.items?.length > 0
-          ? dto.items.map((d) => ({
-              'items.id': d.id,
-              'items.value':
-                d.value != undefined ? d.value : { $gte: d.min, $lte: d.max },
-            }))
-          : [...[{ 'items.id': { $ne: '' } }]];
-      const body = {
-        $and: [{ $or: cate }, { $or: items }],
-        view: AdView.show,
-        adStatus: {
-          $nin: [
-            AdStatus.deleted,
-            AdStatus.sold,
-            AdStatus.timed,
-            AdStatus.checking,
-          ],
-        },
-        adType: type == AdTypes.all ? { $ne: AdTypes.all } : type,
+    const categoryId = isValidObjectId(dto.cateId);
+    console.log(categoryId);
+    console.log(dto.cateId);
+    const category = await this.categoryModel.findOne(
+      categoryId ? { _id: new ObjectId(dto.cateId) } : { href: dto.cateId },
+    );
+    if (!category && dto.cateId != '') throw new CategoryNotFound();
+    let cate = [
+      {
+        subCategory:
+          dto.cateId == '' ? { $ne: '641c932bf60152dbf901c070' } : category._id,
+      },
+      {
+        category:
+          dto.cateId == '' ? { $ne: '641c932bf60152dbf901c070' } : category._id,
+      },
+    ];
+    let items =
+      dto.items?.length > 0
+        ? dto.items.map((d) => ({
+            $and: [
+              {
+                'items.id': d.id,
+              },
+              {
+                'items.value':
+                  d.value != undefined ? d.value : { $gte: d.min, $lte: d.max },
+              },
+            ],
+          }))
+        : [...[{ 'items.id': { $ne: '' } }]];
 
-        sellType: dto.types.length > 0 ? { $in: dto.types } : { $nin: [] },
-      };
-      let ads = await this.model
-        .find(body)
-        .limit(num * limit)
-        .skip((num == 0 ? 0 : num - 1) * limit)
-        .sort({ updatedAt: 'desc' });
-      let l = await this.model.find(body).countDocuments();
+    const body = {
+      $and: [{ $or: cate }, { $or: items }],
+      view: AdView.show,
+      adStatus: {
+        $nin: [
+          AdStatus.deleted,
+          AdStatus.sold,
+          AdStatus.timed,
+          AdStatus.checking,
+        ],
+      },
+      adType: type === AdTypes.all ? { $ne: AdTypes.all } : type,
 
-      return { ads: ads, limit: l };
-    } catch (error) {
-      throw new HttpException(error.message, 500);
-    }
+      sellType:
+        dto.sellTypes.length > 0 ? { $in: dto.sellTypes } : { $nin: [] },
+    };
+    let ads = await this.model
+      .find(body)
+      .limit(limit)
+      .skip(num * limit)
+      .sort({ updatedAt: 'desc' });
+    let l = length == 0 ? await this.model.find(body).countDocuments() : length;
+
+    return { ads: ads, limit: l };
   }
 
   async updateAd(id: string, dto: AdDto) {
@@ -706,6 +733,11 @@ export class AdService {
   }
 
   async delete() {
-    return await this.model.deleteMany();
+    const res = await this.model.deleteMany();
+    return {
+      success: true,
+      message: ActionMessage.success,
+      status: 200,
+    };
   }
 }

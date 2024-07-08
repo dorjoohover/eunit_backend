@@ -7,7 +7,8 @@ import {
   AdView,
   ItemPosition,
   ItemTypes,
-} from 'src/utils/enum';
+} from '../../../utils/enum';
+import { ObjectId } from 'mongodb';
 
 export class AdLocation {
   @ApiProperty()
@@ -34,12 +35,15 @@ export class FilterDto {
   items: AdFilterDto[];
 
   @ApiProperty({ isArray: true })
-  types: string[];
+  sellTypes: string[];
   @ApiProperty()
   cateId: string;
 }
 
 export class AdItemDto {
+  @ApiProperty()
+  name: string;
+
   @ApiProperty()
   @IsString()
   id: string;
@@ -63,18 +67,36 @@ export class AdItemDto {
   isUse: boolean;
 }
 
+export const AdRequired = (dto: AdDto) => {
+  const sub = new ObjectId(dto.subCategory);
+  const cate = new ObjectId(dto.category);
+  return (
+    dto.images &&
+    dto.images.length > 0 &&
+    dto.title &&
+    dto.description &&
+    dto.category &&
+    ObjectId.isValid(sub) &&
+    ObjectId.isValid(cate) &&
+    dto.description &&
+    dto.location &&
+    dto.location.lat &&
+    dto.location.lng
+  );
+};
+
 export class AdDto {
   @ApiProperty({ maxLength: 100 })
   @IsString()
   title: string;
 
-  @ApiProperty()
-  unitPrice: number;
-  @ApiProperty()
-  area: number;
+  // @ApiProperty()
+  // unitPrice: number;
+  // @ApiProperty()
+  // area: number;
   @ApiProperty()
   @IsArray()
-  images: [];
+  images: string[];
 
   @ApiProperty({ maxLength: 1000 })
   description: string;
@@ -102,12 +124,11 @@ export class AdDto {
   @ApiProperty({ enum: AdStatus, default: AdStatus.pending })
   adStatus: AdStatus;
 
+  @ApiProperty({ enum: AdView })
+  view: AdView;
   @ApiProperty()
   image?: string;
 
   @ApiProperty()
   file?: string;
-
-  @ApiProperty({ enum: AdView })
-  view: AdView;
 }

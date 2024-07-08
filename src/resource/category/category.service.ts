@@ -7,8 +7,18 @@ import {
 import { InjectModel } from '@nestjs/mongoose';
 import mongoose, { Model, Types } from 'mongoose';
 
-import { Category, CategoryDocument, Item, ItemDocument } from 'src/schema';
-import { CategoryDto } from './category.dto';
+import { Category, CategoryDocument, Item, ItemDocument } from '../../schema';
+import {
+  CategoryDto,
+  CategoryRequiredDto,
+  CategorySubRequiredDto,
+} from './dto/category.dto';
+import {
+  CategoryAlreadyExists,
+  CategoryNotFound,
+  CategoryWrongExists,
+} from './category.exits.exception';
+import { ActionMessage } from '../../utils/enum';
 
 @Injectable()
 export class CategoryService {
@@ -19,27 +29,31 @@ export class CategoryService {
 
   async createCategory(dto: CategoryDto) {
     let category = await this.model.findOne({ name: dto.name });
-    if (category) throw new ForbiddenException('found that category');
-
-    try {
-      category = await this.model.create({
-        name: dto.name,
-        parent: dto.parent,
-        href: dto.href,
-        english: dto.english,
-        steps: dto.steps,
-        suggestionItem: dto.suggestionItem,
-        estimate: dto.estimate,
-      });
-      return category;
-    } catch (error) {
-      throw new HttpException('server error', 500);
+    if (category) throw new CategoryAlreadyExists();
+    if (dto.parent != null) {
+      if (!CategorySubRequiredDto(dto)) throw new CategoryWrongExists();
+    } else {
+    if (!CategoryRequiredDto(dto)) throw new CategoryWrongExists();
     }
+    category = await this.model.create({
+      name: dto.name,
+      parent: dto.parent,
+      href: dto.href,
+      english: dto.english,
+      steps: dto.steps,
+      suggestionItem: dto.suggestionItem,
+      estimate: dto.estimate,
+    });
+    return {
+      success: true,
+      id: category._id,
+      message: ActionMessage.success,
+      status: 201,
+    };
   }
 
   async getAllCategories(estimate: string) {
-    try {
-
+    
       let categories = await this.model
         .find({
           estimate: estimate === 'true' ? true : null,
@@ -54,27 +68,24 @@ export class CategoryService {
         )
         .exec();
 
-      if (!categories) throw new ForbiddenException('not found');
+      if (!categories) throw new CategoryNotFound()
 
       return categories;
-    } catch (error) {
-      console.log(error);
-      throw new HttpException('server error', 500);
-    }
+    
   }
 
   async getCategoryById(id: string) {
-    try {
+    
       let category;
-      if (mongoose.Types.ObjectId.isValid(id)) {
+      const isValid = mongoose.Types.ObjectId.isValid(id)
+      if (isValid) {
         category = await this.model.findById(id).exec();
       } else {
         category = await this.model.findOne({ href: id }).exec();
       }
+      if(!category) throw new CategoryNotFound()
       return category;
-    } catch (error) {
-      throw new HttpException(error.message, 500);
-    }
+    
   }
 
   async getSubCategoryFiltersById(id: string) {

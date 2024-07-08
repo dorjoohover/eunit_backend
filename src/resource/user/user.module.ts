@@ -1,6 +1,6 @@
 import { Global, Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { Ad, AdSchema, Feedback, FeedbackSchema, User, UserSchema } from 'src/schema';
+import { Ad, AdSchema, Feedback, FeedbackSchema, User, UserSchema } from '../../schema';
 
 import { UserController } from './user.controller';
 import { UserService } from './user.service';

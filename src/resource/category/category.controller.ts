@@ -2,7 +2,7 @@ import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { Put } from '@nestjs/common/decorators';
 import { ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 
-import { CategoryDto } from './category.dto';
+import { CategoryDto } from './dto/category.dto';
 import { CategoryService } from './category.service';
 @ApiTags('Category')
 @Controller('category')
@@ -29,6 +29,8 @@ export class CategoryController {
     return this.service.getCategoryById(id);
   }
 
+
+  
   @ApiParam({ name: 'id' })
   @Get('filters/:id')
   @ApiOperation({

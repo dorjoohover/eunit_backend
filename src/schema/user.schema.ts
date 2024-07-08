@@ -6,7 +6,7 @@ import {
   Socials,
   UserStatus,
   UserType,
-} from 'src/utils/enum';
+} from '../utils/enum';
 
 export type UserDocument = Document & User;
 export class UserLocation {

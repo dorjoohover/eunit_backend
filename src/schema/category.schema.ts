@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { Document } from 'mongoose';
-import { CreateAdSteps } from 'src/utils/enum';
+import { CreateAdSteps } from '../utils/enum';
 
 export type CategoryDocument = Document & Category;
 export class CategorySteps {

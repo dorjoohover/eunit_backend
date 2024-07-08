@@ -17,12 +17,12 @@ import { ApiBearerAuth, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { PointSendType } from 'src/utils/enum';
+import { PointSendType } from '../../utils/enum';
 
-import { Feedback, FeedbackDocument, User, UserDocument } from 'src/schema';
+import { Feedback, FeedbackDocument, User, UserDocument } from '../../schema';
 import { FeedbackDto, UpdateUserDto } from './user.dto';
 import { UserService } from './user.service';
-import { AuthGuard } from 'src/guard/auth.guard';
+import { AuthGuard } from '../../guard/auth.guard';
 @ApiTags('User')
 @Controller('user')
 export class UserController {

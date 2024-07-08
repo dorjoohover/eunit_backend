@@ -103,3 +103,12 @@ export enum CreateAdSteps {
   general = 'general',
   detail = 'detail',
 }
+
+
+
+
+export enum ActionMessage {
+  success = "success",
+  warning = 'warning',
+  error = 'error'
+}

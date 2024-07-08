@@ -11,8 +11,9 @@ import {
 
 import { ApiParam, ApiTags } from '@nestjs/swagger';
 
-import { ItemDto } from './items.dto';
-import { ItemsService } from './items.service';
+import { ItemDto } from './dto/items.dto';
+import { CreateElementType, ItemsService } from './items.service';
+import { Item } from 'src/schema';
 
 @Controller('items')
 @ApiTags('Items')
@@ -20,23 +21,26 @@ export class ItemsController {
   constructor(private service: ItemsService) {}
 
   @Post()
-  createItem(@Body() dto: ItemDto) {
-    try {
-      return this.service.createItem(dto);
-    } catch (error) {
-      throw new HttpException(error, 500);
-    }
+  async create(@Body() dto: ItemDto):Promise<CreateElementType> {
+    // return true
+    
+    let item = await this.service.createItem(dto);
+    return item
   }
 
+  @Post('create')
+  async createIt(dto: ItemDto) {
+    return await this.service.createItem(dto)
+  }
   @Get()
   async getItems() {
-    return this.service.findAll();
+    return await this.service.findAll();
   }
 
   @Get('/:type')
   @ApiParam({ name: 'type' })
-  async getByType(@Param('type') type: string) {
-    return this.service.findByType(type);
+  async getByType(@Param('type') type: string): Promise<Item | null> {
+    return await this.service.findByType(type);
   }
 
   @Put('/:id')

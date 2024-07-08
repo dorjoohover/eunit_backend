@@ -1,8 +1,8 @@
 import { ForbiddenException, HttpException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import mongoose, { Model } from 'mongoose';
-import { UserType } from 'src/utils/enum';
-import { User, UserDocument } from 'src/schema';
+import { UserType } from '../../utils/enum';
+import { User, UserDocument } from '../../schema';
 import { PointHistory, UpdateUserDto } from './user.dto';
 
 @Injectable()

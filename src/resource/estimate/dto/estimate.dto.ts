@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsArray, IsString } from 'class-validator';
+import { ObjectId } from 'mongodb';
 import {
   AdSellType,
   AdStatus,
@@ -8,7 +9,7 @@ import {
   EstimateStatus,
   ItemPosition,
   ItemTypes,
-} from 'src/utils/enum';
+} from '../../../utils/enum';
 
 export class EstimateItemDto {
   @ApiProperty()
@@ -26,9 +27,19 @@ export class EstimateItemDto {
   type: ItemTypes;
 
   @ApiProperty()
-  index: number;
+  index?: number;
 }
-
+export const EstimateRequired = (dto: EstimateDto) => {
+  const sub = new ObjectId(dto.subCategory);
+  const cate = new ObjectId(dto.category);
+  return (
+    ObjectId.isValid(sub) &&
+    ObjectId.isValid(cate) &&
+    dto.file &&
+    dto.items &&
+    dto.items.length > 0
+  );
+};
 export class EstimateDto {
   @ApiProperty()
   @IsString()
@@ -49,5 +60,4 @@ export class EstimateDto {
 
   @ApiProperty()
   file?: string;
-
 }

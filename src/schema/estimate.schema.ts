@@ -1,8 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { Document } from 'mongoose';
-import { AdSellType, EstimateStatus, ItemTypes } from 'src/utils/enum';
-import { Category } from './category.schema';
-import { User } from './user.schema';
+import { AdSellType, EstimateStatus, ItemTypes } from '../utils/enum';
+
 
 export type EstimateDocument = Estimate & Document;
 

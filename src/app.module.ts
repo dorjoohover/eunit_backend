@@ -7,10 +7,12 @@ import { AuthModule } from './resource/auth/auth.module';
 import { AdModule } from './resource/ad/ad.module';
 import { UserModule } from './resource/user/user.module';
 import { ItemsModule } from './resource/items/items.module';
-import { CategoryModule } from './resource/category/category.module';
+
 import { EstimateModule } from './resource/estimate/estimate.module';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { MulterModule } from '@nestjs/platform-express';
+import { CategoryModule } from './resource/category/category.module';
+import { EmailModule } from './resource/auth/email.module';
 @Global()
 @Module({
   imports: [
@@ -25,23 +27,7 @@ import { MulterModule } from '@nestjs/platform-express';
 
       dbName: appConfig().dbName,
     }),
-    MailerModule.forRootAsync({
-      imports: [ConfigModule],
-      useFactory: async (config: ConfigService) => ({
-        transport: {
-          host: 'smtp.ethereal.email',
-          port: 587,
-          service: 'gmail',
-          auth: {
-            user: 'dorjoohover@gmail.com',
-            pass: 'qwrn ysyk prkg iuls',
-          },
-        },
-        defaults: {
-          from: 'dorjoohover@gmail.com',
-        },
-      }),
-    }),
+    EmailModule,
 
     AuthModule,
     AdModule,

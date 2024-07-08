@@ -14,9 +14,9 @@ import { InjectModel } from '@nestjs/mongoose';
 import { ApiOperation, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 
 import { Model } from 'mongoose';
-import appConfig from 'src/config/app.config';
-import { UserStatus } from 'src/utils/enum';
-import { User, UserDocument } from 'src/schema/user.schema';
+import appConfig from '../../config/app.config';
+import { UserStatus } from '../../utils/enum';
+import { User, UserDocument } from '../../schema/user.schema';
 import { LoginUser, RegisterUser } from './auth.dto';
 import { AuthService } from './auth.service';
 @ApiTags('Auth')
@@ -60,11 +60,11 @@ export class AuthController {
   async createUser(@Body() dto: RegisterUser) {
     const user = await this.service.register(dto);
     if (user) {
-    //   const code =
-    //     Math.round(Math.random() * 10000000000).toString() + Date.now();
-    //   user.code = code;
-    //   user.save();
-    //   await this.sendConfirmMail(user.email, code);
+      //   const code =
+      //     Math.round(Math.random() * 10000000000).toString() + Date.now();
+      //   user.code = code;
+      //   user.save();
+      //   await this.sendConfirmMail(user.email, code);
       return false;
     }
   }
@@ -72,7 +72,6 @@ export class AuthController {
   @Post('login')
   @ApiOperation({ description: 'login hiih' })
   async login(@Body() dto: LoginUser) {
-    
     const user = await this.service.login(dto);
     if (user.status) {
       const token = await this.service.signPayload(user.user.email);
@@ -97,7 +96,9 @@ export class AuthController {
     let user = await this.model.findOne({ code });
     if (!user) throw new HttpException('user not found', HttpStatus.NOT_FOUND);
 
-    return res.redirect(`https://eunitbackend-production.up.railway.app/forget/${code}`);
+    return res.redirect(
+      `https://eunitbackend-production.up.railway.app/forget/${code}`,
+    );
   }
 
   @Post('forget/:code')

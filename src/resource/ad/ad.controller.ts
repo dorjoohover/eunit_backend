@@ -8,13 +8,11 @@ import {
   Post,
   Put,
   Query,
+  Req,
   Request,
-  UploadedFiles,
+  Res,
   UseGuards,
-  UseInterceptors,
 } from '@nestjs/common';
-import { FileFieldsInterceptor } from '@nestjs/platform-express';
-
 import {
   ApiBearerAuth,
   ApiOperation,
@@ -24,13 +22,21 @@ import {
 } from '@nestjs/swagger';
 import mongoose from 'mongoose';
 
-import { AdSellType, AdStatus, AdTypes, PointSendType, UserType } from 'src/utils/enum';
+import {
+  ActionMessage,
+  AdStatus,
+  AdTypes,
+  PointSendType,
+  UserType,
+} from '../../utils/enum';
 
-import { AdDto, FilterDto } from './ad.dto';
+import { AdDto, FilterDto } from './dto/ad.dto';
 import { AdService } from './ad.service';
-import { AuthGuard } from 'src/guard/auth.guard';
-import { Roles } from 'src/guard/roles.decorator';
+import { AuthGuard } from '../../guard/auth.guard';
+import { Roles } from '../../guard/roles.decorator';
 import { Cron } from '@nestjs/schedule';
+import { Response } from 'express';
+import { NotEnoughEunit } from './ad.exists.exception';
 
 @ApiTags('Ads')
 @Controller('ad')
@@ -50,15 +56,15 @@ export class AdController {
       case 'poster':
         return {
           message: 'soon',
-          status: false,
+          status: 500,
+          success: false,
+          id: ''
         };
       case 'special': {
         if (user.point >= 10000) {
           return this.service.createAd(dto, user['_id']);
         } else {
-          return {
-            message: 'not enough Eunit',
-          };
+          throw new NotEnoughEunit();
         }
       }
       default:
@@ -66,59 +72,63 @@ export class AdController {
     }
   }
 
-  @Get('get/:num')
+  @Get('get/:num/:limit/:type/:length')
   // @ApiCreatedResponse({ description: 'Created Succesfully' })
   @ApiOperation({ description: 'buh zariig harna' })
   @ApiParam({ name: 'num' })
-  async getAllAds(@Param('num') num: number) {
-    let defaultAds = await this.service.getAds(
+  @ApiParam({ name: 'limit' })
+  @ApiParam({ name: 'type' })
+  @ApiParam({ name: 'length' })
+  async getAllAds(
+    @Param('num') num: number,
+    @Param('limit') limit: number,
+    @Param('type') type: AdTypes,
+    @Param('length') length: number,
+  ) {
+    let ads = await this.service.getAds(
       num,
-      10,
+      limit,
       true,
-      AdTypes.default,
+      type,
       true,
       AdStatus.all,
+      length,
     );
-    let specialAds = await this.service.getAds(
-      num,
-      4,
-      true,
-      AdTypes.special,
-      true,
-      AdStatus.all,
-    );
-    return {
-      defaultAds: defaultAds,
-
-      specialAds: specialAds,
-    };
+    return ads;
   }
 
-  @Get('admin/:type/:num/:status')
+  @Get('test')
+  testAd(@Req() req: Request, @Res() res: Response) {
+    // const {count, page} = req.req
+  }
+
+  @Get('admin/:type/:num/:limit/:status/:length')
   @UseGuards(AuthGuard)
   @ApiBearerAuth('access-token')
   @ApiParam({ name: 'num' })
+  @ApiParam({ name: 'limit' })
   @ApiParam({ name: 'status' })
   @ApiParam({ name: 'type' })
+  @ApiParam({ name: 'length' })
+  @Roles(UserType.admin)
   async getAll(
     @Request() { user },
     @Param('type') type,
     @Param('num') num: number,
+    @Param('limit') limit: number,
     @Param('status') status: AdStatus,
+    @Param('length') length: number,
   ) {
-    if (user.userType == 'admin' || user.userType == 'system') {
-      let ads = await this.service.getAds(
-        num,
-        20,
-        false,
-        type,
-        type != 'all',
-        status,
-      );
-      if (!ads) throw new HttpException('not found ads', 402);
-      return ads;
-    }
-    return false;
+    let ads = await this.service.getAds(
+      num,
+      limit,
+      false,
+      type,
+      type != 'all',
+      status,
+      length,
+    );
+    return ads;
   }
 
   @Get('update/:id/:status/:view/:message')
@@ -155,16 +165,30 @@ export class AdController {
     return this.service.addAdView(id, user['_id']);
   }
 
-  @Get('search/:value')
+  @Get('search/:value/:type/:limit/:page/:length')
   @ApiQuery({ name: 'value' })
+  @ApiQuery({ name: 'type' })
+  @ApiQuery({ name: 'page' })
+  @ApiQuery({ name: 'limit' })
+  @ApiQuery({ name: 'length' })
   @ApiOperation({ description: 'search ad' })
-  async searchAd(@Query('value') value: string) {
-    return this.service.searchAd(value);
+  async searchAd(
+    @Query('value') value: string,
+    @Query('type') type: AdTypes,
+    @Query('page') page: number,
+    @Query('limit') limit: number,
+    @Query('length') length: number,
+  ) {
+    return this.service.searchAd(value, type, limit, page, length);
   }
 
-  @Post('many/:num/:self/:limit/:status/:type')
+  @Post('many/:num/:self/:limit/:status/:type/:length')
   @ApiParam({ name: 'num' })
   @ApiParam({ name: 'self' })
+  @ApiParam({ name: 'limit' })
+  @ApiParam({ name: 'status' })
+  @ApiParam({ name: 'type' })
+  @ApiParam({ name: 'length' })
   @ApiOperation({ description: 'images by multi ids' })
   async manyAdById(
     @Body()
@@ -177,14 +201,15 @@ export class AdController {
     @Param('limit') limit: number,
     @Param('status') status: AdStatus,
     @Param('type') type: AdTypes,
+    @Param('length') length: number,
   ) {
-    return this.service.getManyAds(dto, num, type, self, limit, status);
+    return this.service.getManyAds(dto, num, type, self, limit, status, length);
   }
 
-  @Get('adType/:id/:type/:message/')
+  @Get('adType/:id/:type/:message')
   @ApiParam({ name: 'id' })
   @ApiParam({ name: 'type' })
-@ApiQuery({ name: 'message' })
+  @ApiQuery({ name: 'message' })
   @UseGuards(AuthGuard)
   @ApiBearerAuth('access-token')
   @ApiOperation({ description: 'change ad type' })
@@ -194,42 +219,51 @@ export class AdController {
     @Param('type') type: AdTypes,
     @Query('message') message,
   ) {
-    try {
-      let receiver = new mongoose.mongo.ObjectId('641fc3b3bc1f3f56080e1f83');
-      if (user.point >= 10000 && type == AdTypes.special) {
-        let res = await this.service.updateTypeAd(id, type, true);
-        if (res) {
-          user.point = Number.parseFloat(user.point.toString()) - 10000;
-          user.pointHistory.push({
-            point: 10000,
-            sender: user['_id'],
-            receiver: receiver,
-            type: PointSendType.sender,
-            message: message ?? '',
-          });
-          user.save();
-          return true;
-        }
+    let receiver = new mongoose.mongo.ObjectId('641fc3b3bc1f3f56080e1f83');
+    if (user.point >= 10000 && type == AdTypes.special) {
+      let res = await this.service.updateTypeAd(id, type, true);
+      if (res) {
+        user.point = Number.parseFloat(user.point.toString()) - 10000;
+        user.pointHistory.push({
+          point: 10000,
+          sender: user['_id'],
+          receiver: receiver,
+          type: PointSendType.sender,
+          message: message ?? '',
+        });
+        user.save();
+        return {
+          success: true,
+          messsage: ActionMessage.success,
+          status: 200,
+          id: id,
+        };
       }
-      if (user.point >= 15000 && type == AdTypes.specialM) {
-        let res = await this.service.updateTypeAd(id, type, true);
-        if (res) {
-          user.point = Number.parseFloat(user.point.toString()) - 15000;
-          user.pointHistory.push({
-            point: 15000,
-            sender: user['_id'],
-            receiver: receiver,
-            type: PointSendType.sender,
-            message: message ?? '',
-          });
-          user.save();
-          return true;
-        }
-      }
-      return false;
-    } catch (error) {
-      throw new HttpException(error, 500);
     }
+    if (user.point >= 15000 && type == AdTypes.specialM) {
+      let res = await this.service.updateTypeAd(id, type, true);
+      if (res) {
+        user.point = Number.parseFloat(user.point.toString()) - 15000;
+        user.pointHistory.push({
+          point: 15000,
+          sender: user['_id'],
+          receiver: receiver,
+          type: PointSendType.sender,
+          message: message ?? '',
+        });
+        user.save();
+        return {
+          success: true,
+          message: ActionMessage.success,
+          status: 200,
+          id: id,
+        };
+      }
+    }
+    return {
+      success: false,
+      message: 'not enough Eunit point',
+    };
   }
 
   @Post('count')
@@ -237,11 +271,21 @@ export class AdController {
     return this.service.getAdsCount(dto);
   }
 
-  @ApiParam({ name: 'id' })
   @ApiOperation({ description: 'zar g category id gaar awna' })
-  @Get('category/:id/:num')
-  getAdByCategoryId(@Param('id') id: string, @Param('num') num: number) {
-    return this.service.getAdByCategoryId(id, num);
+  @Get('category/:id/:num/:limit/:type/:length')
+  @ApiParam({ name: 'id' })
+  @ApiParam({ name: 'num' })
+  @ApiParam({ name: 'limit' })
+  @ApiParam({ name: 'length' })
+  @ApiParam({ name: 'type' })
+  getAdByCategoryId(
+    @Param('id') id: string,
+    @Param('num') num: number,
+    @Param('limit') limit: number,
+    @Param('type') type: AdTypes,
+    @Param('length') length: number,
+  ) {
+    return this.service.getAdByCategoryId(id, num, limit, type, length);
   }
 
   @Get('json/:type')
@@ -252,42 +296,26 @@ export class AdController {
   }
 
   @ApiOperation({ description: 'filter ad' })
-  @Post('filter/:num/:type')
+  @Post('filter/:num/:type/:limit/:length')
   @ApiParam({ name: 'num' })
   @ApiParam({ name: 'type' })
+  @ApiParam({ name: 'limit' })
+  @ApiParam({ name: 'length' })
   async getFilterAd(
     @Param('num') num: number,
     @Param('type') type: AdTypes,
+    @Param('limit') limit: number,
+    @Param('length') length: number,
     @Body() dto: FilterDto,
   ) {
-    if (type == AdTypes.all) {
-      let defaultAds = await this.service.filterAd(
-        dto,
-        num,
-        10,
-        AdTypes.default,
-        dto.cateId,
-      );
-      let special = await this.service.filterAd(
-        dto,
-        num,
-        4,
-        AdTypes.special,
-        '',
-      );
-      return { defaultAds: defaultAds, specialAds: special };
-    }
-    if (type == AdTypes.any) {
-      return await this.service.filterAd(dto, num, 12, AdTypes.all, dto.cateId);
-    } else {
-      return await this.service.filterAd(
-        dto,
-        num,
-        type == AdTypes.default ? 10 : 4,
-        type,
-        type == AdTypes.default ? dto.cateId : '',
-      );
-    }
+    const ads = await this.service.filterAd(
+      dto,
+      num,
+      limit,
+      type,
+      length,
+    );
+    return ads;
   }
   // @ApiOperation({ description: 'filter ad' })
   // @Post('filter/:num')
@@ -304,31 +332,31 @@ export class AdController {
   //   return { defaultAds: defaultAds, specialAds: special };
   // }
 
-  @ApiOperation({ description: 'filter and suggest ad by value ' })
-  @Post('/category/filter/:cateId/:num')
-  @ApiParam({ name: 'cateId' })
-  @ApiParam({ name: 'num' })
-  async getFilterByValueAd(
-    @Param('cateId') cateId: string,
-    @Param('num') num: number,
-    @Body() dto: FilterDto,
-  ) {
-    let defaultAds = await this.service.filterAd(
-      dto,
-      num,
-      10,
-      AdTypes.default,
-      cateId,
-    );
-    let special = await this.service.filterAd(
-      dto,
-      num,
-      4,
-      AdTypes.special,
-      cateId,
-    );
-    return { defaultAds: defaultAds, specialAds: special };
-  }
+  // @ApiOperation({ description: 'filter and suggest ad by value ' })
+  // @Post('/category/filter/:cateId/:num')
+  // @ApiParam({ name: 'cateId' })
+  // @ApiParam({ name: 'num' })
+  // async getFilterByValueAd(
+  //   @Param('cateId') cateId: string,
+  //   @Param('num') num: number,
+  //   @Body() dto: FilterDto,
+  // ) {
+  //   let defaultAds = await this.service.filterAd(
+  //     dto,
+  //     num,
+  //     10,
+  //     AdTypes.default,
+  //     cateId,
+  //   );
+  //   let special = await this.service.filterAd(
+  //     dto,
+  //     num,
+  //     4,
+  //     AdTypes.special,
+  //     cateId,
+  //   );
+  //   return { defaultAds: defaultAds, specialAds: special };
+  // }
 
   @ApiOperation({ description: 'suggest ad by enum' })
   @Post('suggestion/:id/:num/:page')
@@ -336,7 +364,8 @@ export class AdController {
   @ApiParam({ name: 'num' })
   @ApiParam({ name: 'page' })
   async getSuggestion(
-    @Body() dto: {
+    @Body()
+    dto: {
       id: string;
       value: string;
     },
@@ -344,7 +373,7 @@ export class AdController {
     @Param('num') num: number,
     @Param('id') id: string,
   ) {
-    return await this.service.suggestAd(id,  dto, num, page);
+    return await this.service.suggestAd(id, dto, num, page);
   }
 
   @Get('id/:id')

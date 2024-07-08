@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 
 
-import { Ad, AdSchema, Category, CategorySchema, Item, ItemSchema, User, UserSchema } from 'src/schema';
+import { Ad, AdSchema, Category, CategorySchema, Item, ItemSchema, User, UserSchema } from '../../schema';
 import { CategoryService } from '../category/category.service';
 import { AdController } from './ad.controller';
 import { AdService } from './ad.service';

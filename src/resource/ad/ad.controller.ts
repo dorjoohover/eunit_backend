@@ -43,7 +43,7 @@ import { NotEnoughEunit } from './ad.exists.exception';
 @Controller('ad')
 export class AdController {
   constructor(private readonly service: AdService) {}
-  private readonly logger = new Logger(AdController.name)
+  private readonly logger = new Logger(AdController.name);
 
   @UseGuards(AuthGuard)
   @ApiBearerAuth('access-token')
@@ -60,7 +60,7 @@ export class AdController {
           message: 'soon',
           status: 500,
           success: false,
-          id: ''
+          id: '',
         };
       case 'special': {
         if (user.point >= 10000) {
@@ -90,10 +90,18 @@ export class AdController {
     @Param('status') status: AdStatus,
     @Param('length') length: number,
     @Param('type') type: AdTypes,
-    @Request() {user}
-   ) {
-    const ads = await this.service.getMyAds(num, limit, cate, status, length, type, user['_id'])
-    return ads
+    @Request() { user },
+  ) {
+    const ads = await this.service.getMyAds(
+      num,
+      limit,
+      cate,
+      status,
+      length,
+      type,
+      user['_id'],
+    );
+    return ads;
   }
 
   @Get('get/:num/:limit/:type/:length')
@@ -126,10 +134,11 @@ export class AdController {
     // const {count, page} = req.req
   }
 
-  @Get('admin/:type/:num/:limit/:status/:length')
+  @Get('admin/:cate/:type/:num/:limit/:status/:length')
   @UseGuards(AuthGuard)
   @ApiBearerAuth('access-token')
   @ApiParam({ name: 'num' })
+  @ApiParam({ name: 'cate' })
   @ApiParam({ name: 'limit' })
   @ApiParam({ name: 'status' })
   @ApiParam({ name: 'type' })
@@ -138,11 +147,13 @@ export class AdController {
   async getAll(
     @Request() { user },
     @Param('type') type,
+    @Param('cate') cate: string,
     @Param('num') num: number,
     @Param('limit') limit: number,
     @Param('status') status: AdStatus,
     @Param('length') length: number,
   ) {
+    
     let ads = await this.service.getAds(
       num,
       limit,
@@ -151,6 +162,7 @@ export class AdController {
       type != 'all',
       status,
       length,
+      cate == ' ' ? undefined : cate,
     );
     return ads;
   }
@@ -332,13 +344,7 @@ export class AdController {
     @Param('length') length: number,
     @Body() dto: FilterDto,
   ) {
-    const ads = await this.service.filterAd(
-      dto,
-      num,
-      limit,
-      type,
-      length,
-    );
+    const ads = await this.service.filterAd(dto, num, limit, type, length);
     return ads;
   }
   // @ApiOperation({ description: 'filter ad' })
@@ -431,9 +437,8 @@ export class AdController {
     description: 'todorhoi hugatsaa heterwel status g ni timed bolgono',
   })
   updateStatusTimed() {
-    
-    this.logger.debug('called cron')
-     
+    this.logger.debug('called cron');
+
     return this.service.updateStatusTimed();
   }
 }

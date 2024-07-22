@@ -656,8 +656,7 @@ export class AdService {
     length: number,
   ) {
     const categoryId = isValidObjectId(dto.cateId);
-    console.log(categoryId);
-    console.log(dto.cateId);
+  
     const category = await this.categoryModel.findOne(
       categoryId ? { _id: new ObjectId(dto.cateId) } : { href: dto.cateId },
     );
@@ -711,6 +710,44 @@ export class AdService {
     let l = length == 0 ? await this.model.find(body).countDocuments() : length;
 
     return { ads: ads, limit: l };
+  }
+
+  async getMyAds(
+    num: number,
+    limit: number,
+    cate: string,
+    status: AdStatus,
+    length: number,
+    type: AdTypes,
+    user: string,
+  ) {
+    
+    const body = {
+      user: user,
+      adStatus: status,
+      $or: [
+        {
+          category: cate == ' ' ? { $ne: '641c932bf60152dbf901c070' } : cate,
+        },
+        {
+          subCategory: cate == ' ' ? { $ne: '641c932bf60152dbf901c070' } : cate,
+        },
+      ],
+      type:
+        type == AdTypes.all ? { $nin: [AdTypes.all, AdTypes.sharing] } : type,
+    };
+    
+    const ads = await this.model
+      .find(body, {}, { num: -1 })
+      .limit(limit)
+      .skip(num * limit);
+    if (!ads) throw new AdNotFound();
+    const l =
+      length == 0 ? await this.model.find(body).countDocuments() : length;
+    return {
+      ads: ads,
+      limit: l,
+    };
   }
 
   async updateAd(id: string, dto: AdDto) {

@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   HttpException,
+  Logger,
   Param,
   Post,
   Put,
@@ -42,6 +43,7 @@ import { NotEnoughEunit } from './ad.exists.exception';
 @Controller('ad')
 export class AdController {
   constructor(private readonly service: AdService) {}
+  private readonly logger = new Logger(AdController.name)
 
   @UseGuards(AuthGuard)
   @ApiBearerAuth('access-token')
@@ -70,6 +72,28 @@ export class AdController {
       default:
         return this.service.createAd(dto, user['_id']);
     }
+  }
+
+  @Get('my/:num/:limit/:cate/:status/:type/:length')
+  @ApiOperation({ description: 'ooriin zar harah' })
+  @ApiParam({ name: 'num' })
+  @ApiParam({ name: 'limit' })
+  @ApiParam({ name: 'status' })
+  @ApiParam({ name: 'cate' })
+  @ApiParam({ name: 'type' })
+  @ApiParam({ name: 'length' })
+  @UseGuards(AuthGuard)
+  async getMyAds(
+    @Param('num') num: number,
+    @Param('limit') limit: number,
+    @Param('cate') cate: string,
+    @Param('status') status: AdStatus,
+    @Param('length') length: number,
+    @Param('type') type: AdTypes,
+    @Request() {user}
+   ) {
+    const ads = await this.service.getMyAds(num, limit, cate, status, length, type, user['_id'])
+    return ads
   }
 
   @Get('get/:num/:limit/:type/:length')
@@ -401,12 +425,15 @@ export class AdController {
   deleteAds() {
     return this.service.delete();
   }
-  @Cron('* * * 1 * *')
+  @Cron('* * 8 * * *')
   @Get('/status/timed')
   @ApiOperation({
     description: 'todorhoi hugatsaa heterwel status g ni timed bolgono',
   })
   updateStatusTimed() {
+    
+    this.logger.debug('called cron')
+     
     return this.service.updateStatusTimed();
   }
 }

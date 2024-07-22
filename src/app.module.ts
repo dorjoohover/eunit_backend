@@ -13,6 +13,7 @@ import { MailerModule } from '@nestjs-modules/mailer';
 import { MulterModule } from '@nestjs/platform-express';
 import { CategoryModule } from './resource/category/category.module';
 import { EmailModule } from './resource/auth/email.module';
+import { ScheduleModule } from '@nestjs/schedule';
 @Global()
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { EmailModule } from './resource/auth/email.module';
       isGlobal: true,
       load: [appConfig],
     }),
+    ScheduleModule.forRoot(),
 
     MongooseModule.forRoot(appConfig().dbUrl, {
       // useNewUrlParser: true,

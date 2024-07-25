@@ -79,6 +79,15 @@ export class EstimateService {
     };
   }
 
+  async delete() {
+    const estimate = await this.model.deleteMany()
+    return {
+      status: 200, 
+      message: ActionMessage.success,
+      id: estimate.deletedCount,
+      success: true
+    }
+  }
   async updatePrice(id: string, price: number) {
     let estimate = await this.model.findById(id);
     if (!estimate) throw new EstimateNotFound();

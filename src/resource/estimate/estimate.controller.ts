@@ -69,6 +69,12 @@ export class EstimateController {
     return await this.service.deleteEstimate(id);
   }
 
+
+  @Delete()
+  async delete() {
+    return await this.service.delete()
+  }
+
   @Get('price/:id/:price')
   @ApiParam({ name: 'id' })
   @ApiParam({ name: 'price' })

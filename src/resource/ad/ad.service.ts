@@ -743,7 +743,9 @@ export class AdService {
       adType: type === AdTypes.all ? { $ne: AdTypes.all } : type,
 
       sellType:
-        dto.sellTypes.length > 0 ? { $in: dto.sellTypes } : { $nin: [] },
+        dto.sellTypes.length > 0
+          ? { $in: [...dto.sellTypes, AdSellType.sellRent] }
+          : { $nin: [] },
     };
     let ads = await this.model
       .find(body)

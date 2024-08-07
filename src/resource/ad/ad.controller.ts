@@ -31,7 +31,7 @@ import {
   UserType,
 } from '../../utils/enum';
 
-import { AdDto, FilterDto } from './dto/ad.dto';
+import { AdDataDto, AdDto, FilterDto } from './dto/ad.dto';
 import { AdService } from './ad.service';
 import { AuthGuard } from '../../guard/auth.guard';
 import { Roles } from '../../guard/roles.decorator';
@@ -72,6 +72,11 @@ export class AdController {
       default:
         return this.service.createAd(dto, user['_id']);
     }
+  }
+  @Post('data')
+  async uploadData(@Body() dto: AdDataDto) {
+    return this.service.uploadData(dto)
+    
   }
 
   @Get('my/:num/:limit/:cate/:status/:type/:length')
@@ -153,7 +158,6 @@ export class AdController {
     @Param('status') status: AdStatus,
     @Param('length') length: number,
   ) {
-    
     let ads = await this.service.getAds(
       num,
       limit,
@@ -203,17 +207,17 @@ export class AdController {
 
   @Get('search/:value/:type/:limit/:page/:length')
   @ApiQuery({ name: 'value' })
-  @ApiQuery({ name: 'type' })
-  @ApiQuery({ name: 'page' })
-  @ApiQuery({ name: 'limit' })
-  @ApiQuery({ name: 'length' })
+  @ApiParam({ name: 'type' })
+  @ApiParam({ name: 'page' })
+  @ApiParam({ name: 'limit' })
+  @ApiParam({ name: 'length' })
   @ApiOperation({ description: 'search ad' })
   async searchAd(
     @Query('value') value: string,
-    @Query('type') type: AdTypes,
-    @Query('page') page: number,
-    @Query('limit') limit: number,
-    @Query('length') length: number,
+    @Param('type') type: AdTypes,
+    @Param('page') page: number,
+    @Param('limit') limit: number,
+    @Param('length') length: number,
   ) {
     return this.service.searchAd(value, type, limit, page, length);
   }
@@ -440,5 +444,11 @@ export class AdController {
     this.logger.debug('called cron');
 
     return this.service.updateStatusTimed();
+  }
+
+
+  @Put('update/num')
+  updateNum() {
+    return this.service.updateNum()
   }
 }

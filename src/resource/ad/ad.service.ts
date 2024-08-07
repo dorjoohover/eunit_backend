@@ -12,6 +12,8 @@ import {
   AdStatus,
   AdTypes,
   AdView,
+  ItemPosition,
+  ItemTypes,
 } from '../../utils/enum';
 import {
   Ad,
@@ -22,7 +24,7 @@ import {
   UserDocument,
 } from '../../schema';
 import { CategoryService } from '../category/category.service';
-import { AdDto, AdRequired, FilterDto } from './dto/ad.dto';
+import { AdDataDto, AdDto, AdRequired, FilterDto } from './dto/ad.dto';
 import {
   AdAlreadyExists,
   AdNotFound,
@@ -98,6 +100,33 @@ export class AdService {
       status: 201,
       id: ad._id,
       message: ActionMessage.success,
+    };
+  }
+
+  async uploadData(dto: AdDataDto) {
+    let adNum = Number(`${Date.now()}`);
+    const ad = await this.model.create({
+      num: adNum,
+      user: new ObjectId('65fd0fdd141800e0a6619a5a'),
+      images: [],
+      title: dto.title,
+      description: dto.description,
+      location: dto.location,
+      category: new ObjectId('63f212d2742b202a77c109d5'),
+      subCategory: dto.subCategory,
+      sellType: dto.sellType,
+      items: dto.items,
+      adType: dto.adType,
+      adStatus: dto.adStatus,
+      image: dto.image,
+      file: dto.file,
+      view: dto.view,
+      createdAt: dto.date,
+    });
+
+    return {
+      success: true,
+      id: ad._id,
     };
   }
   async getAds(
@@ -266,6 +295,89 @@ export class AdService {
 
     if (ads.length == 0 || !ads) throw new AdNotFound();
     return ads;
+  }
+  async updateNum() {
+    const ads = await this.model.find();
+    for (let i = 0; i < ads.length; i++) {
+      let items = ads[i].items;
+      if (i == 2) break;
+      items.map((item) => {
+        let i = item;
+        let id = i.id;
+        let name = i.name;
+        let value = i.value;
+        let types = ItemTypes.dropdown;
+        let position = ItemPosition.default;
+        let index = 1;
+        let search = true;
+        let use = true;
+        if (id == 'price') {
+          types = ItemTypes.text;
+          position = ItemPosition.side;
+          index = 0;
+        }
+        if (id == 'buildingProcess') {
+          types = ItemTypes.text;
+          index = 5;
+          search = false;
+        }
+        if (id == 'area') {
+          types = ItemTypes.text;
+          index = -1;
+          position = ItemPosition.any;
+        }
+        if (id == 'floor') {
+          index = 10;
+        }
+        if (id == 'operation') {
+          index = 2;
+          types = ItemTypes.date;
+        }
+        if (id == 'garage') {
+          index = 11;
+        }
+        if (id == 'windowUnit') {
+          index = 7;
+        }
+        if (id == 'paymentMethod') {
+          index = 12;
+        }
+        if (id == 'location') {
+          index = 1;
+          i = { ...i, other: true };
+        }
+        if (id == 'landUsage') {
+          index = 2;
+        }
+        if (id == 'howFloor') {
+          index = 4;
+          i = { ...i, parentId: 'buildingFloor' };
+        }
+        if (id == 'balcony') {
+          index = 9;
+          name = 'Тагтны тоо';
+          value = value.toString().split(' ')?.[0] ?? 'Тагтгүй';
+          id = 'balconyUnit';
+        }
+        let nothing = ['title', 'description'];
+        if (!nothing.includes(i.id))
+          i = {
+            isUse: use,
+            id: id,
+            isSearch: search,
+            index: index,
+            name: name,
+            value: value,
+            position: position,
+            type: types,
+            ...i,
+          };
+        return i;
+      });
+      console.log(ads[i].items[0].index);
+      console.log(i, ads[i].id);
+      ads[i].save();
+    }
   }
   async updateStatusTimed() {
     const date = Date.now();
@@ -440,10 +552,10 @@ export class AdService {
     const body = {
       title: { $regex: value, $options: 'i' },
       view: AdView.show,
-      adType: type,
+      adType: type == AdTypes.all ? { $ne: AdTypes.all } : type,
     };
     let ads = await this.model
-      .find(body, null, { sort: -1 })
+      .find(body, null, { sort: { createdAt: -1 } })
       .limit(limit)
       .skip(page * limit);
     const l =

@@ -76,14 +76,14 @@ export enum ItemPosition {
 }
 // item
 export enum ItemTypes {
-  dropdown,
-  text,
-  date,
-  year,
-  select,
-  number,
-  committee,
-  radio,
+  dropdown = 'dropdown',
+  text = 'text',
+  date = 'date',
+  year = 'year',
+  select = 'select',
+  number = 'number',
+  committee = 'committee',
+  radio = 'radio',
 }
 // point
 export enum PointSendType {
@@ -104,11 +104,8 @@ export enum CreateAdSteps {
   detail = 'detail',
 }
 
-
-
-
 export enum ActionMessage {
-  success = "success",
+  success = 'success',
   warning = 'warning',
-  error = 'error'
+  error = 'error',
 }

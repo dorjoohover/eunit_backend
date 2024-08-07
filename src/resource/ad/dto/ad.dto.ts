@@ -109,7 +109,47 @@ export class AdDto {
   subCategory: string;
 
   @ApiProperty()
+  category: string;
+
+  @ApiProperty({ enum: AdSellType })
+  sellType: AdSellType;
+
+  @ApiProperty({ isArray: true })
+  items: AdItemDto[];
+
+  @ApiProperty({ enum: AdTypes, default: AdTypes.default })
+  adType: AdTypes;
+
+  @ApiProperty({ enum: AdStatus, default: AdStatus.pending })
+  adStatus: AdStatus;
+
+  @ApiProperty({ enum: AdView })
+  view: AdView;
+  @ApiProperty()
+  image?: string;
+
+  @ApiProperty()
+  file?: string;
+}
+export class AdDataDto {
+  @ApiProperty({ maxLength: 100 })
   @IsString()
+  title: string;
+
+  @ApiProperty({ maxLength: 1000 })
+  description: string;
+
+  @ApiProperty({ type: AdLocation })
+  location: AdLocation;
+
+  @ApiProperty()
+  @IsString()
+  subCategory: string;
+  @ApiProperty()
+  @IsString()
+  date: string;
+
+  @ApiProperty()
   category: string;
 
   @ApiProperty({ enum: AdSellType })

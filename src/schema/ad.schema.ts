@@ -28,6 +28,8 @@ export class AdItems {
   isSearch: boolean;
   @Prop({ required: true })
   isUse: boolean;
+  parentId: string;
+  other : boolean
 }
 export class AdLocation {
   @Prop()

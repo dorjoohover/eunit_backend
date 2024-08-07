@@ -14,6 +14,7 @@ import { MulterModule } from '@nestjs/platform-express';
 import { CategoryModule } from './resource/category/category.module';
 import { EmailModule } from './resource/auth/email.module';
 import { ScheduleModule } from '@nestjs/schedule';
+import { AppService } from './app.service';
 @Global()
 @Module({
   imports: [
@@ -39,6 +40,6 @@ import { ScheduleModule } from '@nestjs/schedule';
     EstimateModule,
   ],
   controllers: [AppController],
-  providers: [],
+  providers: [AppService],
 })
 export class AppModule {}

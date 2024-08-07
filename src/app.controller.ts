@@ -9,18 +9,16 @@ import {
   UploadedFiles,
   UseInterceptors,
 } from '@nestjs/common';
-import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
+import { FilesInterceptor } from '@nestjs/platform-express';
 import { ApiParam } from '@nestjs/swagger';
 import * as path from 'path';
 import { createReadStream } from 'fs';
-import { join } from 'path';
-import { multerOptions } from './multer.config';
-import type { Response } from 'express';
+import { memoryStorage } from 'multer';
+import { AppService } from './app.service';
 
 @Controller()
 export class AppController {
-  constructor() {}
-
+  constructor(private readonly service: AppService) {}
   // @Post()
   // @UseInterceptors(
   //   FileInterceptor('file', {
@@ -39,12 +37,11 @@ export class AppController {
   //   };
   // }
   @Post('upload')
-  @UseInterceptors(FilesInterceptor('files', 8, multerOptions))
+  @UseInterceptors(FilesInterceptor('files', 8, { storage: memoryStorage() }))
   async multiFileUpload(@UploadedFiles() file: Array<Express.Multer.File>) {
-    const files = file.map((f) => f.filename);
-    return {
-      file: files,
-    };
+    const processImage = await this.service.processMultipleImages(file);
+
+    return { file: processImage };
   }
 
   @Get('/file/:file')

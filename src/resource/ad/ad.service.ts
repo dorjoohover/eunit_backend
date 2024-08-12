@@ -104,29 +104,29 @@ export class AdService {
   }
 
   async uploadData(dto: AdDataDto) {
-    let adNum = Number(`${Date.now()}`);
-    const ad = await this.model.create({
-      num: adNum,
-      user: new ObjectId('65fd0fdd141800e0a6619a5a'),
-      images: [],
-      title: dto.title,
-      description: dto.description,
-      location: dto.location,
-      category: new ObjectId('63f212d2742b202a77c109d5'),
-      subCategory: dto.subCategory,
-      sellType: dto.sellType,
-      items: dto.items,
-      adType: dto.adType,
-      adStatus: dto.adStatus,
-      image: dto.image,
-      file: dto.file,
-      view: dto.view,
-      createdAt: dto.date,
-    });
+    // let adNum = Number(`${Date.now()}`);
+    // const ad = await this.model.create({
+    //   num: adNum,
+    //   user: new ObjectId('65fd0fdd141800e0a6619a5a'),
+    //   images: [],
+    //   title: dto.title,
+    //   description: dto.description,
+    //   location: dto.location,
+    //   category: new ObjectId('63f212d2742b202a77c109d5'),
+    //   subCategory: dto.subCategory,
+    //   sellType: dto.sellType,
+    //   items: dto.items,
+    //   adType: dto.adType,
+    //   adStatus: dto.adStatus,
+    //   image: dto.image,
+    //   file: dto.file,
+    //   view: dto.view,
+    //   createdAt: dto.date,
+    // });
 
     return {
       success: true,
-      id: ad._id,
+      id: '',
     };
   }
   async getAds(

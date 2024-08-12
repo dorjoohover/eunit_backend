@@ -13,12 +13,14 @@ export class AppService {
     if (file.mimetype.startsWith('image')) {
       processImage = await sharp(imageBuffer)
         .jpeg({
-          quality:
-            file.size > 2000000
+          quality: parseInt(
+            (file.size > 2000000
               ? (2000000 / file.size) * 100 < 20
                 ? 20
                 : (2000000 / file.size) * 100
-              : 100,
+              : 100
+            ).toString(),
+          ),
         })
         .toBuffer();
     }

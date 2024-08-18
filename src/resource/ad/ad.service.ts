@@ -24,7 +24,13 @@ import {
   UserDocument,
 } from '../../schema';
 import { CategoryService } from '../category/category.service';
-import { AdDataDto, AdDto, AdRequired, FilterDto } from './dto/ad.dto';
+import {
+  AdDataDto,
+  AdDto,
+  AdRequired,
+  DataFilterDto,
+  FilterDto,
+} from './dto/ad.dto';
 import {
   AdAlreadyExists,
   AdNotFound,
@@ -128,6 +134,89 @@ export class AdService {
       success: true,
       id: '',
     };
+  }
+
+  async dataFilter(dto: DataFilterDto) {
+    try {
+      const subcategoryId = isValidObjectId(dto.subCategory);
+
+      const category = await this.categoryModel.findOne(
+        subcategoryId
+          ? { _id: new ObjectId(dto.subCategory) }
+          : { href: dto.subCategory },
+      );
+      if (!subcategoryId && dto.subCategory != '') throw new CategoryNotFound();
+
+      let items =
+        dto.items?.length > 0
+          ? dto.items.map((d) => {
+              if (d.id == 'location') {
+                return {
+                  'items.id': 'location',
+                  'items.value': {
+                    $regex: dto.locations.join('|'),
+                  },
+                };
+              }
+              return {
+                'items.id': d.id,
+
+                'items.value':
+                  d.value != undefined ? d.value : { $gte: d.min, $lte: d.max },
+              };
+            })
+          : [...[{ 'items.id': { $ne: '' } }]];
+
+      let body = {
+        $and: [
+          {
+            subCategory:
+              dto.subCategory == ''
+                ? { $ne: '641c932bf60152dbf901c070' }
+                : dto.subCategory,
+          },
+        ],
+        adStatus:
+          dto.adStatus.length > 0
+            ? dto.adStatus[0]
+            : {
+                $nin: [
+                  AdStatus.deleted,
+                  AdStatus.sold,
+                  AdStatus.timed,
+                  AdStatus.checking,
+                  AdStatus.pending,
+                ],
+              },
+        adType: { $ne: AdTypes.all },
+
+        sellType: dto.sellTypes.length > 0 ? dto.sellTypes[0] : { $nin: [] },
+      };
+      console.log(items);
+      let ads = await this.model
+        .find({
+          ...body,
+
+          $and: items,
+        })
+        .sort({ updatedAt: 'desc' })
+
+        .limit(30);
+      let l = await this.model
+        .find({
+          ...body,
+
+          $and: items,
+        })
+        .countDocuments();
+
+      return {
+        limit: l,
+        data: ads,
+      };
+    } catch (error) {
+      console.log(error);
+    }
   }
   async getAds(
     num: number,

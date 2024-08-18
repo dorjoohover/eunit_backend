@@ -31,7 +31,13 @@ import {
   UserType,
 } from '../../utils/enum';
 
-import { AdDataDto, AdDto, FilterDto } from './dto/ad.dto';
+import {
+  AdDataDto,
+  AdDto,
+  AdFilterDto,
+  DataFilterDto,
+  FilterDto,
+} from './dto/ad.dto';
 import { AdService } from './ad.service';
 import { AuthGuard } from '../../guard/auth.guard';
 import { Roles } from '../../guard/roles.decorator';
@@ -75,8 +81,12 @@ export class AdController {
   }
   @Post('data')
   async uploadData(@Body() dto: AdDataDto) {
-    return this.service.uploadData(dto)
-    
+    return this.service.uploadData(dto);
+  }
+  @Post('data/filter')
+  async dataFilter(@Body() dto: DataFilterDto) {
+    console.log(dto)
+    return this.service.dataFilter(dto);
   }
 
   @Get('my/:num/:limit/:cate/:status/:type/:length')
@@ -446,9 +456,8 @@ export class AdController {
     return this.service.updateStatusTimed();
   }
 
-
   @Put('update/num')
   updateNum() {
-    return this.service.updateNum()
+    return this.service.updateNum();
   }
 }

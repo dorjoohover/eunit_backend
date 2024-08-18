@@ -39,6 +39,23 @@ export class FilterDto {
   @ApiProperty()
   cateId: string;
 }
+export class DataFilterDto {
+  @ApiProperty({ isArray: true, type: AdFilterDto })
+  @IsArray()
+  items: AdFilterDto[];
+
+  @ApiProperty({ isArray: true })
+  sellTypes: string[];
+  @ApiProperty({ isArray: true })
+  adStatus: string[];
+
+  @ApiProperty({ isArray: true })
+  locations: string[];
+  @ApiProperty()
+  category: string;
+  @ApiProperty()
+  subCategory: string;
+}
 
 export class AdItemDto {
   @ApiProperty()

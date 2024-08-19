@@ -20,6 +20,8 @@ import {
   AdDocument,
   Category,
   CategoryDocument,
+  Item,
+  ItemDocument,
   User,
   UserDocument,
 } from '../../schema';
@@ -43,6 +45,7 @@ import { CategoryNotFound } from '../category/category.exits.exception';
 export class AdService {
   constructor(
     @InjectModel(Ad.name) private model: Model<AdDocument>,
+    @InjectModel(Item.name) private itemModel: Model<ItemDocument>,
     @InjectModel(Category.name) private categoryModel: Model<CategoryDocument>,
     @InjectModel(User.name) private userModel: Model<UserDocument>,
   ) {}
@@ -136,6 +139,85 @@ export class AdService {
     };
   }
 
+  async getItems(value: string) {
+    try {
+      let ad = await this.model.findOne({ _id: '66b1f6040d7fbc5e9af29a6b' });
+      ad.items = ad.items.map((i) => {
+        if (typeof i.value == 'string') {
+          i.value = i.value.trim().replace(/\s+/g, '');
+        }
+        return i;
+      });
+      await ad.save().then((d) => console.log('success', d));
+      // ads.map(async (ad) => {
+      //   console.log(ad._id);
+      //   const items = ad.items.map((i) => {
+      //     if (typeof i.value === 'string') {
+      //       if (i.value[0] == ' ') i.value = i.value.substring(1);
+      //       i.value = i.value.replace(/\s{2,}/g, '');
+      //       return i;
+      //     } else {
+      //       return i;
+      //     }
+      //   });
+      //   items.map((i) => console.log(i.value));
+      //   ad.items = items;
+      //   await ad.save();
+      //   // console.log(ad.items.$.value);
+      //   // ad.items['value'] = ad.items['value'].replace(/\s{2,}/, '');
+      //   // await ad.save();
+      // });
+
+      const item = await this.model.find({ subCategory: value }).limit(1);
+
+      const data = await this.categoryModel
+        .findById(value)
+        .populate(
+          'steps.values',
+          'name value types type index position parentId other isSearch isUse',
+          this.itemModel,
+        )
+        .exec();
+      const primary = data.steps.map((s) => s.values).flat(1);
+      let items = [];
+      item[0].items.map((i) => {
+        for (let s = 0; s < primary.length; s++) {
+          if (i.id == primary[s]['type']) {
+            items.push(primary[s]);
+          }
+        }
+      });
+      return items;
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async getLocation(district: string) {
+    try {
+      let location = await this.model.find({
+        $and: [
+          {
+            'items.id': 'district',
+          },
+          {
+            'items.value': { $regex: district },
+          },
+        ],
+      });
+      let locations = [];
+      location.map((l) =>
+        l.items.map((i) => {
+          if (i.id == 'location') {
+            const value = i.value.replaceAll('\r', '');
+            if (!locations.includes(value)) locations.push(value);
+          }
+        }),
+      );
+      return locations;
+    } catch (error) {}
+  }
+
   async dataFilter(dto: DataFilterDto) {
     try {
       const subcategoryId = isValidObjectId(dto.subCategory);
@@ -158,24 +240,31 @@ export class AdService {
                   },
                 };
               }
+              if (d.id == 'balconyUnit') {
+                let value = `/${d.value}/`;
+                if (d.value == '5+') value = '/\b([6-9]|[1-9]d+)\b/';
+                console.log(value);
+                return {
+                  'items.id': d.id,
+                  'items.value': { $regex: value },
+                };
+              }
               return {
                 'items.id': d.id,
 
                 'items.value':
-                  d.value != undefined ? d.value : { $gte: d.min, $lte: d.max },
+                  d.value != undefined
+                    ? !isNaN(parseFloat(d.value))
+                      ? parseFloat(d.value)
+                      : d.value
+                    : { $gte: d.min, $lte: d.max },
               };
             })
           : [...[{ 'items.id': { $ne: '' } }]];
 
       let body = {
-        $and: [
-          {
-            subCategory:
-              dto.subCategory == ''
-                ? { $ne: '641c932bf60152dbf901c070' }
-                : dto.subCategory,
-          },
-        ],
+        subCategory: dto.subCategory,
+
         adStatus:
           dto.adStatus.length > 0
             ? dto.adStatus[0]

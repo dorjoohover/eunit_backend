@@ -85,8 +85,18 @@ export class AdController {
   }
   @Post('data/filter')
   async dataFilter(@Body() dto: DataFilterDto) {
-    console.log(dto)
+    console.log(dto);
     return this.service.dataFilter(dto);
+  }
+  @Get('data/items/:name/:value')
+  @ApiParam({ name: 'value' })
+  @ApiParam({ name: 'name' })
+  async getLocation(
+    @Param('value') value: string,
+    @Param('name') name: string,
+  ) {
+    if (name == 'location') return this.service.getLocation(value);
+    return this.service.getItems(value)
   }
 
   @Get('my/:num/:limit/:cate/:status/:type/:length')

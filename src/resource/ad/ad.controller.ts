@@ -44,11 +44,15 @@ import { Roles } from '../../guard/roles.decorator';
 import { Cron } from '@nestjs/schedule';
 import { Response } from 'express';
 import { NotEnoughEunit } from './ad.exists.exception';
+import { ExcelService } from './excel.service';
 
 @ApiTags('Ads')
 @Controller('ad')
 export class AdController {
-  constructor(private readonly service: AdService) {}
+  constructor(
+    private readonly service: AdService,
+    private readonly excel: ExcelService,
+  ) {}
   private readonly logger = new Logger(AdController.name);
 
   @UseGuards(AuthGuard)
@@ -85,18 +89,20 @@ export class AdController {
   }
   @Post('data/filter')
   async dataFilter(@Body() dto: DataFilterDto) {
-    console.log(dto);
     return this.service.dataFilter(dto);
   }
-  @Get('data/items/:name/:value')
+
+  @Get('data/items/:name/:value/:category')
   @ApiParam({ name: 'value' })
   @ApiParam({ name: 'name' })
+  @ApiParam({ name: 'category' })
   async getLocation(
     @Param('value') value: string,
     @Param('name') name: string,
+    @Param('category') category: number,
   ) {
-    if (name == 'location') return this.service.getLocation(value);
-    return this.service.getItems(value)
+    // if (name == 'location') return this.service.getLocation(value);
+    return this.service.getItems(name, value, category);
   }
 
   @Get('my/:num/:limit/:cate/:status/:type/:length')

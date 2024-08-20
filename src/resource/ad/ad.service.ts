@@ -40,6 +40,9 @@ import {
 } from './ad.exists.exception';
 import { ObjectId } from 'mongodb';
 import { CategoryNotFound } from '../category/category.exits.exception';
+import { ExcelService } from './excel.service';
+import { clearScreenDown } from 'readline';
+import { names } from 'src/utils/strings';
 
 @Injectable()
 export class AdService {
@@ -48,6 +51,7 @@ export class AdService {
     @InjectModel(Item.name) private itemModel: Model<ItemDocument>,
     @InjectModel(Category.name) private categoryModel: Model<CategoryDocument>,
     @InjectModel(User.name) private userModel: Model<UserDocument>,
+    private service: ExcelService,
   ) {}
 
   async createAd(dto: AdDto, user: string) {
@@ -139,16 +143,40 @@ export class AdService {
     };
   }
 
-  async getItems(value: string) {
+  async getItems(name: string, value: string, category: number) {
     try {
-      let ad = await this.model.findOne({ _id: '66b1f6040d7fbc5e9af29a6b' });
-      ad.items = ad.items.map((i) => {
-        if (typeof i.value == 'string') {
-          i.value = i.value.trim().replace(/\s+/g, '');
-        }
-        return i;
-      });
-      await ad.save().then((d) => console.log('success', d));
+      let data = this.service.readExcel('zarna_7-30', category);
+      console.log(data.length);
+      if (name == 'location') {
+        data = data.map((d) =>
+          d['district'].toLowerCase() == value.toLowerCase()
+            ? d['location']
+            : null,
+        );
+
+        data = data.filter((d, v) => d != null && data.indexOf(d) === v).sort();
+      } else {
+        data = Object.keys(data[0]).filter(
+          (d) =>
+            d != 'id' &&
+            d != 'title' &&
+            d != 'description' &&
+            d != 'location' &&
+            d != 'district',
+        );
+        data = await this.itemModel.find({
+          type: { $regex: `${data.join('|')}` },
+        });
+      }
+      return data;
+      // let ad = await this.model.findOne({ _id: '66b1f6040d7fbc5e9af29a6b' });
+      // ad.items = ad.items.map((i) => {
+      //   if (typeof i.value == 'string') {
+      //     i.value = i.value.trim().replace(/\s+/g, '');
+      //   }
+      //   return i;
+      // });
+      // await ad.save().then((d) => console.log('success', d));
       // ads.map(async (ad) => {
       //   console.log(ad._id);
       //   const items = ad.items.map((i) => {
@@ -168,26 +196,26 @@ export class AdService {
       //   // await ad.save();
       // });
 
-      const item = await this.model.find({ subCategory: value }).limit(1);
+      // const item = await this.model.find({ subCategory: value }).limit(1);
 
-      const data = await this.categoryModel
-        .findById(value)
-        .populate(
-          'steps.values',
-          'name value types type index position parentId other isSearch isUse',
-          this.itemModel,
-        )
-        .exec();
-      const primary = data.steps.map((s) => s.values).flat(1);
-      let items = [];
-      item[0].items.map((i) => {
-        for (let s = 0; s < primary.length; s++) {
-          if (i.id == primary[s]['type']) {
-            items.push(primary[s]);
-          }
-        }
-      });
-      return items;
+      // const data = await this.categoryModel
+      //   .findById(value)
+      //   .populate(
+      //     'steps.values',
+      //     'name value types type index position parentId other isSearch isUse',
+      //     this.itemModel,
+      //   )
+      //   .exec();
+      // const primary = data.steps.map((s) => s.values).flat(1);
+      // let items = [];
+      // item[0].items.map((i) => {
+      //   for (let s = 0; s < primary.length; s++) {
+      //     if (i.id == primary[s]['type']) {
+      //       items.push(primary[s]);
+      //     }
+      //   }
+      // });
+      // return items;
     } catch (error) {
       console.log(error);
     }
@@ -195,114 +223,200 @@ export class AdService {
 
   async getLocation(district: string) {
     try {
-      let location = await this.model.find({
-        $and: [
-          {
-            'items.id': 'district',
-          },
-          {
-            'items.value': { $regex: district },
-          },
-        ],
-      });
-      let locations = [];
-      location.map((l) =>
-        l.items.map((i) => {
-          if (i.id == 'location') {
-            const value = i.value.replaceAll('\r', '');
-            if (!locations.includes(value)) locations.push(value);
-          }
-        }),
-      );
-      return locations;
+      names.map((d, i) => {});
+      // let location = await this.model.find({
+      //   $and: [
+      //     {
+      //       'items.id': 'district',
+      //     },
+      //     {
+      //       'items.value': { $regex: district },
+      //     },
+      //   ],
+      // });
+      // let locations = [];
+      // location.map((l) =>
+      //   l.items.map((i) => {
+      //     if (i.id == 'location') {
+      //       const value = i.value.replaceAll('\r', '');
+      //       if (!locations.includes(value)) locations.push(value);
+      //     }
+      //   }),
+      // );
+      // return locations;
     } catch (error) {}
   }
 
   async dataFilter(dto: DataFilterDto) {
     try {
-      const subcategoryId = isValidObjectId(dto.subCategory);
+      // let allData = [];
 
-      const category = await this.categoryModel.findOne(
-        subcategoryId
-          ? { _id: new ObjectId(dto.subCategory) }
-          : { href: dto.subCategory },
+      // names.map((name, i) => {
+      let data = this.service.readExcel(
+        'zarna_7-30',
+        parseInt(dto.subCategory) ?? 0,
       );
-      if (!subcategoryId && dto.subCategory != '') throw new CategoryNotFound();
+      // data = data
+      //   .map((d: any) => {
+      //     let date = d['date'];
+      //     let location = d['location'];
+      //     let lsplit = location.split(',');
+      //     let district = lsplit[0].split('—')[1];
+      //     if (district === undefined) district = lsplit[0];
+      //     for (let [key, value] of Object.entries(d)) {
+      //       if (key == 'balconyUnit') {
+      //         `${value}`.toLowerCase().trim() == 'тагтгүй'
+      //           ? (d[key] = '0'.trim())
+      //           : (d[key] = `${value}`.replace('тагттай', '').trim());
+      //       }
+      //       if (key == 'area') {
+      //         if (value) {
+      //           d[key] = parseFloat(
+      //             `${value}`.replaceAll('м', '').replaceAll('²', '').trim(),
+      //           );
+      //         } else {
+      //           d[key] = 0;
+      //         }
+      //       }
+      //       if (key == 'lat') {
+      //         value = `${value}`.replaceAll('(', '');
+      //       }
+      //       if (!isNaN(parseFloat(value as string))) {
+      //         d[key] = parseFloat(value as string);
+      //       } else {
+      //         d[key] = (value as string).trim();
+      //       }
+      //     }
+      //     location = lsplit[lsplit.length - 1].trim();
+      //     date.toLowerCase() == 'өнөөдөр'
+      //       ? (date = '2024-07-30')
+      //       : (date as string).toLowerCase() == 'өчигдөр'
+      //         ? (date = '2024-07-29')
+      //         : null;
+      //     return {
+      //       ...d,
+      //       title: (`${d['title']}` ?? '').trim(),
+      //       description: (`${d['description']}` ?? '').trim(),
+      //       date: date,
+      //       district: district.trim(),
+      //       location: location.trim(),
+      //     };
+      //   })
+      //   .sort((a, b) => a['date'] - b['date']);
+      // allData.push({
+      //   data: data,
+      //   name: name,
+      // });
+      // });
 
-      let items =
-        dto.items?.length > 0
-          ? dto.items.map((d) => {
-              if (d.id == 'location') {
-                return {
-                  'items.id': 'location',
-                  'items.value': {
-                    $regex: dto.locations.join('|'),
-                  },
-                };
+      // this.service.writeExcel('data/unegui_data_zarna_7-30.xlsx', allData);
+      const res = data
+        .map((d) => {
+          let filters = dto.items.map((item) => {
+            let success = false;
+            let field = d[item.id];
+
+            if (field) {
+              if (item.value) {
+                let value = item.value;
+                if (item.id == 'balconyUnit') {
+                  if (value == '0') value = 'тагтгүй';
+                  if (['3', '4', '5', '5+'].includes(value)) value = '3';
+                }
+                value == field ||
+                `${value}`.toLowerCase() == `${field}`.toLowerCase()
+                  ? (success = true)
+                  : (success = false);
+              } else {
+                field >= item.min && field <= item.max
+                  ? (success = true)
+                  : (success = false);
               }
-              if (d.id == 'balconyUnit') {
-                let value = `/${d.value}/`;
-                if (d.value == '5+') value = '/\b([6-9]|[1-9]d+)\b/';
-                console.log(value);
-                return {
-                  'items.id': d.id,
-                  'items.value': { $regex: value },
-                };
-              }
-              return {
-                'items.id': d.id,
+            }
+            return success;
+          });
+          let locations = dto.locations.join('|');
+          let regex = new RegExp(locations, 'i');
+          let location = regex.test(d['location'].trim());
 
-                'items.value':
-                  d.value != undefined
-                    ? !isNaN(parseFloat(d.value))
-                      ? parseFloat(d.value)
-                      : d.value
-                    : { $gte: d.min, $lte: d.max },
-              };
-            })
-          : [...[{ 'items.id': { $ne: '' } }]];
-
-      let body = {
-        subCategory: dto.subCategory,
-
-        adStatus:
-          dto.adStatus.length > 0
-            ? dto.adStatus[0]
-            : {
-                $nin: [
-                  AdStatus.deleted,
-                  AdStatus.sold,
-                  AdStatus.timed,
-                  AdStatus.checking,
-                  AdStatus.pending,
-                ],
-              },
-        adType: { $ne: AdTypes.all },
-
-        sellType: dto.sellTypes.length > 0 ? dto.sellTypes[0] : { $nin: [] },
-      };
-      console.log(items);
-      let ads = await this.model
-        .find({
-          ...body,
-
-          $and: items,
+          if (!filters.includes(false) && location) return d;
         })
-        .sort({ updatedAt: 'desc' })
+        .filter((d) => d != undefined);
 
-        .limit(30);
-      let l = await this.model
-        .find({
-          ...body,
-
-          $and: items,
-        })
-        .countDocuments();
-
-      return {
-        limit: l,
-        data: ads,
-      };
+      return res.length > 30 ? res.splice(0, 30) : res;
+      // const subcategoryId = isValidObjectId(dto.subCategory);
+      // const category = await this.categoryModel.findOne(
+      //   subcategoryId
+      //     ? { _id: new ObjectId(dto.subCategory) }
+      //     : { href: dto.subCategory },
+      // );
+      // if (!subcategoryId && dto.subCategory != '') throw new CategoryNotFound();
+      // let items =
+      //   dto.items?.length > 0
+      //     ? dto.items.map((d) => {
+      //         if (d.id == 'location') {
+      //           return {
+      //             'items.id': 'location',
+      //             'items.value': {
+      //               $regex: dto.locations.join('|'),
+      //             },
+      //           };
+      //         }
+      //         if (d.id == 'balconyUnit') {
+      //           let value = `/${d.value}/`;
+      //           if (d.value == '5+') value = '/\b([6-9]|[1-9]d+)\b/';
+      //           console.log(value);
+      //           return {
+      //             'items.id': d.id,
+      //             'items.value': { $regex: value },
+      //           };
+      //         }
+      //         return {
+      //           'items.id': d.id,
+      //           'items.value':
+      //             d.value != undefined
+      //               ? !isNaN(parseFloat(d.value))
+      //                 ? parseFloat(d.value)
+      //                 : d.value
+      //               : { $gte: d.min, $lte: d.max },
+      //         };
+      //       })
+      //     : [...[{ 'items.id': { $ne: '' } }]];
+      // let body = {
+      //   subCategory: dto.subCategory,
+      //   adStatus:
+      //     dto.adStatus.length > 0
+      //       ? dto.adStatus[0]
+      //       : {
+      //           $nin: [
+      //             AdStatus.deleted,
+      //             AdStatus.sold,
+      //             AdStatus.timed,
+      //             AdStatus.checking,
+      //             AdStatus.pending,
+      //           ],
+      //         },
+      //   adType: { $ne: AdTypes.all },
+      //   sellType: dto.sellTypes.length > 0 ? dto.sellTypes[0] : { $nin: [] },
+      // };
+      // console.log(items);
+      // let ads = await this.model
+      //   .find({
+      //     ...body,
+      //     $and: items,
+      //   })
+      //   .sort({ updatedAt: 'desc' })
+      //   .limit(30);
+      // let l = await this.model
+      //   .find({
+      //     ...body,
+      //     $and: items,
+      //   })
+      //   .countDocuments();
+      // return {
+      //   limit: l,
+      //   data: ads,
+      // };
     } catch (error) {
       console.log(error);
     }

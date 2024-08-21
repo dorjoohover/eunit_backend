@@ -146,7 +146,7 @@ export class AdService {
   async getItems(name: string, value: string, category: number) {
     try {
       let data = this.service.readExcel('zarna_7-30', category);
-      console.log(data.length);
+
       if (name == 'location') {
         data = data.map((d) =>
           d['district'].toLowerCase() == value.toLowerCase()
@@ -155,6 +155,28 @@ export class AdService {
         );
 
         data = data.filter((d, v) => d != null && data.indexOf(d) === v).sort();
+      } else if (name == 'data') {
+        let ids = value.split('|').map((a) => parseInt(a));
+        const duplicates = data.filter((value) =>
+          ids.some((id) => id === value['id']),
+        );
+        let items = Object.keys(duplicates[0]).filter(
+          (d) =>
+            d != 'id' &&
+            d != 'title' &&
+            d != 'description' &&
+            d != 'location' &&
+            d != 'district',
+        );
+        items = await this.itemModel.find({
+          type: { $regex: `${items.join('|')}` },
+        });
+        data = [
+          {
+            items: items,
+            data: duplicates,
+          },
+        ];
       } else {
         data = Object.keys(data[0]).filter(
           (d) =>

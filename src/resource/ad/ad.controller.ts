@@ -87,9 +87,9 @@ export class AdController {
   async uploadData(@Body() dto: AdDataDto) {
     return this.service.uploadData(dto);
   }
-  @Post('data/filter')
-  async dataFilter(@Body() dto: DataFilterDto) {
-    return this.service.dataFilter(dto);
+  @Post('data/filter/:page')
+  async dataFilter(@Body() dto: DataFilterDto, @Param('page') page: number) {
+    return this.service.dataFilter(dto, page);
   }
 
   @Get('data/items/:name/:value/:category')

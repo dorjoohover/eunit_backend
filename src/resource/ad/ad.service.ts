@@ -269,69 +269,12 @@ export class AdService {
     } catch (error) {}
   }
 
-  async dataFilter(dto: DataFilterDto) {
+  async dataFilter(dto: DataFilterDto, page: number) {
     try {
-      // let allData = [];
-
-      // names.map((name, i) => {
       let data = this.service.readExcel(
         'zarna_7-30',
         parseInt(dto.subCategory) ?? 0,
       );
-      // data = data
-      //   .map((d: any) => {
-      //     let date = d['date'];
-      //     let location = d['location'];
-      //     let lsplit = location.split(',');
-      //     let district = lsplit[0].split('—')[1];
-      //     if (district === undefined) district = lsplit[0];
-      //     for (let [key, value] of Object.entries(d)) {
-      //       if (key == 'balconyUnit') {
-      //         `${value}`.toLowerCase().trim() == 'тагтгүй'
-      //           ? (d[key] = '0'.trim())
-      //           : (d[key] = `${value}`.replace('тагттай', '').trim());
-      //       }
-      //       if (key == 'area') {
-      //         if (value) {
-      //           d[key] = parseFloat(
-      //             `${value}`.replaceAll('м', '').replaceAll('²', '').trim(),
-      //           );
-      //         } else {
-      //           d[key] = 0;
-      //         }
-      //       }
-      //       if (key == 'lat') {
-      //         value = `${value}`.replaceAll('(', '');
-      //       }
-      //       if (!isNaN(parseFloat(value as string))) {
-      //         d[key] = parseFloat(value as string);
-      //       } else {
-      //         d[key] = (value as string).trim();
-      //       }
-      //     }
-      //     location = lsplit[lsplit.length - 1].trim();
-      //     date.toLowerCase() == 'өнөөдөр'
-      //       ? (date = '2024-07-30')
-      //       : (date as string).toLowerCase() == 'өчигдөр'
-      //         ? (date = '2024-07-29')
-      //         : null;
-      //     return {
-      //       ...d,
-      //       title: (`${d['title']}` ?? '').trim(),
-      //       description: (`${d['description']}` ?? '').trim(),
-      //       date: date,
-      //       district: district.trim(),
-      //       location: location.trim(),
-      //     };
-      //   })
-      //   .sort((a, b) => a['date'] - b['date']);
-      // allData.push({
-      //   data: data,
-      //   name: name,
-      // });
-      // });
-
-      // this.service.writeExcel('data/unegui_data_zarna_7-30.xlsx', allData);
       const res = data
         .map((d) => {
           let filters = dto.items.map((item) => {
@@ -364,8 +307,12 @@ export class AdService {
           if (!filters.includes(false) && location) return d;
         })
         .filter((d) => d != undefined);
-
-      return res.length > 30 ? res.splice(0, 30) : res;
+      const limit = 30;
+      const result = res.length > 30 ? res.splice(page * limit, limit) : limit;
+      return {
+        data: result,
+        limit: res.length,
+      };
       // const subcategoryId = isValidObjectId(dto.subCategory);
       // const category = await this.categoryModel.findOne(
       //   subcategoryId

@@ -308,7 +308,7 @@ export class AdService {
         })
         .filter((d) => d != undefined);
       const limit = 30;
-      const result = res.length > 30 ? res.splice(page * limit, limit) : limit;
+      const result = res.length > 30 ? res.splice(page * limit, limit) : res;
       return {
         data: result,
         limit: res.length,

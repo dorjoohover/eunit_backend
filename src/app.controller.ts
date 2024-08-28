@@ -47,7 +47,7 @@ export class AppController {
   @Get('/file/:file')
   @ApiParam({ name: 'file' })
   getFile(@Param('file') filename: string): StreamableFile {
-    const file = createReadStream(path.join('./uploads/' + filename));
+    const file = createReadStream(path.join('./data/' + filename));
     return new StreamableFile(file);
   }
 }

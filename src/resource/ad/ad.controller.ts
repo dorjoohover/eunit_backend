@@ -162,7 +162,7 @@ export class AdController {
 
   @Get('test')
   testAd(@Req() req: Request, @Res() res: Response) {
-    // const {count, page} = req.req
+    return this.service.test()
   }
 
   @Get('admin/:cate/:type/:num/:limit/:status/:length')

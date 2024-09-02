@@ -143,9 +143,44 @@ export class AdService {
     };
   }
 
+  async test() {
+    try {
+      let data = [];
+      names.map((name, i) => {
+        console.log(i);
+        let current = this.service.readExcel('8', 'zarna_8', i);
+        let prev = this.service.readExcel('7', 'zarna_7-30', i);
+        prev.map((c) => {
+          c['price'] =
+            c['price'] <= 20000000 && i == 0
+              ? (c['price'] = parseFloat(c['price']) * parseFloat(c['area']))
+              : c['price'];
+          return c;
+        });
+
+        current.map((c) => {
+          c['price'] =
+            c['price'] <= 20000000 && i == 0
+              ? (c['price'] = parseFloat(c['price']) * parseFloat(c['area']))
+              : c['price'];
+          return c;
+        });
+        const currentData = current.concat(prev);
+        data.push({
+          data: [...new Map(currentData.map((c) => [c['id'], c])).values()],
+          name: name,
+        });
+      });
+      this.service.writeExcel('data/zarna.xlsx', data);
+      return [];
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   async getItems(name: string, value: string, category: number) {
     try {
-      let data = this.service.readExcel('zarna_7-30', category);
+      let data = this.service.readExcel('', 'zarna_7-30', category);
 
       if (name == 'location') {
         data = data.map((d) =>
@@ -272,6 +307,7 @@ export class AdService {
   async dataFilter(dto: DataFilterDto, page: number) {
     try {
       let data = this.service.readExcel(
+        '',
         'zarna_7-30',
         parseInt(dto.subCategory) ?? 0,
       );

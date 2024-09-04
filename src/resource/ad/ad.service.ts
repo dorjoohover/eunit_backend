@@ -145,33 +145,127 @@ export class AdService {
 
   async test() {
     try {
-      let data = [];
-      names.map((name, i) => {
-        console.log(i);
-        let current = this.service.readExcel('8', 'zarna_8', i);
-        let prev = this.service.readExcel('7', 'zarna_7-30', i);
-        prev.map((c) => {
-          c['price'] =
-            c['price'] <= 20000000 && i == 0
-              ? (c['price'] = parseFloat(c['price']) * parseFloat(c['area']))
-              : c['price'];
-          return c;
-        });
+      let res = [];
+      let data = this.service.readExcel(
+        '0',
+        'zarna',
+        0,
+        'data/unegui_zarna.xlsx',
+      );
+      data.map((d, i) => {
+        // if (i > 10) return;
+        let desc = d['description'];
 
-        current.map((c) => {
-          c['price'] =
-            c['price'] <= 20000000 && i == 0
-              ? (c['price'] = parseFloat(c['price']) * parseFloat(c['area']))
-              : c['price'];
-          return c;
-        });
-        const currentData = current.concat(prev);
-        data.push({
-          data: [...new Map(currentData.map((c) => [c['id'], c])).values()],
-          name: name,
-        });
+        let words = null;
+        let isDesc = false;
+        const regex =
+          /^(хотхон|хотхонд|цогцолбор|цогцолборт|цогцолборд|хотхонт|hothond|hothon)$/;
+
+        const regex1 = /(“|'|"|”)$/;
+
+        isDesc = regex.test(desc);
+        let r = [];
+        // if (isDesc) {
+        let word = [];
+        words = desc.toLowerCase().split(' ');
+        let key = -1;
+        let keyLast = -1;
+        for (let index = 0; index < words.length; index++) {
+          if (regex.test(words[index])) {
+            key = index;
+            break;
+          } else {
+            if (regex1.test(words[index])) {
+              key = index;
+              keyLast = words.indexOf('“', 2);
+              keyLast = words.indexOf('"', 2);
+              keyLast = words.indexOf("'", 2);
+
+              keyLast = words.indexOf('”', 1);
+              break;
+            } else {
+              key = -1;
+            }
+          }
+        }
+        if (keyLast == -1) {
+          word =
+            key > 1
+              ? key > 2
+                ? (word = words.slice(key - 3, key + 1))
+                : (word = words.slice(key - 2, key + 1))
+              : (word = words.slice(key - 1, key + 1));
+        } else {
+          word = words.slice(key, keyLast + 1);
+        }
+        // let reg = words.match(regex)
+
+        // let key = words.indexOf(reg[0]);
+        // if (key == -1) key = words.indexOf('хотхонд', 1);
+        // if (key == -1) key = words.indexOf('цогцолбор', 1);
+        // if (key == -1) key = words.indexOf('цогцолборд', 1);
+        // if (key > -1) {
+        //   word =
+
+        // }
+        // if (desc.includes('"')) {
+        //   let text = desc.split('"');
+        //   word = [text[1]];
+        // }
+        // if (desc.includes("'")) {
+        //   let text = desc.split("'");
+        //   word = [text[1]];
+        // }
+        // if (desc.includes("“")) {
+        //   let text = desc.split("“");
+        //   word = [text[1]];
+        // }
+
+        // console.log(isDesc, word);
+        r['id'] = d['id']
+        r['title'] = d['title'];
+        r['desc'] = desc;
+        // r['town'] = word.join(' ');
+        r['town'] = word.join(' ');
+        r['district'] = d['district']
+        r['location'] = d['location']
+        res.push(r);
+        // }
       });
-      this.service.writeExcel('data/zarna.xlsx', data);
+      // console.log(res)
+      this.service.writeExcel('data/test.xlsx', [
+        {
+          data: res,
+          name: names[0],
+        },
+      ]);
+      // let data = [];
+      // names.map((name, i) => {
+      //   console.log(i);
+      //   let current = this.service.readExcel('8', 'zarna_8', i);
+      //   let prev = this.service.readExcel('7', 'zarna_7-30', i);
+      //   prev.map((c) => {
+      //     c['price'] =
+      //       c['price'] <= 20000000 && i == 0
+      //         ? (c['price'] = parseFloat(c['price']) * parseFloat(c['area']))
+      //         : c['price'];
+      //     return c;
+      //   });
+
+      //   current.map((c) => {
+      //     c['price'] =
+      //       c['price'] <= 20000000 && i == 0
+      //         ? (c['price'] = parseFloat(c['price']) * parseFloat(c['area']))
+      //         : c['price'];
+      //     return c;
+      //   });
+      //   const currentData = current.concat(prev);
+      //   data.push({
+      //     data: [...new Map(currentData.map((c) => [c['id'], c])).values()],
+      //     name: name,
+      //   });
+      // });
+      // this.service.writeExcel('data/zarna.xlsx', data);
       return [];
     } catch (error) {
       console.log(error);
@@ -308,8 +402,9 @@ export class AdService {
     try {
       let data = this.service.readExcel(
         '',
-        'zarna_7-30',
+        'zarna',
         parseInt(dto.subCategory) ?? 0,
+        'data/unegui_zarna.xlsx'
       );
       const res = data
         .map((d) => {

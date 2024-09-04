@@ -3,8 +3,8 @@ import * as XLSX from 'xlsx';
 
 @Injectable()
 export class ExcelService {
-  readExcel(month: string,url: string, category: number) {
-    const workbook = XLSX.readFile(`data/${month}/unegui_data_${url}.xlsx`);
+  readExcel(month: string,url: string, category: number, uri?: string) {
+    const workbook = XLSX.readFile(uri ?? `data/${month}/unegui_data_${url}.xlsx`);
     const sheetName = workbook.SheetNames[category];
     const worksheet = workbook.Sheets[sheetName];
 

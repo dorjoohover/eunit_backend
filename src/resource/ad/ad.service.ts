@@ -145,97 +145,108 @@ export class AdService {
 
   async test() {
     try {
-      let res = [];
+      // let res = [];
+      let res = this.service.readExcel('', '', 0, 'data/unegui_zarna.xlsx');
       let data = this.service.readExcel(
         '0',
         'zarna',
         0,
-        'data/unegui_zarna.xlsx',
+        'data/location_2.xlsx',
       );
+      let count = 0;
+      let c = 0;
       data.map((d, i) => {
-        // if (i > 10) return;
-        let desc = d['description'];
+        let id = d['id'];
+        let rm = res.filter((r) => r['id'] == id);
 
-        let words = null;
-        let isDesc = false;
-        const regex =
-          /^(хотхон|хотхонд|цогцолбор|цогцолборт|цогцолборд|хотхонт|hothond|hothon)$/;
-
-        const regex1 = /(“|'|"|”)$/;
-
-        isDesc = regex.test(desc);
-        let r = [];
-        // if (isDesc) {
-        let word = [];
-        words = desc.toLowerCase().split(' ');
-        let key = -1;
-        let keyLast = -1;
-        for (let index = 0; index < words.length; index++) {
-          if (regex.test(words[index])) {
-            key = index;
-            break;
-          } else {
-            if (regex1.test(words[index])) {
-              key = index;
-              keyLast = words.indexOf('“', 2);
-              keyLast = words.indexOf('"', 2);
-              keyLast = words.indexOf("'", 2);
-
-              keyLast = words.indexOf('”', 1);
-              break;
-            } else {
-              key = -1;
-            }
-          }
-        }
-        if (keyLast == -1) {
-          word =
-            key > 1
-              ? key > 2
-                ? (word = words.slice(key - 3, key + 1))
-                : (word = words.slice(key - 2, key + 1))
-              : (word = words.slice(key - 1, key + 1));
-        } else {
-          word = words.slice(key, keyLast + 1);
-        }
-        // let reg = words.match(regex)
-
-        // let key = words.indexOf(reg[0]);
-        // if (key == -1) key = words.indexOf('хотхонд', 1);
-        // if (key == -1) key = words.indexOf('цогцолбор', 1);
-        // if (key == -1) key = words.indexOf('цогцолборд', 1);
-        // if (key > -1) {
-        //   word =
-
-        // }
-        // if (desc.includes('"')) {
-        //   let text = desc.split('"');
-        //   word = [text[1]];
-        // }
-        // if (desc.includes("'")) {
-        //   let text = desc.split("'");
-        //   word = [text[1]];
-        // }
-        // if (desc.includes("“")) {
-        //   let text = desc.split("“");
-        //   word = [text[1]];
-        // }
-
-        // console.log(isDesc, word);
-        r['id'] = d['id']
-        r['title'] = d['title'];
-        r['desc'] = desc;
-        // r['town'] = word.join(' ');
-        r['town'] = word.join(' ');
-        r['district'] = d['district']
-        r['location'] = d['location']
-        res.push(r);
-        // }
+        d['link'] =
+          `=HYPERLINK("http://192.168.1.15:3002/maps/${rm[0]['lat']}|${rm[0]['lng']}","Google")`;
       });
-      // console.log(res)
+  
+      // data.map((d, i) => {
+      //   // if (i > 10) return;
+      //   let desc = d['description'];
+
+      //   let words = null;
+      //   let isDesc = false;
+      //   const regex =
+      //     /^(хотхон|хотхонд|цогцолбор|цогцолборт|цогцолборд|хотхонт|hothond|hothon)$/;
+
+      //   const regex1 = /(“|'|"|”)$/;
+
+      //   isDesc = regex.test(desc);
+      //   let r = [];
+      //   // if (isDesc) {
+      //   let word = [];
+      //   words = desc.toLowerCase().split(' ');
+      //   let key = -1;
+      //   let keyLast = -1;
+      //   for (let index = 0; index < words.length; index++) {
+      //     if (regex.test(words[index])) {
+      //       key = index;
+      //       break;
+      //     } else {
+      //       if (regex1.test(words[index])) {
+      //         key = index;
+      //         keyLast = words.indexOf('“', 2);
+      //         keyLast = words.indexOf('"', 2);
+      //         keyLast = words.indexOf("'", 2);
+
+      //         keyLast = words.indexOf('”', 1);
+      //         break;
+      //       } else {
+      //         key = -1;
+      //       }
+      //     }
+      //   }
+      //   if (keyLast == -1) {
+      //     word =
+      //       key > 1
+      //         ? key > 2
+      //           ? (word = words.slice(key - 3, key + 1))
+      //           : (word = words.slice(key - 2, key + 1))
+      //         : (word = words.slice(key - 1, key + 1));
+      //   } else {
+      //     word = words.slice(key, keyLast + 1);
+      //   }
+      //   // let reg = words.match(regex)
+
+      //   // let key = words.indexOf(reg[0]);
+      //   // if (key == -1) key = words.indexOf('хотхонд', 1);
+      //   // if (key == -1) key = words.indexOf('цогцолбор', 1);
+      //   // if (key == -1) key = words.indexOf('цогцолборд', 1);
+      //   // if (key > -1) {
+      //   //   word =
+
+      //   // }
+      //   // if (desc.includes('"')) {
+      //   //   let text = desc.split('"');
+      //   //   word = [text[1]];
+      //   // }
+      //   // if (desc.includes("'")) {
+      //   //   let text = desc.split("'");
+      //   //   word = [text[1]];
+      //   // }
+      //   // if (desc.includes("“")) {
+      //   //   let text = desc.split("“");
+      //   //   word = [text[1]];
+      //   // }
+
+      //   // console.log(isDesc, word);
+      //   r['id'] = d['id']
+      //   r['title'] = d['title'];
+      //   r['desc'] = desc;
+      //   // r['town'] = word.join(' ');
+      //   r['town'] = word.join(' ');
+      //   r['district'] = d['district']
+      //   r['location'] = d['location']
+      //   res.push(r);
+      //   // }
+      // });
+      // // console.log(res)
       this.service.writeExcel('data/test.xlsx', [
         {
-          data: res,
+          data: data,
           name: names[0],
         },
       ]);
@@ -404,7 +415,7 @@ export class AdService {
         '',
         'zarna',
         parseInt(dto.subCategory) ?? 0,
-        'data/unegui_zarna.xlsx'
+        'data/unegui_zarna.xlsx',
       );
       const res = data
         .map((d) => {

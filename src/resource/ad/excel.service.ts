@@ -3,8 +3,10 @@ import * as XLSX from 'xlsx';
 
 @Injectable()
 export class ExcelService {
-  readExcel(month: string,url: string, category: number, uri?: string) {
-    const workbook = XLSX.readFile(uri ?? `data/${month}/unegui_data_${url}.xlsx`);
+  readExcel(month: string, url: string, category: number, uri?: string) {
+    const workbook = XLSX.readFile(
+      uri ?? `data/${month}/unegui_data_${url}.xlsx`,
+    );
     const sheetName = workbook.SheetNames[category];
     const worksheet = workbook.Sheets[sheetName];
 
@@ -19,6 +21,10 @@ export class ExcelService {
       const worksheet = XLSX.utils.json_to_sheet(d.data);
 
       XLSX.utils.book_append_sheet(workbook, worksheet, d.name);
+      Array.from({ length: d.data.length }, (_, i) => i++).map((a) => {
+        XLSX.utils.encode_cell({ c: 9, r: a });
+        XLSX.utils.encode_cell({ c: 8, r: a });
+      });
     });
 
     XLSX.writeFile(workbook, filePath);

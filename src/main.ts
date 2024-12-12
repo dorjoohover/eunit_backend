@@ -9,8 +9,8 @@ import { useContainer, ValidationError } from 'class-validator';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.setGlobalPrefix('/api/v1');
-  app.use(json({ limit: '50mb' }));
-  app.use(urlencoded({ extended: true, limit: '50mb' }));
+  // app.use(json({ limit: '50mb' }));
+  // app.use(urlencoded({ extended: true, limit: '50mb' }));
   app.enableCors();
   app.useGlobalPipes(
     new ValidationPipe({

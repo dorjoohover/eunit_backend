@@ -55,7 +55,7 @@ export class UserDao {
   };
 
   getByEmail = async (email: string) => {
-    return this.db.findOne({
+    return await this.db.findOne({
       where: {
         email: email,
       },

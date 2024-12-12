@@ -10,7 +10,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.setGlobalPrefix('/api/v1');
   app.enableCors({
-    origin: '*', // Adjust as needed for security
+    origin: ['https://www.eunit.mn'], // Adjust as needed for security
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
   });

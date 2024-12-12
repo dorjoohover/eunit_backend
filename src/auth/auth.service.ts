@@ -21,8 +21,8 @@ export class AuthService {
         profile,
         // role: 10,
       });
-      return true;
     }
+
     let isMatch = false;
     // if (user) {
     //   if (password != null && password != undefined) {
@@ -45,7 +45,7 @@ export class AuthService {
     //   const { password, ...result } = user;
     //   return result;
     // }
-    return false;
+    return true;
   }
 
   async login(user: any) {

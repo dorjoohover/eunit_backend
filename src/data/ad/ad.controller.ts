@@ -28,8 +28,13 @@ export class AdController {
 
   @Public()
   @Post('/data')
-  createDataExcel() {
+  createDataAd() {
     return this.adService.createDataExcel();
+  }
+  @Public()
+  @Post('/location')
+  createDataLocation() {
+    return this.adService.createDataExcelLocation();
   }
 
   @Public()

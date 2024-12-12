@@ -27,6 +27,7 @@ export class AuthService {
           email: email,
           name,
           profile,
+          role: 10,
         });
         return true;
       }

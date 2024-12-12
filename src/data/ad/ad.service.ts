@@ -22,6 +22,62 @@ export class AdService extends BaseService {
     return 'This action adds a new ad';
   }
 
+  public async createDataExcelLocation() {
+    const locations = this.excel.readExcel(
+      '',
+      '',
+      2,
+      'src/excel/Data_unegui_12.09_last_v_1.xlsx',
+    );
+
+    const ads = this.excel.readExcel(
+      '',
+      '',
+      1,
+      'src/excel/Data_unegui_12.09_last_v_1.xlsx',
+    );
+    console.log(ads[0]);
+    try {
+      const uniqueAds = [
+        ...new Map(
+          ads.map((ad) => [
+            `${ad['Дүүрэг']}-${ad['Байршил']}`, // Combining both district and name as a string key
+            ad, // The entire ad object is kept as the value
+          ]),
+        ).values(),
+      ];
+      uniqueAds.map(async (ad) => {
+        const body = {
+          city: 'Улаанбаатар',
+          district: ad['Дүүрэг'],
+          name: ad['Байршил'],
+        };
+        await this.locationDao.create(body);
+      });
+      locations.map(async (location) => {
+        const lat = location['Lng'];
+        const lng = location['Lat_1'];
+        const district = location['Дүүрэг'];
+        const town = location['Хотхон Монгол'];
+        const townEnglish = location['Хотхон англи'];
+        const name = location['Ерөнхий байршил'];
+        const zipcode = location['Zip code'];
+        const khoroo = location['Khoroo'];
+        const body = {
+          city: 'Улаанбаатар',
+          khoroo,
+          district,
+          lat,
+          lng,
+          town,
+          englishNameOfTown: townEnglish,
+          name,
+          zipcode,
+        };
+        this.locationDao.create(body);
+      });
+    } catch (error) {}
+  }
   public async createDataExcel() {
     const ads = this.excel.readExcel(
       '',
@@ -29,29 +85,12 @@ export class AdService extends BaseService {
       0,
       'src/excel/Data_unegui_12.09_last_v_1.xlsx',
     );
-
-    // locations
-    // Promise.all(
-    //   ads.map(async (ad) => {
-    //     const body = {
-    //       district: ad['Дүүрэг'],
-    //       name: ad['Байршил'],
-    //     };
-    //     return body;
-    //   }),
-    // ).then((d) => {
-    //   const arr = Array.from(
-    //     new Map(d.map((item) => [item.name, item])).values(),
-    //   );
-    //   arr.map(async (ar) => {
-    //     const res = await this.locationDao.create({
-    //       district: ar.district,
-    //       name: ar.name,
-    //       city: 'Улаанбаатар',
-    //     });
-    //   });
-    // });
-
+    const ads1 = this.excel.readExcel(
+      '',
+      '',
+      1,
+      'src/excel/Data_unegui_12.09_last_v_1.xlsx',
+    );
     // without town
     const startDate = new Date(1900, 0, 1);
     ads.map(async (ad) => {
@@ -111,6 +150,64 @@ export class AdService extends BaseService {
         paymentMethod: leasing,
       };
       console.log(dto);
+      if (dto.unitPrice != null && dto.area && dto.location && dto.uneguiId) {
+        await this.dao.create(dto);
+      }
+      // return res;
+    });
+    ads1.map(async (ad) => {
+      const buildingProcess = ad['buildingProcess'];
+      const id = ad['id'];
+
+      const title = ad['title'];
+      const price = ad['price'];
+      const area = ad['area'];
+      const unitPrice = ad['Per price'];
+      const floor = ad['floor'];
+      const door = ad['door'];
+      const balcony = ad['balcony'];
+      const operation = ad['operation'];
+      const howFloor = ad['howFloor'];
+      const garage = ad['garage'];
+      const window = ad['window'];
+      const windowUnit = ad['windowUnit'];
+      const buildingFloor = ad['buildingFloor'];
+      const leasing = ad['leasing'];
+      const description = ad['description'];
+      const district = ad['Дүүрэг'];
+      const address = ad['Байршил'];
+      let date = ad['Date'];
+
+      date = new Date(
+        startDate.getTime() + (parseInt(date) - 2) * 24 * 60 * 60 * 1000,
+      );
+      let location = await this.locationDao.findByNameWithout(
+        address,
+        district,
+      );
+
+      const dto: CreateAdDto = {
+        area: area,
+        buildingFloor: buildingFloor,
+        description: description,
+        location: { id: location?.id },
+        operation: operation,
+        price: price,
+        unitPrice: unitPrice,
+        uneguiId: id,
+        balconyUnit: balcony,
+        buildingProcess:
+          buildingProcess == 0 ? null : (buildingProcess ?? null),
+        floor: floor,
+        door: door,
+        title: title,
+        garage: garage,
+        howFloor: howFloor,
+        window: window,
+        windowUnit: windowUnit,
+        date: new Date(date),
+        paymentMethod: leasing,
+      };
       if (dto.unitPrice != null && dto.area && dto.location && dto.uneguiId) {
         await this.dao.create(dto);
       }

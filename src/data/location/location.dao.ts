@@ -88,4 +88,13 @@ export class LocationDao {
       },
     });
   };
+  findByNameWithout = async (name: string, district: string) => {
+    return await this.db.findOne({
+      where: {
+        name: name,
+        town: IsNull(),
+        district: district,
+      },
+    });
+  };
 }

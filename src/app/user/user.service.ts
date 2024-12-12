@@ -22,8 +22,8 @@ export class UserService extends BaseService {
     });
   }
 
-  findAll() {
-    return `This action returns all user`;
+  public async findAll() {
+    return await this.userDao.find();
   }
 
   public async updateUser(user: CreateUserDto, id: number) {

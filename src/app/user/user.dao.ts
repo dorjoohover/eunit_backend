@@ -12,6 +12,11 @@ export class UserDao {
     this.db = this.dataSource.getRepository(UserEntity);
   }
 
+  find = async () => {
+    const res = await this.db.find();
+    return res;
+  };
+
   add = async (user: CreateUserDto) => {
     const res = this.db.create({
       ...user,

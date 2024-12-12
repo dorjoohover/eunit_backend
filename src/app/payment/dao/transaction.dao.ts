@@ -10,6 +10,11 @@ export class TransactionDao {
     this.db = this.dataSource.getRepository(TransactionEntity);
   }
 
+  find = async () => {
+    const res = this.db.find();
+    return res;
+  };
+
   create = async (dto: CreateTransactionDto) => {
     const res = this.db.create({
       ...dto,

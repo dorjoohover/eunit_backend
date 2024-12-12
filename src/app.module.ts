@@ -1,0 +1,54 @@
+import { Module } from '@nestjs/common';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
+import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
+import { JwtAuthGuard } from './auth/guards/jwt/jwt-auth-guard';
+import { RolesGuard } from './auth/guards/role/role.guard';
+import { AllExceptionsFilter } from './common/all-exceptions.filter';
+import { PostInterceptor } from './post.interceptor';
+import { ConfigModule } from '@nestjs/config';
+import { UserModule } from './app/user/user.module';
+import { AuthModule } from './auth/auth.module';
+import { BaseModule } from './base/base.module';
+import { PaymentModule } from './app/payment/payment.module';
+import { LocationModule } from './data/location/location.module';
+import { AdModule } from './data/ad/ad.module';
+import { DatabaseModule } from './database/database.module';
+import { RequestModule } from './app/request/request.module';
+import { AppExcel } from './common/app.excel';
+
+@Module({
+  imports: [
+    ConfigModule.forRoot({}),
+    DatabaseModule,
+    UserModule,
+    AuthModule,
+    BaseModule,
+    PaymentModule,
+    RequestModule,
+    LocationModule,
+    AdModule,
+  ],
+  controllers: [AppController],
+  providers: [
+    AppService,
+    AppExcel,
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: RolesGuard,
+    },
+    {
+      provide: APP_FILTER,
+      useClass: AllExceptionsFilter,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: PostInterceptor,
+    },
+  ],
+})
+export class AppModule {}

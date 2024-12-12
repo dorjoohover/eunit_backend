@@ -12,6 +12,7 @@ import { RequestService } from './request.service';
 import { CreateRequestDto } from './dto/create-request.dto';
 import { UpdateRequestDto } from './dto/update-request.dto';
 import { ApiBearerAuth, ApiParam } from '@nestjs/swagger';
+import { Public } from 'src/auth/guards/jwt/jwt-auth-guard';
 
 @Controller('request')
 export class RequestController {
@@ -55,7 +56,8 @@ export class RequestController {
   ) {
     return this.requestService.findByUser(user['id'], +page, +limit);
   }
-  @ApiBearerAuth('access-token')
+  // @ApiBearerAuth('access-token')
+  @Public()
   @Get('service/:id')
   findOne(@Param('id') id: string) {
     return this.requestService.findOne(+id);

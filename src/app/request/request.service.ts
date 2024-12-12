@@ -64,6 +64,7 @@ export class RequestService extends BaseService {
       startDate: service.startDate,
       paid: true,
     });
+    console.log(res, service);
     return {
       data: {
         ...res,

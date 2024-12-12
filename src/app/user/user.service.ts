@@ -36,8 +36,8 @@ export class UserService extends BaseService {
   }
   async getUser(username: string) {
     const res = await this.userDao.getByEmail(username);
-    if (!res)
-      throw new HttpException('Хэрэглэгч олдсонгүй', HttpStatus.NOT_FOUND);
+    // if (!res)
+    //   throw new HttpException('Хэрэглэгч олдсонгүй', HttpStatus.NOT_FOUND);
     return res;
   }
 

@@ -14,28 +14,37 @@ export class AuthService {
   async validateUser(dto: LoginUserDto): Promise<any> {
     const { password, email, name, profile } = dto;
     const user = await this.usersService.getUser(email);
+    if (!user) {
+      await this.usersService.create({
+        email: email,
+        name,
+        profile,
+        // role: 10,
+      });
+      return true;
+    }
     let isMatch = false;
-    if (user) {
-      if (password != null && password != undefined) {
-        isMatch = await bcrypt.compare(password, user.password);
-      } else {
-        isMatch = true;
-      }
-    } else {
-      if (password == null || password == undefined) {
-        await this.usersService.create({
-          email: email,
-          name,
-          profile,
-          role: 10,
-        });
-        return true;
-      }
-    }
-    if (user && isMatch == true) {
-      const { password, ...result } = user;
-      return result;
-    }
+    // if (user) {
+    //   if (password != null && password != undefined) {
+    //     isMatch = await bcrypt.compare(password, user.password);
+    //   } else {
+    //     isMatch = true;
+    //   }
+    // } else {
+    //   if (password == null || password == undefined) {
+    //     await this.usersService.create({
+    //       email: email,
+    //       name,
+    //       profile,
+    //       // role: 10,
+    //     });
+    //     return true;
+    //   }
+    // }
+    // if (user && isMatch == true) {
+    //   const { password, ...result } = user;
+    //   return result;
+    // }
     return false;
   }
 

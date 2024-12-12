@@ -14,12 +14,13 @@ export class UserService extends BaseService {
   }
   public async create(dto: CreateUserDto) {
     const user = await this.userDao.add(dto);
-    await this.transaction.create({
+    const res = await this.transaction.create({
       point: 20000,
-      receiver: user,
+      receiver: user.id,
       remitter: 5,
       message: 'Шинэ хэрэглэгчийн урамшуулал',
     });
+    return user;
   }
 
   public async findAll() {

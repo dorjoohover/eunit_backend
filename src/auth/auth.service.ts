@@ -13,9 +13,9 @@ export class AuthService {
 
   async validateUser(dto: LoginUserDto): Promise<any> {
     const { password, email, name, profile } = dto;
-    const user = await this.usersService.getUser(email);
+    let user = await this.usersService.getUser(email);
     if (!user) {
-      await this.usersService.create({
+      user = await this.usersService.create({
         email: email,
         name,
         profile,
@@ -45,11 +45,12 @@ export class AuthService {
     //   const { password, ...result } = user;
     //   return result;
     // }
-    return true;
+    return user;
   }
 
   async login(user: any) {
     const result = await this.validateUser(user);
+    console.log(result);
     if (!result) {
       throw new UnauthorizedException();
     }

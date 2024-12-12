@@ -25,7 +25,7 @@ export class UserDao {
     });
     await this.db.save(res);
     console.log(res.id);
-    return res.id;
+    return res
   };
 
   updateUser = async (user: CreateUserDto, id: number) => {

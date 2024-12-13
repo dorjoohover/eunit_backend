@@ -21,9 +21,9 @@ export class RequestService extends BaseService {
   public async create(dto: CreateRequestDto, email: string, user: number) {
     const point =
       dto.service == ServiceType.REVIEW
-        ? 2000
+        ? 1000
         : dto.service == ServiceType.DATA
-          ? dto.count * 200
+          ? dto.count * 100
           : 20000;
     const success = await this.transactionService.create({
       point: point,

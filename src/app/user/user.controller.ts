@@ -14,6 +14,7 @@ import { CreateUserDto, WalletUserDto } from './dto/create-user.dto';
 import { Public } from 'src/auth/guards/jwt/jwt-auth-guard';
 import { Roles } from 'src/auth/guards/role/role.decorator';
 import { Role } from 'src/auth/guards/role/role.enum';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
 @Controller('user')
 export class UserController {
@@ -35,6 +36,7 @@ export class UserController {
   }
 
   @Post('wallet')
+  @ApiBearerAuth('access-token')
   @Roles(Role.Admin)
   async updateUser(@Body() dto: WalletUserDto, @Request() { user }) {
     this.userService.changeWallet(dto, user['id']);

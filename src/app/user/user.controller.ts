@@ -31,6 +31,7 @@ export class UserController {
   }
 
   @Get('me')
+  @ApiBearerAuth('access-token')
   findMe(@Request() { user }) {
     return user;
   }

@@ -32,7 +32,7 @@ export class RequestService extends BaseService {
         remitter: email,
         message: 'Худалдан авалт хийсэн',
       });
-      if (success) {
+      if (success?.id) {
         const res = await this.dao.create({
           ...dto,
           location: +dto.location,

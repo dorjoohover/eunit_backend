@@ -18,7 +18,7 @@ export class TransactionService extends BaseService {
     const receiver = await this.userService.getUser(dto.receiver as string);
     const remitterPoint = remitter.wallet - dto.point;
     const receiverPoint = receiver.wallet + dto.point;
-
+    console.log(remitterPoint, receiverPoint)
     let success = remitterPoint > 0 && receiverPoint > 0;
     const date = new Date();
     const right = remitter.endDate > date;

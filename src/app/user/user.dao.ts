@@ -25,20 +25,23 @@ export class UserDao {
     });
     await this.db.save(res);
     console.log(res.id);
-    return res
+    return res;
   };
 
   updateUser = async (user: CreateUserDto, id: number) => {
     const res = await this.getUserInfo(id);
-    await this.db.save({
-      ...res,
-      lastname: user.lastname ?? res.lastname,
-      firstname: user.firstname ?? res.firstname,
-      email: user.email ?? res.email,
-      phone: user.phone ?? res.phone,
-      wallet: user.wallet ?? res.wallet,
-      profile: user.profile ?? res.phone,
+    await this.db.update(id, {
+      ...user,
     });
+    // await this.db.save({
+    //   ...res,
+    //   lastname: user.lastname ?? res.lastname,
+    //   firstname: user.firstname ?? res.firstname,
+    //   email: user.email ?? res.email,
+    //   phone: user.phone ?? res.phone,
+    //   wallet: user.wallet ?? res.wallet,
+    //   profile: user.profile ?? res.phone,
+    // });
     return true;
   };
   changePassword = async (id: string, password: string, merchantId: string) => {

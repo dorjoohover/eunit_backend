@@ -25,6 +25,14 @@ export class UserService extends BaseService {
 
   public async changeWallet(dto: WalletUserDto, id: number) {
     const user = await this.userDao.getUserInfo(dto.email);
+    await this.userDao.updateUser(
+      {
+        ...user,
+        wallet: dto.wallet,
+        role: dto.role,
+      },
+      user.id,
+    );
     return await this.transaction.create({
       point: dto.wallet,
       remitter: id,

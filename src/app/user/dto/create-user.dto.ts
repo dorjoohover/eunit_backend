@@ -28,4 +28,5 @@ export class WalletUserDto {
   email: string;
   @ApiProperty()
   wallet: number;
+  role?: number;
 }

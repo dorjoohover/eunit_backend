@@ -29,7 +29,7 @@ export class UserService extends BaseService {
       {
         ...user,
         wallet: dto.wallet,
-        role: dto.role,
+        role: 10,
       },
       user.id,
     );

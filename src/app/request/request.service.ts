@@ -32,13 +32,15 @@ export class RequestService extends BaseService {
         remitter: email,
         message: 'Худалдан авалт хийсэн',
       });
-      const res = await this.dao.create({
-        ...dto,
-        location: +dto.location,
-        user: user,
-      });
-      await this.transactionService.updateRequest(success.id, res);
-      return res;
+      if (success) {
+        const res = await this.dao.create({
+          ...dto,
+          location: +dto.location,
+          user: user,
+        });
+        await this.transactionService.updateRequest(success.id, res);
+        return res;
+      }
     } catch (error) {
       return {
         success: false,

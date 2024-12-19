@@ -3,6 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { UserService } from 'src/app/user/user.service';
 import { LoginUserDto } from './auth.dto';
+import { jwtConstants } from './constants';
 
 @Injectable()
 export class AuthService {
@@ -55,10 +56,15 @@ export class AuthService {
       throw new UnauthorizedException();
     }
     return {
-      accessToken: this.jwtService.sign({
-        app: 'app',
-        ...result,
-      }),
+      accessToken: this.jwtService.sign(
+        {
+          app: 'app',
+          ...result,
+        },
+        {
+          secret: jwtConstants.secret,
+        },
+      ),
       user: {
         name: result.name,
         role: result.role,

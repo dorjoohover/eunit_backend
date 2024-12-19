@@ -37,7 +37,7 @@ export class UserController {
 
   @Post('wallet')
   @ApiBearerAuth('access-token')
-  // @Roles(Role.Admin)
+  @Roles(Role.Admin)
   async updateUser(@Body() dto: WalletUserDto, @Request() { user }) {
     this.userService.changeWallet(dto, user['id']);
   }

@@ -24,12 +24,11 @@ export class UserService extends BaseService {
   }
 
   public async changeWallet(dto: WalletUserDto, id: number) {
-    const user = await this.userDao.getByEmail(dto.email);
+    const user = await this.userDao.getUserInfo(dto.email);
     await this.userDao.updateUser(
       {
         ...user,
         wallet: dto.wallet,
-        role: 10,
       },
       user.id,
     );

@@ -22,3 +22,10 @@ export class CreateUserDto {
   @ApiProperty()
   birthdate?: string;
 }
+
+export class WalletUserDto {
+  @ApiProperty()
+  email: string;
+  @ApiProperty()
+  wallet: number;
+}

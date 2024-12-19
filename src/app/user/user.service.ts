@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { UserDao } from './user.dao';
 import { BaseService } from 'src/base/base.service';
-import { CreateUserDto } from './dto/create-user.dto';
+import { CreateUserDto, WalletUserDto } from './dto/create-user.dto';
 import { TransactionDao } from '../payment/dao/transaction.dao';
 
 @Injectable()
@@ -21,6 +21,16 @@ export class UserService extends BaseService {
       message: 'Шинэ хэрэглэгчийн урамшуулал',
     });
     return user;
+  }
+
+  public async changeWallet(dto: WalletUserDto, id: number) {
+    const user = await this.userDao.getUserInfo(dto.email);
+    return await this.transaction.create({
+      point: dto.wallet,
+      remitter: id,
+      receiver: user.id,
+      message: 'Test',
+    });
   }
 
   public async findAll() {

@@ -10,8 +10,10 @@ import {
   Put,
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import { CreateUserDto } from './dto/create-user.dto';
+import { CreateUserDto, WalletUserDto } from './dto/create-user.dto';
 import { Public } from 'src/auth/guards/jwt/jwt-auth-guard';
+import { Roles } from 'src/auth/guards/role/role.decorator';
+import { Role } from 'src/auth/guards/role/role.enum';
 
 @Controller('user')
 export class UserController {
@@ -32,6 +34,11 @@ export class UserController {
     return user;
   }
 
+  @Post('wallet')
+  @Roles(Role.Admin)
+  async updateUser(@Body() dto: WalletUserDto, @Request() { user }) {
+    this.userService.changeWallet(dto, user['id']);
+  }
   // @Get(':id')
   // findOne(@Param('id') id: string) {
   //   return this.userService.findOne(id);

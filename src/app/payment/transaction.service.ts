@@ -22,7 +22,7 @@ export class TransactionService extends BaseService {
     let success = remitterPoint > 0 && receiverPoint > 0;
     const date = new Date();
     const right = remitter.endDate > date;
-    if (!success && right) {
+    if (!success || right) {
       throw new HttpException(
         'Үлдэгдэл хүрэлцэхгүй байна.',
         HttpStatus.BAD_REQUEST,

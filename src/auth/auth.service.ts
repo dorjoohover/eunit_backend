@@ -51,20 +51,15 @@ export class AuthService {
 
   async login(user: any) {
     const result = await this.validateUser(user);
-    console.log(result);
     if (!result) {
       throw new UnauthorizedException();
     }
+    const token = this.jwtService.sign({
+      app: 'app',
+      email: result.email,
+    });
     return {
-      accessToken: this.jwtService.sign(
-        {
-          app: 'app',
-          ...result,
-        },
-        {
-          secret: jwtConstants.secret,
-        },
-      ),
+      accessToken: token,
       user: {
         name: result.name,
         role: result.role,

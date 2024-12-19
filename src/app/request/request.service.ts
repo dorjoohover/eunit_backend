@@ -19,25 +19,33 @@ export class RequestService extends BaseService {
     super();
   }
   public async create(dto: CreateRequestDto, email: string, user: number) {
-    const point =
-      dto.service == ServiceType.REVIEW
-        ? 1000
-        : dto.service == ServiceType.DATA
-          ? dto.count * 100
-          : 20000;
-    const success = await this.transactionService.create({
-      point: point,
-      receiver: 'bomarketm@gmail.com',
-      remitter: email,
-      message: 'Худалдан авалт хийсэн',
-    });
-    const res = await this.dao.create({
-      ...dto,
-      location: +dto.location,
-      user: user,
-    });
-    await this.transactionService.updateRequest(success.id, res);
-    return res;
+    try {
+      const point =
+        dto.service == ServiceType.REVIEW
+          ? 1000
+          : dto.service == ServiceType.DATA
+            ? dto.count * 100
+            : 20000;
+      const success = await this.transactionService.create({
+        point: point,
+        receiver: 'bomarketm@gmail.com',
+        remitter: email,
+        message: 'Худалдан авалт хийсэн',
+      });
+      const res = await this.dao.create({
+        ...dto,
+        location: +dto.location,
+        user: user,
+      });
+      await this.transactionService.updateRequest(success.id, res);
+      return res;
+    } catch (error) {
+      return {
+        success: false,
+        message: error.message,
+        status: error.status,
+      };
+    }
   }
 
   findAll() {

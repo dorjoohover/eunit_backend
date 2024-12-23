@@ -10,6 +10,7 @@ import { LocationDao } from 'src/data/location/location.dao';
 import PdfPrinter from 'pdfmake';
 import { TDocumentDefinitions } from 'pdfmake/interfaces';
 import { RequestReport } from './request.pdf';
+import { Formatter } from './formatter';
 const fonts = {
   Roboto: {
     normal: 'src/fonts/Roboto-Regular.ttf',
@@ -37,22 +38,41 @@ export class RequestService extends BaseService {
 
   async getPdf(id: number): Promise<PDFKit.PDFDocument> {
     const res = await this.findOne(id);
-    console.log(res);
     const docDefinition = RequestReport({
-      location: '',
-      text: '',
-      town: '',
-      type: '',
+      location: Formatter.location(
+        res.location.city,
+        res.location.district,
+        res.location.town,
+        res.location.khoroo,
+      ),
+      text: Formatter.text(
+        res.location.city,
+        res.location.district,
+        res.location.khoroo,
+        res.location.zipcode,
+        res.location.town,
+        res.data.area * res.data.avg,
+        res.data.area,
+        res.data.room,
+        res.data.floor,
+        res.data.no,
+      ),
+      town: res.location.town,
+      type: 'Орон сууц',
       user: {
-        email: '',
-        name: '',
-        phone: '',
+        email: res.user.email,
+        name: Formatter.userName(
+          res.user.name,
+          res.user.lastname,
+          res.user.firstname,
+        ),
+        phone: res.user.phone ?? '',
       },
       value: {
-        area: 1,
-        avg: 1,
-        max: 2,
-        min: 1,
+        area: res.data.area,
+        avg: res.data.avg,
+        max: res.data.max,
+        min: res.data.min,
       },
     });
 
@@ -106,14 +126,14 @@ export class RequestService extends BaseService {
     const service = await this.dao.findOne(id);
 
     const location = await this.locationDao.findById(service.location.id);
-    const res = await this.adService.calcData({
+    const res = (await this.adService.calcData({
       area: service.area,
       location: service.location.id,
       type: service.service,
       endDate: service.endDate,
       startDate: service.startDate,
       paid: true,
-    });
+    })) as { min: number; max: number; avg: number };
     return {
       data: {
         ...res,
@@ -123,6 +143,7 @@ export class RequestService extends BaseService {
         room: service.room,
         floor: service.floor,
       },
+      user: service.user,
       location: location,
     };
   }

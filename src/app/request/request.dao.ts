@@ -54,7 +54,7 @@ export class RequestDao {
       where: {
         id: id,
       },
-      relations: ['location'],
+      relations: ['location', 'user'],
     });
   };
 }

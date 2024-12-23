@@ -90,7 +90,7 @@ export const RequestReport = ({
   location,
 }: {
   text: string;
-  user: { name: string; email: string; phone: string };
+  user: { name: string; email: string; phone?: string };
   value: { min: number; max: number; area: number; avg: number };
   town: string;
   type: string;
@@ -251,11 +251,11 @@ export const RequestReport = ({
       {
         columns: [
           {
-            text: `Утасны дугаар`,
+            text: `${user.phone && 'Утасны дугаар'}`,
             style: 'h4',
           },
           {
-            text: user.phone,
+            text: user.phone ?? '',
             style: 'h4',
             color: '#7A808D',
           },

@@ -118,7 +118,6 @@ export const RequestReport = ({
         columns: [
           logo,
           {
-            marginTop: 15,
             marginLeft: 20,
             text: town,
             style: 'h1',

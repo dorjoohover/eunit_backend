@@ -7,12 +7,14 @@ import {
   Param,
   Delete,
   Request,
+  Res,
 } from '@nestjs/common';
 import { RequestService } from './request.service';
 import { CreateRequestDto } from './dto/create-request.dto';
 import { UpdateRequestDto } from './dto/update-request.dto';
 import { ApiBearerAuth, ApiParam } from '@nestjs/swagger';
 import { Public } from 'src/auth/guards/jwt/jwt-auth-guard';
+import { Response } from 'express';
 
 @Controller('request')
 export class RequestController {
@@ -35,13 +37,25 @@ export class RequestController {
       };
     }
   }
+  @Public()
+  @Get('service/pdf/:id')
+  @ApiParam({ name: 'id' })
+  async requestPdf(@Res() response: Response, @Param('id') id: string) {
+    const pdfDoc = await this.requestService.getPdf(+id);
 
+    response.setHeader('Content-Type', 'application/pdf');
+    pdfDoc.info.Title = 'Report';
+    pdfDoc.pipe(response);
+    pdfDoc.end();
+  }
   @Get()
+  @Public()
   findAll() {
     return this.requestService.findAll();
   }
 
   // user all count
+
   @Get('all')
   findAllUser(@Request() { user }) {
     return this.requestService.findAllUser(user['id']);

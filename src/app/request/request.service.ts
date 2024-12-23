@@ -7,7 +7,17 @@ import { TransactionService } from '../payment/transaction.service';
 import { ServiceType } from 'src/base/constants';
 import { AdService } from 'src/data/ad/ad.service';
 import { LocationDao } from 'src/data/location/location.dao';
-
+import PdfPrinter from 'pdfmake';
+import { TDocumentDefinitions } from 'pdfmake/interfaces';
+import { RequestReport } from './request.pdf';
+const fonts = {
+  Roboto: {
+    normal: 'src/fonts/Roboto-Regular.ttf',
+    bold: 'src/fonts/Roboto-Medium.ttf',
+    italics: 'src/fonts/Roboto-Italic.ttf',
+    bolditalics: 'src/fonts/Roboto-MediumItalic.ttf',
+  },
+};
 @Injectable()
 export class RequestService extends BaseService {
   constructor(
@@ -17,6 +27,36 @@ export class RequestService extends BaseService {
     private transactionService: TransactionService,
   ) {
     super();
+  }
+
+  private printer = new PdfPrinter(fonts);
+
+  createPdf(docDefinition: TDocumentDefinitions) {
+    return this.printer.createPdfKitDocument(docDefinition);
+  }
+
+  async getPdf(id: number): Promise<PDFKit.PDFDocument> {
+    const res = await this.findOne(id);
+    console.log(res);
+    const docDefinition = RequestReport({
+      location: '',
+      text: '',
+      town: '',
+      type: '',
+      user: {
+        email: '',
+        name: '',
+        phone: '',
+      },
+      value: {
+        area: 1,
+        avg: 1,
+        max: 2,
+        min: 1,
+      },
+    });
+
+    return this.createPdf(docDefinition);
   }
   public async create(dto: CreateRequestDto, email: string, user: number) {
     try {
@@ -50,8 +90,8 @@ export class RequestService extends BaseService {
     }
   }
 
-  findAll() {
-    return `This action returns all request`;
+  async findAll() {
+    return await this.dao.findAll();
   }
 
   async findByUser(id: number, page: number, limit = 10) {

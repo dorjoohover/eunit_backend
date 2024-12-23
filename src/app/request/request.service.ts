@@ -51,7 +51,11 @@ export class RequestService extends BaseService {
         res.location.khoroo,
         res.location.zipcode,
         res.location.town,
-        res.data.area * res.data.avg,
+        Math.round(
+          (Number(res?.data.avg) || 0) *
+            (parseFloat(`${res?.data.area}` || '0') || 0),
+        ),
+
         res.data.area,
         res.data.room,
         res.data.floor,

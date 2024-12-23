@@ -209,7 +209,13 @@ export const RequestReport = ({
             marginTop: 4,
           },
           {
-            text: ` ${Formatter.money(`${value.avg * value.area}`, 'MNT')} `,
+            text: ` ${Formatter.money(
+              `${Math.round(
+                (Number(value.avg) || 0) *
+                  (parseFloat(`${value.area}` || '0') || 0),
+              )}`,
+              'MNT',
+            )} `,
             style: 'h3',
             background: '#2850FA',
             padding: 16,

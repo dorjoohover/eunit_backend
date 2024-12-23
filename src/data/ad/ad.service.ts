@@ -343,7 +343,7 @@ export class AdService extends BaseService {
   public async calcData(dto: CalcDataDto) {
     if (dto.type == ServiceType.REVIEW) {
       let ads = await this.dao.findReview(dto.location, dto.area);
-      if (ads.length == 0 || !ads)
+      if (ads.length <= 3 || !ads)
         ads = await this.dao.findReview(dto.location, 0);
       let data = ads.map((d) => +d.unitPrice);
       const half = Math.floor(data.length / 2);

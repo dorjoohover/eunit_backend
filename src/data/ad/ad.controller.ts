@@ -8,12 +8,12 @@ import {
   Delete,
 } from '@nestjs/common';
 import { AdService } from './ad.service';
-import { CalcDataDto, CreateAdDto } from './dto/create-ad.dto';
+import { CalcDataDto, CalculateDto, CreateAdDto } from './dto/create-ad.dto';
 import { UpdateAdDto } from './dto/update-ad.dto';
 import { Public } from 'src/auth/guards/jwt/jwt-auth-guard';
 import { LocationService } from '../location/location.service';
 import { LocationDao } from '../location/location.dao';
-
+import locationData from '../../excel/togtool.json';
 @Controller('ad')
 export class AdController {
   constructor(
@@ -35,6 +35,20 @@ export class AdController {
   @Post('/location')
   createDataLocation() {
     return this.adService.createDataExcelLocation();
+  }
+
+  @Public()
+  @Post('/constant')
+  createConstant() {
+    return this.adService.createConstant();
+  }
+
+  @Public()
+  @Post('/calculate')
+  async calc(@Body() dto: CalculateDto) {
+    return dto.isBuilding
+      ? this.adService.calculateBuilding(dto)
+      : this.adService.calculateBuilding(dto);
   }
 
   @Public()

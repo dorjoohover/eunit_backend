@@ -1,7 +1,7 @@
 import * as XLSX from 'xlsx';
 
 export class AppExcel {
-  readExcel(month: string, url: string, category: number, uri?: string) {
+  readExcel(month: string, url: string, category: number | string, uri?: string) {
     const workbook = XLSX.readFile(
       uri ?? `data/${month}/unegui_data_${url}.xlsx`,
     );

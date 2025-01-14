@@ -1,14 +1,16 @@
 import { Injectable } from '@nestjs/common';
-import { CalcDataDto, CreateAdDto } from './dto/create-ad.dto';
+import { CalcDataDto, CalculateDto, CreateAdDto } from './dto/create-ad.dto';
 import { UpdateAdDto } from './dto/update-ad.dto';
 import { BaseService } from 'src/base/base.service';
 import { AdDao } from './ad.dao';
 import { AppExcel } from 'src/common/app.excel';
 import { LocationService } from '../location/location.service';
 import { LocationDao } from '../location/location.dao';
-import { ServiceType } from 'src/base/constants';
+import { NutagDevsgerBuschlel, ServiceType } from 'src/base/constants';
 import { CreateLocationDto } from '../location/dto/create-location.dto';
-
+import { writeFile } from 'fs/promises';
+import { join } from 'path';
+import togtool from '../../excel/togtool.json';
 @Injectable()
 export class AdService extends BaseService {
   constructor(
@@ -22,6 +24,67 @@ export class AdService extends BaseService {
     return 'This action adds a new ad';
   }
 
+  public async createConstant() {
+    const togtool = this.excel.readExcel(
+      '',
+      '',
+      9,
+      'src/excel/baiguullagad-zoriulsan-uilchilgee.xlsx',
+    );
+    await writeFile(
+      join(process.cwd(), 'src/excel', 'suljee.json'),
+      JSON.stringify(togtool),
+    );
+    console.log(togtool);
+
+    // const ads = this.excel.readExcel(
+    //   '',
+    //   '',
+    //   1,
+    //   'src/excel/Data_unegui_12.09_last_v_1.xlsx',
+    // );
+    // console.log(ads[0]);
+    // try {
+    //   const uniqueAds = [
+    //     ...new Map(
+    //       ads.map((ad) => [
+    //         `${ad['Дүүрэг']}-${ad['Байршил']}`, // Combining both district and name as a string key
+    //         ad, // The entire ad object is kept as the value
+    //       ]),
+    //     ).values(),
+    //   ];
+    //   uniqueAds.map(async (ad) => {
+    //     const body = {
+    //       city: 'Улаанбаатар',
+    //       district: ad['Дүүрэг'],
+    //       name: ad['Байршил'],
+    //     };
+    //     await this.locationDao.create(body);
+    //   });
+    //   locations.map(async (location) => {
+    //     const lat = location['Lng'];
+    //     const lng = location['Lat_1'];
+    //     const district = location['Дүүрэг'];
+    //     const town = location['Хотхон Монгол'];
+    //     const townEnglish = location['Хотхон англи'];
+    //     const name = location['Ерөнхий байршил'];
+    //     const zipcode = location['Zip code'];
+    //     const khoroo = location['Khoroo'];
+    //     const body = {
+    //       city: 'Улаанбаатар',
+    //       khoroo,
+    //       district,
+    //       lat,
+    //       lng,
+    //       town,
+    //       englishNameOfTown: townEnglish,
+    //       name,
+    //       zipcode,
+    //     };
+    //     this.locationDao.create(body);
+    //   });
+    // } catch (error) {}
+  }
   public async createDataExcelLocation() {
     const locations = this.excel.readExcel(
       '',
@@ -382,5 +445,135 @@ export class AdService extends BaseService {
 
   remove(id: number) {
     return `This action removes a #${id} ad`;
+  }
+
+  public async findFromCJ(usage: string, catalog: string, c: string) {
+    const cate = togtool['4'][usage];
+    if (cate == undefined) return false;
+    const response = await Promise.all(
+      cate
+        .map((cat) => {
+          if (cat.type == catalog) {
+            const res = cat.cost[c];
+            if (res == undefined) {
+              return false;
+            }
+            return res;
+          }
+        })
+        .filter((f) => f != undefined),
+    );
+    return response?.[0] == undefined ? false : response[0];
+  }
+  public async calculateBuilding(dto: CalculateDto) {
+    let unitPowerPrice = await this.findFromCJ(
+      dto.usage,
+      dto.catalog,
+      dto.class,
+    );
+    let buildingFloor = 1,
+      location = 1,
+      haniinZuzaan = 1,
+      natural = 1,
+      engineering = 1,
+      priceIndex = 2.48;
+    if (!unitPowerPrice) {
+      // console.log(res);
+      unitPowerPrice = null;
+    }
+    unitPowerPrice *= 1000;
+    const transportDistanceData = togtool['Тээврийн зайн итгэлцүүр'];
+    const transportDistance = await Promise.all(
+      transportDistanceData
+        .map((transport) => {
+          if (transport['range'] == dto.transport)
+            return transport['coefficient'];
+        })
+        .filter((d) => d != undefined),
+    );
+
+    const buildingFloorIndex = togtool['Барилгын өндрын итгэлцүүр']
+      .map((a) => {
+        if (a.type == dto.usage) return a.coefficient;
+      })
+      .filter((d) => d != undefined)[0];
+    buildingFloor =
+      1 +
+      (dto.buildingFloor - buildingFloorIndex < 0
+        ? 0
+        : dto.buildingFloor - buildingFloorIndex) *
+        0.05;
+    natural = NutagDevsgerBuschlel[dto.location];
+    const usage = togtool['4'][dto.usage];
+    let catalog = await Promise.all(
+      usage
+        .map((u) => {
+          if (u.type == dto.catalog) return u;
+        })
+        .filter((a) => a != undefined),
+    );
+    catalog = catalog[0];
+
+    const burenOrtog =
+      unitPowerPrice *
+      haniinZuzaan *
+      transportDistance[0] *
+      buildingFloor *
+      location *
+      natural *
+      engineering *
+      priceIndex *
+      dto.area;
+
+    let undsenHiits =
+        catalog.structure *
+        togtool['Элэгдлийн хувь']
+          .map((el) => {
+            if (el.score == dto.quality) return el.round;
+          })
+          .filter((a) => a != undefined)[0],
+      ceil =
+        catalog.ceil *
+        togtool['Элэгдлийн хувь']
+          .map((el) => {
+            if (el.score == dto.ceil) return el.round;
+          })
+          .filter((a) => a != undefined)[0],
+      electric =
+        catalog.electric *
+        togtool['Элэгдлийн хувь']
+          .map((el) => {
+            if (el.score == dto.electric) return el.round;
+          })
+          .filter((a) => a != undefined)[0],
+      san =
+        catalog.san *
+        togtool['Элэгдлийн хувь']
+          .map((el) => {
+            if (el.score == dto.san) return el.round;
+          })
+          .filter((a) => a != undefined)[0];
+
+    const elegdelPercent = undsenHiits + ceil + electric + san;
+
+    const elegdel = (burenOrtog * Math.round(elegdelPercent)) / 100;
+
+    const res = burenOrtog - elegdel;
+
+    return {
+      unitPowerPrice,
+      haniinZuzaan,
+      transport: transportDistance[0],
+      buildingFloor,
+      location,
+      natural,
+      engineering,
+      priceIndex,
+      area: dto.area,
+      elegdelPercent,
+      elegdel,
+      burenOrtog,
+      res,
+    };
   }
 }

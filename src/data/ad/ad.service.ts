@@ -11,6 +11,7 @@ import { CreateLocationDto } from '../location/dto/create-location.dto';
 import { writeFile } from 'fs/promises';
 import { join } from 'path';
 import togtool from '../../excel/togtool.json';
+import { NotApartmentIndex } from 'src/base/cost.index';
 @Injectable()
 export class AdService extends BaseService {
   constructor(
@@ -450,6 +451,7 @@ export class AdService extends BaseService {
   public async findFromCJ(usage: string, catalog: string, c: string) {
     const cate = togtool['4'][usage];
     if (cate == undefined) return false;
+    
     const response = await Promise.all(
       cate
         .map((cat) => {
@@ -475,8 +477,8 @@ export class AdService extends BaseService {
       location = 1,
       haniinZuzaan = 1,
       natural = 1,
-      engineering = 1,
-      priceIndex = 2.48;
+      engineering = 1;
+    const priceIndex = NotApartmentIndex(2016);
     if (!unitPowerPrice) {
       // console.log(res);
       unitPowerPrice = null;
@@ -513,7 +515,6 @@ export class AdService extends BaseService {
         .filter((a) => a != undefined),
     );
     catalog = catalog[0];
-
     const burenOrtog =
       unitPowerPrice *
       haniinZuzaan *
@@ -574,6 +575,9 @@ export class AdService extends BaseService {
       elegdel,
       burenOrtog,
       res,
+      ceil,
+      san,
+      electric,
     };
   }
 }

@@ -1,6 +1,7 @@
 import { PaymentEntity } from 'src/app/payment/entities/payment.entity';
 import { TransactionEntity } from 'src/app/payment/entities/transaction.entity';
 import { RequestEntity } from 'src/app/request/entities/request.entity';
+import { ServiceEntity } from 'src/data/ad/entities/service.entity';
 import {
   Entity,
   Column,
@@ -65,4 +66,8 @@ export class UserEntity {
     nullable: true,
   })
   remitterTransactions?: TransactionEntity[];
+  @OneToMany(() => ServiceEntity, (service) => service.user, {
+    nullable: true,
+  })
+  services?: ServiceEntity[];
 }

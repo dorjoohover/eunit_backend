@@ -51,11 +51,19 @@ export class CreateAdDto {
   landUsage?: string;
 }
 
-export class CalculateDto {
-  @ApiProperty()
-  isBuilding: boolean;
+export class CalculateBuildingDto {
   @ApiProperty()
   name: string;
+  @ApiProperty()
+  account: number;
+  @ApiProperty()
+  depreciation: number;
+  @ApiProperty({ nullable: true })
+  year: number;
+  @ApiProperty()
+  date: string;
+  @ApiProperty()
+  initial: number;
   @ApiProperty()
   code: string;
   @ApiProperty()
@@ -66,13 +74,10 @@ export class CalculateDto {
   type: string;
   @ApiProperty()
   catalog: string;
-  @ApiProperty()
-  zoriulalt: string;
+
   @ApiProperty()
   class: string;
-  @ApiProperty()
-  // Барилгын давхрын өндөр /метр/
-  floor: number;
+
   @ApiProperty()
   // Нийт талбайн хэмжээ /м.кв/
   area: number;
@@ -136,9 +141,53 @@ export class CalcDataDto {
   paid?: boolean;
 }
 
-export class CalcApartmentDto {
+export class ServiceDto {
+  name: string;
+
+  code: string;
+
+  operation?: number;
+
+  year?: number;
+
+  area?: number;
+
+  initial?: number;
+
+  depreciation?: number;
+
+  account?: number;
+
+  elegdel?: number;
+
+  elegdelPercent?: number;
+
+  burenOrtog?: number;
+
+  price?: number;
+
+  date?: string;
+}
+
+export class CalculateApartmentDto {
   @ApiProperty()
   district: string;
+  @ApiProperty()
+  name: string;
+  @ApiProperty()
+  code: string;
+  @ApiProperty()
+  operation: number;
+  @ApiProperty()
+  year: number;
+  @ApiProperty()
+  account: number;
+  @ApiProperty()
+  date: string;
+  @ApiProperty()
+  depreciation: number;
+  @ApiProperty()
+  initial: number;
   @ApiProperty()
   khoroo: string;
   @ApiProperty()

@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import {
-  CalcApartmentDto,
   CalcDataDto,
-  CalculateDto,
+  CalculateApartmentDto,
+  CalculateBuildingDto,
   CreateAdDto,
 } from './dto/create-ad.dto';
 import { UpdateAdDto } from './dto/update-ad.dto';
@@ -17,10 +17,12 @@ import { writeFile } from 'fs/promises';
 import { join } from 'path';
 import togtool from '../../excel/togtool.json';
 import { NotApartmentIndex } from 'src/base/cost.index';
+import { ServiceDao } from './service.dao';
 @Injectable()
 export class AdService extends BaseService {
   constructor(
     private dao: AdDao,
+    private serviceDao: ServiceDao,
     private excel: AppExcel,
     private locationDao: LocationDao,
   ) {
@@ -409,8 +411,8 @@ export class AdService extends BaseService {
     return res;
   }
 
-  public async calculateAparment(dto: CalcApartmentDto) {
-    const location = await (
+  public async calculateAparment(dto: CalculateApartmentDto, user: number) {
+    const location = (
       await this.locationDao.findLocationByDistrict(
         dto.district,
         undefined,
@@ -430,6 +432,24 @@ export class AdService extends BaseService {
           half % 2 ? sorted[half] : (sorted[half - 1] + sorted[half]) / 2,
         ),
       };
+      // await this.serviceDao.create(
+      //   {
+      //     code: dto.code,
+      //     name: dto.name,
+      //     account: dto.account,
+      //     area: dto.area,
+      //     depreciation: dto.depreciation,
+      //     year: dto.year,
+      //     operation: dto.operation,
+      //     initial: dto.initial,
+      //     date: dto.date,
+      //     burenOrtog: burenOrtog,
+      //     elegdel: elegdel,
+      //     elegdelPercent: elegdelPercent,
+      //     price: res,
+      //   },
+      //   user,
+      // );
       return res;
     }
     if (dto.type == ServiceType.DATA) {
@@ -509,17 +529,13 @@ export class AdService extends BaseService {
     );
     return response?.[0] == undefined ? false : response[0];
   }
-  public async calculateBuilding(dto: CalculateDto) {
-    let unitPowerPrice = await this.findFromCJ(
-      dto.usage,
-      dto.type,
-      dto.class,
-    );
+  public async calculateBuilding(dto: CalculateBuildingDto, user: number) {
+    let unitPowerPrice = await this.findFromCJ(dto.usage, dto.type, dto.class);
     let buildingFloor = 1,
       location = 1,
-      haniinZuzaan = 1,
-      natural = 1,
-      engineering = 1;
+      haniinZuzaan = dto.haniinZuzaan,
+      natural = dto.natural,
+      engineering = dto.engineering;
     const priceIndex = NotApartmentIndex(2016);
     if (!unitPowerPrice) {
       // console.log(res);
@@ -530,8 +546,7 @@ export class AdService extends BaseService {
     const transportDistance = await Promise.all(
       transportDistanceData
         .map((transport) => {
-          if (transport['range'] == dto.range)
-            return transport['coefficient'];
+          if (transport['range'] == dto.range) return transport['coefficient'];
         })
         .filter((d) => d != undefined),
     );
@@ -602,24 +617,31 @@ export class AdService extends BaseService {
     const elegdel = (burenOrtog * Math.round(elegdelPercent)) / 100;
 
     const res = burenOrtog - elegdel;
-
+    await this.serviceDao.create(
+      {
+        code: dto.code,
+        name: dto.name,
+        account: dto.account,
+        area: dto.area,
+        depreciation: dto.depreciation,
+        year: dto.year,
+        operation: dto.operation,
+        initial: dto.initial,
+        date: dto.date,
+        burenOrtog: burenOrtog,
+        elegdel: elegdel,
+        elegdelPercent: elegdelPercent,
+        price: res,
+      },
+      user,
+    );
     return {
       unitPowerPrice,
-      haniinZuzaan,
-      transport: transportDistance[0],
-      buildingFloor,
-      location,
-      natural,
-      engineering,
       priceIndex,
-      area: dto.area,
       elegdelPercent,
       elegdel,
       burenOrtog,
-      res,
-      ceil,
-      san,
-      electric,
+      price: res,
     };
   }
 }

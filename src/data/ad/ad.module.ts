@@ -7,11 +7,12 @@ import { BaseModule } from 'src/base/base.module';
 import { SequenceModule } from 'src/sequence/sequence.module';
 import { AppExcel } from 'src/common/app.excel';
 import { LocationDao } from '../location/location.dao';
+import { ServiceDao } from './service.dao';
 
 @Module({
   imports: [BaseModule, SequenceModule],
   controllers: [AdController],
-  providers: [AdService, AdDao, BaseService, AppExcel, LocationDao],
+  providers: [AdService, AdDao, BaseService, ServiceDao, AppExcel, LocationDao],
   exports: [AdService, AdDao],
 })
 export class AdModule {}

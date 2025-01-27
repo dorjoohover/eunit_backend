@@ -10,6 +10,7 @@ import { LocationDao } from 'src/data/location/location.dao';
 import { TransactionDao } from '../payment/dao/transaction.dao';
 import { UserService } from '../user/user.service';
 import { UserDao } from '../user/user.dao';
+import { ServiceDao } from 'src/data/ad/service.dao';
 
 @Module({
   controllers: [RequestController],
@@ -21,6 +22,7 @@ import { UserDao } from '../user/user.dao';
     AdDao,
     LocationDao,
     TransactionDao,
+    ServiceDao,
     UserService,
     UserDao,
     AppExcel,

@@ -6,12 +6,13 @@ import {
   Patch,
   Param,
   Delete,
+  Request,
 } from '@nestjs/common';
 import { AdService } from './ad.service';
 import {
-  CalcApartmentDto,
   CalcDataDto,
-  CalculateDto,
+  CalculateApartmentDto,
+  CalculateBuildingDto,
   CreateAdDto,
 } from './dto/create-ad.dto';
 import { UpdateAdDto } from './dto/update-ad.dto';
@@ -19,6 +20,7 @@ import { Public } from 'src/auth/guards/jwt/jwt-auth-guard';
 import { LocationService } from '../location/location.service';
 import { LocationDao } from '../location/location.dao';
 import locationData from '../../excel/togtool.json';
+import { ApiBearerAuth } from '@nestjs/swagger';
 @Controller('ad')
 export class AdController {
   constructor(
@@ -49,11 +51,23 @@ export class AdController {
   }
 
   @Public()
-  @Post('/calculate')
-  async calc(@Body() dto: CalculateDto) {
-    return dto.isBuilding
-      ? this.adService.calculateBuilding(dto)
-      : this.adService.calculateBuilding(dto);
+  @ApiBearerAuth('access-token')
+  @Post('/calculate/building')
+  async calc(@Body() dto: CalculateBuildingDto, @Request() { user }) {
+    return this.adService.calculateBuilding(dto, +user['id']);
+  }
+
+  @Public()
+  @ApiBearerAuth('access-token')
+  @Post('/calculate/apartment')
+  async calcDataByLocation(
+    @Body() dto: CalculateApartmentDto,
+    @Request() { user },
+  ) {
+    const res = await this.adService.calculateAparment(dto, +user['id']);
+    return {
+      ...res,
+    };
   }
 
   @Public()
@@ -66,14 +80,7 @@ export class AdController {
       location,
     };
   }
-  @Public()
-  @Post('/calc1')
-  async calcDataByLocation(@Body() dto: CalcApartmentDto) {
-    const res = await this.adService.calculateAparment(dto);
-    return {
-      ...res,
-    };
-  }
+
   @Public()
   @Get('/district')
   async calcDistrict() {

@@ -638,6 +638,7 @@ export class AdService extends BaseService {
     );
     return {
       unitPowerPrice,
+      code: dto.code,
       priceIndex,
       elegdelPercent,
       elegdel,

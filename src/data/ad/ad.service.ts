@@ -567,7 +567,7 @@ export class AdService extends BaseService {
     let catalog = await Promise.all(
       usage
         .map((u) => {
-          if (u.type == dto.catalog) return u;
+          if (u.type == dto.type) return u;
         })
         .filter((a) => a != undefined),
     );

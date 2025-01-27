@@ -135,3 +135,20 @@ export class CalcDataDto {
   @ApiProperty()
   paid?: boolean;
 }
+
+export class CalcApartmentDto {
+  @ApiProperty()
+  district: string;
+  @ApiProperty()
+  khoroo: string;
+  @ApiProperty()
+  area: number;
+  @ApiProperty()
+  type: number;
+  @ApiProperty()
+  startDate?: Date;
+  @ApiProperty()
+  endDate?: Date;
+  @ApiProperty()
+  paid?: boolean;
+}

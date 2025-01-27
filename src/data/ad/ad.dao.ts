@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import {
   Between,
   DataSource,
+  In,
   IsNull,
   LessThan,
   MoreThan,
@@ -60,7 +61,7 @@ export class AdDao {
   };
 
   findReview = async (
-    location: number,
+    location: number[],
     lowArea: number,
     startDate?: Date,
     endDate?: Date,
@@ -71,7 +72,7 @@ export class AdDao {
         ? await this.db.find({
             where: {
               location: {
-                id: location,
+                id: In(location),
               },
               area: all
                 ? Not(IsNull())
@@ -93,7 +94,7 @@ export class AdDao {
         : await this.db.find({
             where: {
               location: {
-                id: location,
+                id: In(location),
               },
               area:
                 lowArea == 0

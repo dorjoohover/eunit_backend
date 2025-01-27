@@ -1,5 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { CalcDataDto, CalculateDto, CreateAdDto } from './dto/create-ad.dto';
+import {
+  CalcApartmentDto,
+  CalcDataDto,
+  CalculateDto,
+  CreateAdDto,
+} from './dto/create-ad.dto';
 import { UpdateAdDto } from './dto/update-ad.dto';
 import { BaseService } from 'src/base/base.service';
 import { AdDao } from './ad.dao';
@@ -404,11 +409,17 @@ export class AdService extends BaseService {
     return res;
   }
 
-  public async calcData(dto: CalcDataDto) {
+  public async calculateAparment(dto: CalcApartmentDto) {
+    const location = await (
+      await this.locationDao.findLocationByDistrict(
+        dto.district,
+        undefined,
+        dto.khoroo,
+      )
+    ).map((a) => a.id);
     if (dto.type == ServiceType.REVIEW) {
-      let ads = await this.dao.findReview(dto.location, dto.area);
-      if (ads.length <= 3 || !ads)
-        ads = await this.dao.findReview(dto.location, 0);
+      let ads = await this.dao.findReview(location, dto.area);
+      if (ads.length <= 3 || !ads) ads = await this.dao.findReview(location, 0);
       let data = ads.map((d) => +d.unitPrice);
       const half = Math.floor(data.length / 2);
       const sorted = data.sort((a, b) => a - b);
@@ -424,7 +435,38 @@ export class AdService extends BaseService {
     if (dto.type == ServiceType.DATA) {
       const all = dto.area == 0;
       let data = await this.dao.findReview(
-        dto.location,
+        location,
+        dto.area,
+        dto.startDate,
+        dto.endDate,
+        all,
+      );
+      const limit = data.length;
+      if (!dto.paid) data = data.slice(0, 5);
+      return { data: data, limit };
+    }
+  }
+  public async calcData(dto: CalcDataDto) {
+    if (dto.type == ServiceType.REVIEW) {
+      let ads = await this.dao.findReview([dto.location], dto.area);
+      if (ads.length <= 3 || !ads)
+        ads = await this.dao.findReview([dto.location], 0);
+      let data = ads.map((d) => +d.unitPrice);
+      const half = Math.floor(data.length / 2);
+      const sorted = data.sort((a, b) => a - b);
+      const res = {
+        min: Math.min(...data),
+        max: Math.max(...data),
+        avg: Math.round(
+          half % 2 ? sorted[half] : (sorted[half - 1] + sorted[half]) / 2,
+        ),
+      };
+      return res;
+    }
+    if (dto.type == ServiceType.DATA) {
+      const all = dto.area == 0;
+      let data = await this.dao.findReview(
+        [dto.location],
         dto.area,
         dto.startDate,
         dto.endDate,
@@ -451,7 +493,7 @@ export class AdService extends BaseService {
   public async findFromCJ(usage: string, type: string, c: string) {
     const cate = togtool['4'][usage];
     if (cate == undefined) return false;
-    
+
     const response = await Promise.all(
       cate
         .map((cat) => {

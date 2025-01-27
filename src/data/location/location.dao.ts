@@ -27,13 +27,25 @@ export class LocationDao {
     return res;
   };
 
-  findLocationByDistrict = async (id: string, town: boolean) => {
+  findLocationByDistrict = async (
+    id: string,
+    town?: boolean,
+    khoroo?: string,
+  ) => {
+    const whereCondition: any = {
+      district: id,
+    };
+
+    if (khoroo !== undefined) {
+      whereCondition.khoroo = parseInt(khoroo);
+    }
+    if (town !== undefined) {
+      whereCondition.town = town ? Not(IsNull()) : IsNull();
+    }
+
     try {
       const res = await this.db.find({
-        where: {
-          district: id,
-          town: town ? Not(IsNull()) : IsNull(),
-        },
+        where: whereCondition,
       });
       return res;
     } catch (error) {

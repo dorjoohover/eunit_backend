@@ -8,7 +8,12 @@ import {
   Delete,
 } from '@nestjs/common';
 import { AdService } from './ad.service';
-import { CalcDataDto, CalculateDto, CreateAdDto } from './dto/create-ad.dto';
+import {
+  CalcApartmentDto,
+  CalcDataDto,
+  CalculateDto,
+  CreateAdDto,
+} from './dto/create-ad.dto';
 import { UpdateAdDto } from './dto/update-ad.dto';
 import { Public } from 'src/auth/guards/jwt/jwt-auth-guard';
 import { LocationService } from '../location/location.service';
@@ -59,6 +64,14 @@ export class AdController {
     return {
       ...res,
       location,
+    };
+  }
+  @Public()
+  @Post('/calc1')
+  async calcDataByLocation(@Body() dto: CalcApartmentDto) {
+    const res = await this.adService.calculateAparment(dto);
+    return {
+      ...res,
     };
   }
   @Public()

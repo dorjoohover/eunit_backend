@@ -23,9 +23,10 @@ export class ServiceDao {
     try {
       const res = await this.db.insert({
         ...dto,
-        user: {
-          id: user,
-        },
+        user: null,
+        // {
+        //   id: user,
+        // },
       });
     } catch (error) {
       console.log(error);

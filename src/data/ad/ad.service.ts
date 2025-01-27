@@ -411,7 +411,7 @@ export class AdService extends BaseService {
     return res;
   }
 
-  public async calculateAparment(dto: CalculateApartmentDto, user: number) {
+  public async calculateAparment(dto: CalculateApartmentDto) {
     const location = (
       await this.locationDao.findLocationByDistrict(
         dto.district,
@@ -529,7 +529,7 @@ export class AdService extends BaseService {
     );
     return response?.[0] == undefined ? false : response[0];
   }
-  public async calculateBuilding(dto: CalculateBuildingDto, user: number) {
+  public async calculateBuilding(dto: CalculateBuildingDto) {
     let unitPowerPrice = await this.findFromCJ(dto.usage, dto.type, dto.class);
     let buildingFloor = 1,
       location = 1,
@@ -633,7 +633,8 @@ export class AdService extends BaseService {
         elegdelPercent: elegdelPercent,
         price: res,
       },
-      user,
+      null,
+      // user ,
     );
     return {
       unitPowerPrice,

@@ -54,7 +54,8 @@ export class AdController {
   @ApiBearerAuth('access-token')
   @Post('/calculate/building')
   async calc(@Body() dto: CalculateBuildingDto, @Request() { user }) {
-    return this.adService.calculateBuilding(dto, +user['id']);
+    return this.adService.calculateBuilding(dto);
+    // return this.adService.calculateBuilding(dto, +user['id']);
   }
 
   @Public()
@@ -64,7 +65,9 @@ export class AdController {
     @Body() dto: CalculateApartmentDto,
     @Request() { user },
   ) {
-    const res = await this.adService.calculateAparment(dto, +user['id']);
+    // const id =
+    // const res = await this.adService.calculateAparment(dto, +user['id']);
+    const res = await this.adService.calculateAparment(dto);
     return {
       ...res,
     };

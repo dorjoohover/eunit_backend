@@ -63,11 +63,11 @@ export class CalculateDto {
   @ApiProperty()
   usage: string;
   @ApiProperty()
+  type: string;
+  @ApiProperty()
   catalog: string;
   @ApiProperty()
   zoriulalt: string;
-  @ApiProperty()
-  type: string;
   @ApiProperty()
   class: string;
   @ApiProperty()
@@ -90,19 +90,22 @@ export class CalculateDto {
   distance: number;
   @ApiProperty()
   // Тээврийн зайн итгэлцүүр
-  transport: string;
+  range: string;
   @ApiProperty()
   // Үнэлж буй хөрөнгийн байршил
-  location: string;
+  location: number;
   @ApiProperty()
-  // Нутаг дэвсгэрийн бүсчлэлийн итгэлцүүр
-  zone: string;
+  // Ханийн зузаан
+  haniinZuzaan: number;
+  // @ApiProperty()
+  // // Нутаг дэвсгэрийн бүсчлэлийн итгэлцүүр
+  // zone: string;
   @ApiProperty()
   // Байгалийн хүчин зүйлийн нөлөөллийн итгэлцүүр
-  natural: string;
+  natural: number;
   @ApiProperty()
   // Инженерийн шугам сүлжээний холбогдлын итгэлцүүр
-  engineering: string;
+  engineering: number;
   @ApiProperty()
   // Үндсэн хийц чанар байдал
   quality: string;

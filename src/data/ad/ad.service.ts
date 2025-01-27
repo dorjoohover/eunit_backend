@@ -448,14 +448,14 @@ export class AdService extends BaseService {
     return `This action removes a #${id} ad`;
   }
 
-  public async findFromCJ(usage: string, catalog: string, c: string) {
+  public async findFromCJ(usage: string, type: string, c: string) {
     const cate = togtool['4'][usage];
     if (cate == undefined) return false;
     
     const response = await Promise.all(
       cate
         .map((cat) => {
-          if (cat.type == catalog) {
+          if (cat.type == type) {
             const res = cat.cost[c];
             if (res == undefined) {
               return false;
@@ -470,7 +470,7 @@ export class AdService extends BaseService {
   public async calculateBuilding(dto: CalculateDto) {
     let unitPowerPrice = await this.findFromCJ(
       dto.usage,
-      dto.catalog,
+      dto.type,
       dto.class,
     );
     let buildingFloor = 1,
@@ -488,7 +488,7 @@ export class AdService extends BaseService {
     const transportDistance = await Promise.all(
       transportDistanceData
         .map((transport) => {
-          if (transport['range'] == dto.transport)
+          if (transport['range'] == dto.range)
             return transport['coefficient'];
         })
         .filter((d) => d != undefined),

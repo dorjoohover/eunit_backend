@@ -30,13 +30,13 @@ export class ServiceEntity {
   depreciation: number;
   @Column({ nullable: true })
   account: number;
-  @Column({ nullable: true })
+  @Column({ nullable: true, type: 'float' })
   elegdel: number;
-  @Column({ nullable: true })
+  @Column({ nullable: true, type: 'float' })
   elegdelPercent: number;
-  @Column({ nullable: true })
+  @Column({ nullable: true, type: 'float' })
   burenOrtog: number;
-  @Column({ nullable: true })
+  @Column({ nullable: true, type: 'float' })
   price: number;
   @Column({ nullable: true })
   date: string;

@@ -639,12 +639,14 @@ export class AdService extends BaseService {
     return {
       unitPowerPrice,
       code: dto.code,
+      year: dto.year,
       priceIndex,
       elegdelPercent,
       elegdel,
       burenOrtog,
       price: res,
       name: dto.name,
+      date: dto.date,
     };
   }
 }

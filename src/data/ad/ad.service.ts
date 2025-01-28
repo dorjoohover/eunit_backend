@@ -645,6 +645,7 @@ export class AdService extends BaseService {
       elegdel,
       burenOrtog,
       price: res,
+      area: dto.area,
       name: dto.name,
       date: dto.date,
     };

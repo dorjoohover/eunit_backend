@@ -22,7 +22,7 @@ export class ServiceEntity {
   operation: number;
   @Column({ nullable: true })
   year: number;
-  @Column({ nullable: true })
+  @Column({ nullable: true, type: 'float' })
   area: number;
   @Column({ nullable: true })
   initial: number;

@@ -101,16 +101,16 @@ export class CalculateBuildingDto {
   location: number;
   @ApiProperty()
   // Ханийн зузаан
-  haniinZuzaan: number;
+  haniinZuzaan?: number;
   // @ApiProperty()
   // // Нутаг дэвсгэрийн бүсчлэлийн итгэлцүүр
   // zone: string;
   @ApiProperty()
   // Байгалийн хүчин зүйлийн нөлөөллийн итгэлцүүр
-  natural: number;
+  natural?: number;
   @ApiProperty()
   // Инженерийн шугам сүлжээний холбогдлын итгэлцүүр
-  engineering: number;
+  engineering?: number;
   @ApiProperty()
   // Үндсэн хийц чанар байдал
   quality: string;
@@ -121,9 +121,10 @@ export class CalculateBuildingDto {
   san: string;
   @ApiProperty()
   electric: string;
-  @ApiProperty()
-  // Биет хэмжээ
-  size?: string;
+  @ApiProperty({
+    type: Date,
+  })
+  index: Date;
 }
 
 export class CalcDataDto {
@@ -145,12 +146,10 @@ export class ServiceDto {
   name: string;
 
   code: string;
-
-  operation?: number;
-
-  year?: number;
-
-  area?: number;
+  type: number;
+  aggregations: {
+    [key: string]: any;
+  };
 
   initial?: number;
 
@@ -165,8 +164,6 @@ export class ServiceDto {
   burenOrtog?: number;
 
   price?: number;
-
-  date?: string;
 }
 
 export class CalculateApartmentDto {
@@ -184,6 +181,10 @@ export class CalculateApartmentDto {
   account: number;
   @ApiProperty()
   date: string;
+  @ApiProperty({
+    type: Date,
+  })
+  index: Date;
   @ApiProperty()
   depreciation: number;
   @ApiProperty()

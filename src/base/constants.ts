@@ -43,6 +43,18 @@ export const ProductVatType = {
   VAT_ZERO: 30,
 };
 
+export const ServiceDataType = {
+  APARTMENT: 10,
+  BUILDING: 20,
+  STRUCTURE: 30,
+  ENGINEERING: 40,
+  VEHICLE: 50,
+  EQUIPMENT: 60,
+  FURNITURE: 70,
+  COMPUTER: 80,
+  OTHER: 90,
+};
+
 export const PaymentTypeDict = {
   1: 'Карт',
   2: 'Бэлэн',

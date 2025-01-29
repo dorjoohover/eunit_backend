@@ -20,12 +20,14 @@ import { Public } from 'src/auth/guards/jwt/jwt-auth-guard';
 import { LocationService } from '../location/location.service';
 import { LocationDao } from '../location/location.dao';
 import locationData from '../../excel/togtool.json';
-import { ApiBearerAuth } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiParam } from '@nestjs/swagger';
+import { ServiceDao } from './service.dao';
 @Controller('ad')
 export class AdController {
   constructor(
     private readonly adService: AdService,
     private readonly locationDao: LocationDao,
+    private readonly service: ServiceDao,
   ) {}
 
   @Post()
@@ -55,6 +57,22 @@ export class AdController {
   @Post('/calculate/building')
   async calc(@Body() dto: CalculateBuildingDto, @Request() { user }) {
     return this.adService.calculateBuilding(dto);
+    // return this.adService.calculateBuilding(dto, +user['id']);
+  }
+
+  @Public()
+  @ApiBearerAuth('access-token')
+  @Get('/service/:type/:page/:limit')
+  @ApiParam({ name: 'type' })
+  @ApiParam({ name: 'page' })
+  @ApiParam({ name: 'limit' })
+  async getServiceByType(
+    @Param('type') type: string,
+    @Param('page') page: string,
+    @Param('limit') limit: string,
+    @Request() { user },
+  ) {
+    return this.service.findByTypeAndUser(+type, user['id'], +page, +limit);
     // return this.adService.calculateBuilding(dto, +user['id']);
   }
 

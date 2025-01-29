@@ -23,6 +23,7 @@ export class ServiceDao {
     try {
       const res = await this.db.insert({
         ...dto,
+
         user: null,
         // {
         //   id: user,
@@ -45,6 +46,23 @@ export class ServiceDao {
         id: id,
       },
       //   relations: ['level'],
+    });
+  };
+  findByTypeAndUser = async (
+    type: number,
+    user: number,
+    page: number,
+    limit: number,
+  ) => {
+    return await this.db.find({
+      where: {
+        type: type,
+        user: {
+          id: user,
+        },
+      },
+      take: limit,
+      skip: (page - 1) * limit,
     });
   };
 }

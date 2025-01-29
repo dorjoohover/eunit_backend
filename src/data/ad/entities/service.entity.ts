@@ -17,13 +17,9 @@ export class ServiceEntity {
   name: string;
   @Column()
   code: string;
+  @Column({ nullable: true })
+  type: number;
 
-  @Column({ nullable: true })
-  operation: number;
-  @Column({ nullable: true })
-  year: number;
-  @Column({ nullable: true, type: 'float' })
-  area: number;
   @Column({ nullable: true })
   initial: number;
   @Column({ nullable: true })
@@ -38,8 +34,13 @@ export class ServiceEntity {
   burenOrtog: number;
   @Column({ nullable: true, type: 'float' })
   price: number;
-  @Column({ nullable: true })
-  date: string;
+  // @Column({ nullable: true })
+  // date: string;
+
+  @Column('json', { nullable: true })
+  aggregations?: {
+    [key: string]: any;
+  };
   @CreateDateColumn()
   createdAt: Date;
   @ManyToOne(() => UserEntity, (location) => location.services, {

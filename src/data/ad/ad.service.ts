@@ -11,7 +11,11 @@ import { AdDao } from './ad.dao';
 import { AppExcel } from 'src/common/app.excel';
 import { LocationService } from '../location/location.service';
 import { LocationDao } from '../location/location.dao';
-import { NutagDevsgerBuschlel, ServiceType } from 'src/base/constants';
+import {
+  NutagDevsgerBuschlel,
+  ServiceDataType,
+  ServiceType,
+} from 'src/base/constants';
 import { CreateLocationDto } from '../location/dto/create-location.dto';
 import { writeFile } from 'fs/promises';
 import { join } from 'path';
@@ -452,6 +456,9 @@ export class AdService extends BaseService {
       // );
       return res;
     }
+    // await this.serviceDao.create({
+
+    // })
     if (dto.type == ServiceType.DATA) {
       const all = dto.area == 0;
       let data = await this.dao.findReview(
@@ -533,10 +540,12 @@ export class AdService extends BaseService {
     let unitPowerPrice = await this.findFromCJ(dto.usage, dto.type, dto.class);
     let buildingFloor = 1,
       location = 1,
-      haniinZuzaan = dto.haniinZuzaan,
-      natural = dto.natural,
-      engineering = dto.engineering;
-    const priceIndex = NotApartmentIndex(2016);
+      haniinZuzaan = dto.haniinZuzaan ?? 1,
+      natural = dto.natural ?? 1,
+      engineering = dto.engineering ?? 1;
+
+    const date = dto.index ? dto.index.getFullYear() : 2016;
+    const priceIndex = NotApartmentIndex(date);
     if (!unitPowerPrice) {
       // console.log(res);
       unitPowerPrice = null;
@@ -617,21 +626,37 @@ export class AdService extends BaseService {
     const elegdel = (burenOrtog * Math.round(elegdelPercent)) / 100;
 
     const res = burenOrtog - elegdel;
+    const aggregations = {
+      area: dto.area,
+      year: dto.year,
+      operation: dto.operation,
+      date: dto.date,
+      usage: dto.usage,
+      type: dto.type,
+      class: dto.class,
+      haniinZuzaan: dto.haniinZuzaan,
+      buildingFloor: dto.buildingFloor,
+      range: dto.range,
+      natural: dto.natural,
+      engineering: dto.engineering,
+      quality: dto.quality,
+      ceil: dto.ceil,
+      san: dto.san,
+      electric: dto.electric,
+    };
     await this.serviceDao.create(
       {
         code: dto.code,
         name: dto.name,
         account: dto.account,
-        area: dto.area,
+        aggregations,
         depreciation: dto.depreciation,
-        year: dto.year,
-        operation: dto.operation,
         initial: dto.initial,
-        date: dto.date,
         burenOrtog: burenOrtog,
         elegdel: elegdel,
         elegdelPercent: elegdelPercent,
         price: res,
+        type: ServiceDataType.BUILDING,
       },
       null,
       // user ,

@@ -19,12 +19,16 @@ export class ServiceEntity {
   code: string;
   @Column({ nullable: true })
   type: number;
+  @Column({ nullable: true })
+  year: number;
+  @Column({ nullable: true })
+  operation: number;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, type: 'float' })
   initial: number;
-  @Column({ nullable: true })
+  @Column({ nullable: true, type: 'float' })
   depreciation: number;
-  @Column({ nullable: true })
+  @Column({ nullable: true, type: 'float' })
   account: number;
   @Column({ nullable: true, type: 'float' })
   elegdel: number;

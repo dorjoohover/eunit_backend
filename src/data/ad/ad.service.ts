@@ -19,7 +19,7 @@ import {
 import { CreateLocationDto } from '../location/dto/create-location.dto';
 import { writeFile } from 'fs/promises';
 import { join } from 'path';
-import togtool from '../../excel/togtool.json';
+
 import { NotApartmentIndex } from 'src/base/cost.index';
 import { ServiceDao } from './service.dao';
 @Injectable()
@@ -384,10 +384,6 @@ export class AdService extends BaseService {
     // });
   }
 
-  findAll() {
-    return `This action returns all ad`;
-  }
-
   public async calcDistrict() {
     const districts = [
       'Сүхбаатар',
@@ -415,64 +411,6 @@ export class AdService extends BaseService {
     return res;
   }
 
-  public async calculateAparment(dto: CalculateApartmentDto) {
-    const location = (
-      await this.locationDao.findLocationByDistrict(
-        dto.district,
-        undefined,
-        dto.khoroo,
-      )
-    ).map((a) => a.id);
-    if (dto.type == ServiceType.REVIEW) {
-      let ads = await this.dao.findReview(location, dto.area);
-      if (ads.length <= 3 || !ads) ads = await this.dao.findReview(location, 0);
-      let data = ads.map((d) => +d.unitPrice);
-      const half = Math.floor(data.length / 2);
-      const sorted = data.sort((a, b) => a - b);
-      const res = {
-        min: Math.min(...data),
-        max: Math.max(...data),
-        avg: Math.round(
-          half % 2 ? sorted[half] : (sorted[half - 1] + sorted[half]) / 2,
-        ),
-      };
-      // await this.serviceDao.create(
-      //   {
-      //     code: dto.code,
-      //     name: dto.name,
-      //     account: dto.account,
-      //     area: dto.area,
-      //     depreciation: dto.depreciation,
-      //     year: dto.year,
-      //     operation: dto.operation,
-      //     initial: dto.initial,
-      //     date: dto.date,
-      //     burenOrtog: burenOrtog,
-      //     elegdel: elegdel,
-      //     elegdelPercent: elegdelPercent,
-      //     price: res,
-      //   },
-      //   user,
-      // );
-      return res;
-    }
-    // await this.serviceDao.create({
-
-    // })
-    if (dto.type == ServiceType.DATA) {
-      const all = dto.area == 0;
-      let data = await this.dao.findReview(
-        location,
-        dto.area,
-        dto.startDate,
-        dto.endDate,
-        all,
-      );
-      const limit = data.length;
-      if (!dto.paid) data = data.slice(0, 5);
-      return { data: data, limit };
-    }
-  }
   public async calcData(dto: CalcDataDto) {
     if (dto.type == ServiceType.REVIEW) {
       let ads = await this.dao.findReview([dto.location], dto.area);
@@ -503,176 +441,5 @@ export class AdService extends BaseService {
       if (!dto.paid) data = data.slice(0, 5);
       return { data: data, limit };
     }
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} ad`;
-  }
-
-  update(id: number, updateAdDto: UpdateAdDto) {
-    return `This action updates a #${id} ad`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} ad`;
-  }
-
-  public async findFromCJ(usage: string, type: string, c: string) {
-    const cate = togtool['4'][usage];
-    if (cate == undefined) return false;
-
-    const response = await Promise.all(
-      cate
-        .map((cat) => {
-          if (cat.type == type) {
-            const res = cat.cost[c];
-            if (res == undefined) {
-              return false;
-            }
-            return res;
-          }
-        })
-        .filter((f) => f != undefined),
-    );
-    return response?.[0] == undefined ? false : response[0];
-  }
-  public async calculateBuilding(dto: CalculateBuildingDto) {
-    let unitPowerPrice = await this.findFromCJ(dto.usage, dto.type, dto.class);
-    let buildingFloor = 1,
-      location = 1,
-      haniinZuzaan = dto.haniinZuzaan ?? 1,
-      natural = dto.natural ?? 1,
-      engineering = dto.engineering ?? 1;
-
-    const date = dto.index ? dto.index.getFullYear() : 2016;
-    const priceIndex = NotApartmentIndex(date);
-    if (!unitPowerPrice) {
-      // console.log(res);
-      unitPowerPrice = null;
-    }
-    unitPowerPrice *= 1000;
-    const transportDistanceData = togtool['Тээврийн зайн итгэлцүүр'];
-    const transportDistance = await Promise.all(
-      transportDistanceData
-        .map((transport) => {
-          if (transport['range'] == dto.range) return transport['coefficient'];
-        })
-        .filter((d) => d != undefined),
-    );
-
-    const buildingFloorIndex = togtool['Барилгын өндрын итгэлцүүр']
-      .map((a) => {
-        if (a.type == dto.usage) return a.coefficient;
-      })
-      .filter((d) => d != undefined)[0];
-    buildingFloor =
-      1 +
-      (dto.buildingFloor - buildingFloorIndex < 0
-        ? 0
-        : dto.buildingFloor - buildingFloorIndex) *
-        0.05;
-    natural = NutagDevsgerBuschlel[dto.location];
-    const usage = togtool['4'][dto.usage];
-    let catalog = await Promise.all(
-      usage
-        .map((u) => {
-          if (u.type == dto.type) return u;
-        })
-        .filter((a) => a != undefined),
-    );
-    catalog = catalog[0];
-    const burenOrtog =
-      unitPowerPrice *
-      haniinZuzaan *
-      transportDistance[0] *
-      buildingFloor *
-      location *
-      natural *
-      engineering *
-      priceIndex *
-      dto.area;
-
-    let undsenHiits =
-        catalog.structure *
-        togtool['Элэгдлийн хувь']
-          .map((el) => {
-            if (el.score == dto.quality) return el.round;
-          })
-          .filter((a) => a != undefined)[0],
-      ceil =
-        catalog.ceil *
-        togtool['Элэгдлийн хувь']
-          .map((el) => {
-            if (el.score == dto.ceil) return el.round;
-          })
-          .filter((a) => a != undefined)[0],
-      electric =
-        catalog.electric *
-        togtool['Элэгдлийн хувь']
-          .map((el) => {
-            if (el.score == dto.electric) return el.round;
-          })
-          .filter((a) => a != undefined)[0],
-      san =
-        catalog.san *
-        togtool['Элэгдлийн хувь']
-          .map((el) => {
-            if (el.score == dto.san) return el.round;
-          })
-          .filter((a) => a != undefined)[0];
-
-    const elegdelPercent = undsenHiits + ceil + electric + san;
-
-    const elegdel = (burenOrtog * Math.round(elegdelPercent)) / 100;
-
-    const res = burenOrtog - elegdel;
-    const aggregations = {
-      area: dto.area,
-      year: dto.year,
-      operation: dto.operation,
-      date: dto.date,
-      usage: dto.usage,
-      type: dto.type,
-      class: dto.class,
-      haniinZuzaan: dto.haniinZuzaan,
-      buildingFloor: dto.buildingFloor,
-      range: dto.range,
-      natural: dto.natural,
-      engineering: dto.engineering,
-      quality: dto.quality,
-      ceil: dto.ceil,
-      san: dto.san,
-      electric: dto.electric,
-    };
-    await this.serviceDao.create(
-      {
-        code: dto.code,
-        name: dto.name,
-        account: dto.account,
-        aggregations,
-        depreciation: dto.depreciation,
-        initial: dto.initial,
-        burenOrtog: burenOrtog,
-        elegdel: elegdel,
-        elegdelPercent: elegdelPercent,
-        price: res,
-        type: ServiceDataType.BUILDING,
-      },
-      null,
-      // user ,
-    );
-    return {
-      unitPowerPrice,
-      code: dto.code,
-      year: dto.year,
-      priceIndex,
-      elegdelPercent,
-      elegdel,
-      burenOrtog,
-      price: res,
-      area: dto.area,
-      name: dto.name,
-      date: dto.date,
-    };
   }
 }

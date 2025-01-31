@@ -51,48 +51,90 @@ export class CreateAdDto {
   landUsage?: string;
 }
 
-export class CalculateBuildingDto {
+export class CalcDataDto {
+  @ApiProperty()
+  location: number;
+  @ApiProperty()
+  area: number;
+  @ApiProperty()
+  type: number;
+  @ApiProperty()
+  startDate?: Date;
+  @ApiProperty()
+  endDate?: Date;
+  @ApiProperty()
+  paid?: boolean;
+}
+
+export class ServiceDto {
   @ApiProperty()
   name: string;
-  @ApiProperty()
-  account: number;
-  @ApiProperty()
-  depreciation: number;
-  @ApiProperty({ nullable: true })
-  year: number;
-  @ApiProperty()
-  date: string;
-  @ApiProperty()
-  initial: number;
+
   @ApiProperty()
   code: string;
   @ApiProperty()
-  operation: number;
+  type: number;
+  @ApiProperty()
+  date: string;
+  @ApiProperty()
+  year: number;
+  @ApiProperty()
+  aggregations: {
+    [key: string]: any;
+  };
+
+  @ApiProperty()
+  initial?: number;
+
+  @ApiProperty()
+  depreciation?: number;
+
+  @ApiProperty()
+  account?: number;
+
+  elegdel?: number;
+
+  elegdelPercent?: number;
+
+  burenOrtog?: number;
+
+  price?: number;
+}
+
+export class CalculateApartmentDto {
+  @ApiProperty()
+  district: string;
+  @ApiProperty()
+  name: string;
+  @ApiProperty()
+  code: string;
+
+  @ApiProperty()
+  khoroo: string;
+  @ApiProperty()
+  area: number;
+  @ApiProperty({
+    type: Date,
+  })
+  index: Date;
+}
+export class CalculateBuildingDto {
   @ApiProperty()
   usage: string;
   @ApiProperty()
   type: string;
   @ApiProperty()
-  catalog: string;
-
-  @ApiProperty()
   class: string;
-
   @ApiProperty()
   // Нийт талбайн хэмжээ /м.кв/
   area: number;
   @ApiProperty()
   // Нийт давхар
   buildingFloor: number;
-  @ApiProperty()
-  // Нэгж хүчин чадлын жишиг үнэ, төг
-  unitPrice: number;
-  @ApiProperty()
-  // Ханын зузааны итгэлцүүр
-  coefficient: number;
-  @ApiProperty()
-  // Тухайн хөрөнгийн байршлын зай
-  distance: number;
+
+  // @ApiProperty()
+  // // Тухайн хөрөнгийн байршлын зай
+  // distance: number;
   @ApiProperty()
   // Тээврийн зайн итгэлцүүр
   range: string;
@@ -125,80 +167,8 @@ export class CalculateBuildingDto {
     type: Date,
   })
   index: Date;
-}
-
-export class CalcDataDto {
-  @ApiProperty()
-  location: number;
-  @ApiProperty()
-  area: number;
-  @ApiProperty()
-  type: number;
-  @ApiProperty()
-  startDate?: Date;
-  @ApiProperty()
-  endDate?: Date;
-  @ApiProperty()
-  paid?: boolean;
-}
-
-export class ServiceDto {
-  name: string;
-
-  code: string;
-  type: number;
-  aggregations: {
-    [key: string]: any;
-  };
-
-  initial?: number;
-
-  depreciation?: number;
-
-  account?: number;
-
-  elegdel?: number;
-
-  elegdelPercent?: number;
-
-  burenOrtog?: number;
-
-  price?: number;
-}
-
-export class CalculateApartmentDto {
-  @ApiProperty()
-  district: string;
-  @ApiProperty()
-  name: string;
-  @ApiProperty()
-  code: string;
-  @ApiProperty()
-  operation: number;
-  @ApiProperty()
-  year: number;
-  @ApiProperty()
-  account: number;
-  @ApiProperty()
-  date: string;
-  @ApiProperty({
-    type: Date,
-  })
-  index: Date;
-  @ApiProperty()
-  depreciation: number;
-  @ApiProperty()
-  initial: number;
-  @ApiProperty()
-  khoroo: string;
-  @ApiProperty()
-  area: number;
-  @ApiProperty()
-  type: number;
-  @ApiProperty()
-  startDate?: Date;
-  @ApiProperty()
-  endDate?: Date;
-  @ApiProperty()
-  paid?: boolean;
+  // @ApiProperty()
+  // // Ханын зузааны итгэлцүүр
+  // coefficient: number;
+  // operation: d.operation ?? 0,
 }

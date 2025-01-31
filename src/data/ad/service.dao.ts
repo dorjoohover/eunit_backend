@@ -19,15 +19,35 @@ export class ServiceDao {
     this.db = this.dataSource.getRepository(ServiceEntity);
   }
 
+  update = async (dto: ServiceDto) => {
+    try {
+      const res = await this.db.findOne({
+        where: {
+          code: dto.code,
+        },
+      });
+      await this.db.save({
+        ...res,
+        aggregations: dto.aggregations,
+        burenOrtog: dto.burenOrtog,
+        price: dto.price,
+        elegdel: dto.elegdel,
+        elegdelPercent: dto.elegdelPercent,
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   create = async (dto: ServiceDto, user: number) => {
     try {
+      const operation = new Date(dto.date).getFullYear();
       const res = await this.db.insert({
         ...dto,
-
-        user: null,
-        // {
-        //   id: user,
-        // },
+        operation: operation,
+        user: {
+          id: user,
+        },
       });
     } catch (error) {
       console.log(error);

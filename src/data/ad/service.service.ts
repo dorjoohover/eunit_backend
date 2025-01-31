@@ -20,6 +20,7 @@ export class ServiceService extends BaseService {
   }
 
   public async calculate(dto: ServiceDto) {
+    console.log(dto);
     let body: any = {};
     let res: any = { code: dto.code };
     if (dto.type == ServiceDataType.APARTMENT) {
@@ -79,6 +80,7 @@ export class ServiceService extends BaseService {
     return response?.[0] == undefined ? false : response[0];
   }
   public async calculateBuilding(dto: CalculateBuildingDto) {
+    console.log(dto);
     let unitPowerPrice = await this.findFromCJ(
       ServiceDataType.BUILDING,
       dto.usage,

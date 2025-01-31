@@ -60,7 +60,6 @@ export class AdController {
     // return this.adService.calculateBuilding(dto, +user['id']);
   }
 
-  @Public()
   @ApiBearerAuth('access-token')
   @Get('/service/:type/:page/:limit')
   @ApiParam({ name: 'type' })

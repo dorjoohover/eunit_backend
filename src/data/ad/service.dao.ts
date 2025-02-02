@@ -84,7 +84,7 @@ export class ServiceDao {
       take: limit,
       skip: (page - 1) * limit,
     });
-    const count = await this.db.findAndCount({
+    const [d, count] = await this.db.findAndCount({
       where: {
         type,
         user: {

@@ -5,6 +5,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { jwtConstants } from './constants';
 import { JwtStrategy } from './guards/jwt/jwt.strategy';
 import { UserModule } from 'src/app/user/user.module';
+import { FirebaseService } from './firebase.service';
 @Module({
   imports: [
     UserModule,
@@ -16,7 +17,7 @@ import { UserModule } from 'src/app/user/user.module';
       signOptions: { expiresIn: '30d' },
     }),
   ],
-  providers: [AuthService, JwtStrategy],
+  providers: [AuthService,FirebaseService, JwtStrategy],
   exports: [AuthService],
 })
 export class AuthModule {}

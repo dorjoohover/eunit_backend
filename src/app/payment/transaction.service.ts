@@ -34,7 +34,7 @@ export class TransactionService extends BaseService {
       { ...user, wallet: remitterPoint },
       user.id,
     );
-    return res;
+    return res.id;
   }
 
   public async updateRequest(id: number, request: number) {

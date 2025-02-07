@@ -28,9 +28,15 @@ export class RequestEntity {
   @Column({ nullable: true })
   room: number;
   @Column({ nullable: true })
+  status: number;
+  @Column({ nullable: true })
   startDate: Date;
   @Column({ nullable: true })
   endDate: Date;
+  @Column({ nullable: true })
+  payment: number;
+  @Column({ nullable: true })
+  code: string;
   @ManyToOne(() => UserEntity, (user) => user.requests)
   user: UserEntity;
   @ManyToOne(() => LocationEntity, (location) => location.request)

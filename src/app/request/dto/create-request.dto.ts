@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { ParentProperty } from 'src/base/base.dto';
+import { PaymentType } from 'src/base/constants';
 
 export class CreateRequestDto {
   @ApiProperty()
@@ -22,6 +23,11 @@ export class CreateRequestDto {
   startDate?: Date;
   @ApiProperty()
   endDate?: Date;
+
+  @ApiProperty({ enum: PaymentType })
+  payment: number;
+
+  status: number;
+
   count?: number;
- 
 }

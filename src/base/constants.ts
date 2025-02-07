@@ -55,20 +55,18 @@ export const ServiceDataType = {
   OTHER: 90,
 };
 
-export const PaymentTypeDict = {
-  1: 'Карт',
-  2: 'Бэлэн',
-  3: 'Мобайл',
-  4: 'Зээл',
-  5: 'Сошиал пэй',
-};
-
 export const PaymentType = {
-  CARD: 1,
-  CASH: 2,
+  QPAY: 1,
+  POINT: 2,
   MOBILE: 3,
   LOAN: 4,
   SOCIAL: 5,
+};
+
+export const PaymentStatus = {
+  SUCCESS: 10,
+  PENDING: 20,
+  ERROR: 30,
 };
 
 export const ProductMeasureUnitDict = {

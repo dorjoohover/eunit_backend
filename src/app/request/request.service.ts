@@ -4,13 +4,14 @@ import { UpdateRequestDto } from './dto/update-request.dto';
 import { BaseService } from 'src/base/base.service';
 import { RequestDao } from './request.dao';
 import { TransactionService } from '../payment/transaction.service';
-import { ServiceType } from 'src/base/constants';
+import { PaymentStatus, PaymentType, ServiceType } from 'src/base/constants';
 import { AdService } from 'src/data/ad/ad.service';
 import { LocationDao } from 'src/data/location/location.dao';
 import PdfPrinter from 'pdfmake';
 import { TDocumentDefinitions } from 'pdfmake/interfaces';
 import { RequestReport } from './request.pdf';
 import { Formatter } from './formatter';
+import { QpayService } from '../payment/qpay.service';
 const fonts = {
   Roboto: {
     normal: 'src/fonts/Roboto-Regular.ttf',
@@ -26,6 +27,7 @@ export class RequestService extends BaseService {
     private adService: AdService,
     private locationDao: LocationDao,
     private transactionService: TransactionService,
+    private qpay: QpayService,
   ) {
     super();
   }
@@ -90,20 +92,41 @@ export class RequestService extends BaseService {
           : dto.service == ServiceType.DATA
             ? dto.count * 100
             : 20000;
-      const success = await this.transactionService.create({
-        point: point,
-        user: email,
-        message: 'Худалдан авалт хийсэн',
+
+      let success = null;
+      const res = await this.dao.create({
+        ...dto,
+        location: +dto.location,
+        user: user,
+        status: PaymentStatus.PENDING,
       });
-      if (success?.id) {
-        const res = await this.dao.create({
-          ...dto,
-          location: +dto.location,
-          user: user,
+
+      if (dto.payment == PaymentType.POINT) {
+        const transaction = await this.transactionService.create({
+          point: point,
+          user: email,
+          message: 'Худалдан авалт хийсэн',
         });
-        await this.transactionService.updateRequest(success.id, res);
-        return res;
+        await this.dao.updateStatus(res, PaymentStatus.SUCCESS);
+        return {
+          res,
+          data: transaction,
+        };
       }
+
+      if (dto.payment == PaymentType.QPAY) {
+        const qpay = await this.qpay.createPayment(
+          point,
+          res.toString(),
+          user['id'],
+        );
+        await this.dao.updateCode(res, qpay.invoice_id);
+        return {
+          res,
+          data: qpay,
+        };
+      }
+      await this.transactionService.updateRequest(success, res);
     } catch (error) {
       return {
         success: false,
@@ -111,6 +134,20 @@ export class RequestService extends BaseService {
         status: error.status,
       };
     }
+  }
+  public async checkPayment(id: number, code: string, user: number) {
+    const payment = await this.qpay.checkPayment(code);
+    if (payment.paid_amount) {
+      await this.dao.updateStatus(id, PaymentStatus.SUCCESS);
+      await this.transactionService.create({
+        payment: PaymentType.QPAY,
+        point: payment.paid_amount,
+        user: user,
+        message: 'Худалдан авалт хийсэн.',
+      });
+      return true;
+    }
+    return false;
   }
 
   async findAll() {

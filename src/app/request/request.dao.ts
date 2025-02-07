@@ -49,6 +49,26 @@ export class RequestDao {
     });
   };
 
+  updateCode = async (id: number, code: string) => {
+    const res = await this.db.findOne({
+      where: {
+        id,
+      },
+    });
+    res.code = code;
+    await this.db.save(res);
+  };
+
+  updateStatus = async (id: number, status: number) => {
+    const res = await this.db.findOne({
+      where: {
+        id,
+      },
+    });
+    res.status = status;
+    await this.db.save(res);
+  };
+
   findOne = async (id: number) => {
     return await this.db.findOne({
       where: {

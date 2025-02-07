@@ -14,13 +14,11 @@ export class TransactionService extends BaseService {
   }
 
   public async create(dto: CreateTransactionDto) {
-    const remitter = await this.userService.getUser(dto.remitter as string);
-    const receiver = await this.userService.getUser(dto.receiver as string);
-    const remitterPoint = remitter.wallet - dto.point;
-    const receiverPoint = receiver.wallet + dto.point;
-    let success = remitterPoint > 0 && receiverPoint > 0;
+    const user = await this.userService.getUser(dto.user as string);
+    const remitterPoint = user.wallet + dto.point;
+    let success = remitterPoint > 0;
     const date = new Date();
-    const right = remitter.endDate > date;
+    const right = user.endDate > date;
     if (!success || right) {
       throw new HttpException(
         'Үлдэгдэл хүрэлцэхгүй байна.',
@@ -30,16 +28,11 @@ export class TransactionService extends BaseService {
     const res = await this.dao.create({
       ...dto,
       right: right,
-      remitter: remitter.id,
-      receiver: receiver.id,
+      user: user.id,
     });
     await this.userService.updateUser(
-      { ...remitter, wallet: remitterPoint },
-      remitter.id,
-    );
-    await this.userService.updateUser(
-      { ...receiver, wallet: receiverPoint },
-      receiver.id,
+      { ...user, wallet: remitterPoint },
+      user.id,
     );
     return res;
   }

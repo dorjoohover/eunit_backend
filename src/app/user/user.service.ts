@@ -15,9 +15,8 @@ export class UserService extends BaseService {
   public async create(dto: CreateUserDto) {
     const user = await this.userDao.add(dto);
     const res = await this.transaction.create({
-      point: 20000,
-      receiver: user.id,
-      remitter: 5,
+      point: 3000,
+      user: user.id,
       message: 'Шинэ хэрэглэгчийн урамшуулал',
     });
     return user;
@@ -34,8 +33,7 @@ export class UserService extends BaseService {
     );
     return await this.transaction.create({
       point: dto.wallet,
-      remitter: id,
-      receiver: user.id,
+      user: id,
       message: 'Test',
     });
   }

@@ -31,7 +31,7 @@ export class PaymentController {
     try {
       return this.transactionService.create({
         ...dto,
-        remitter: user['email'],
+        user: user['email'],
       });
     } catch (error) {
       return {

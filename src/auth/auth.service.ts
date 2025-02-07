@@ -1,9 +1,14 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  Get,
+  Injectable,
+  Req,
+  UnauthorizedException,
+  UseGuards,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import * as bcrypt from 'bcrypt';
 import { UserService } from 'src/app/user/user.service';
 import { LoginUserDto } from './auth.dto';
-import { jwtConstants } from './constants';
+import { FirebaseAuthGuard } from './firebase.guard';
 
 @Injectable()
 export class AuthService {
@@ -11,7 +16,11 @@ export class AuthService {
     private usersService: UserService,
     private jwtService: JwtService,
   ) {}
-
+  @UseGuards(FirebaseAuthGuard)
+  @Get('profile')
+  getProfile(@Req() req) {
+    return { message: 'Authenticated User', user: req.user };
+  }
   async validateUser(dto: LoginUserDto): Promise<any> {
     const { password, email, name, profile } = dto;
     let user = await this.usersService.getUser(email);

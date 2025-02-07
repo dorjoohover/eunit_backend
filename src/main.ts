@@ -1,7 +1,5 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { json, urlencoded } from 'express';
-import * as cookieParser from 'cookie-parser';
 import { BadRequestException, ValidationPipe } from '@nestjs/common';
 import { setupSwagger } from './config/swagger';
 import { useContainer, ValidationError } from 'class-validator';

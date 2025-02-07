@@ -23,11 +23,8 @@ export class TransactionEntity {
   @Column({ default: false })
   right: boolean;
   //   huleen avagch
-  @ManyToOne(() => UserEntity, (user) => user.receiverTransactions)
-  receiver: UserEntity;
-  //   sender
-  @ManyToOne(() => UserEntity, (user) => user.remitterTransactions)
-  remitter: UserEntity;
+  @ManyToOne(() => UserEntity, (user) => user.users)
+  user: UserEntity;
   @ManyToOne(() => RequestEntity, (request) => request.transactions, {
     nullable: true,
   })

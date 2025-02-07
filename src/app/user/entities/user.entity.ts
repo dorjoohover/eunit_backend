@@ -58,13 +58,11 @@ export class UserEntity {
     nullable: true,
   })
   requests: RequestEntity[];
-  @OneToMany(() => TransactionEntity, (transaction) => transaction.receiver, {
+  @OneToMany(() => TransactionEntity, (transaction) => transaction.user, {
     nullable: true,
   })
-  receiverTransactions?: TransactionEntity[];
-  @OneToMany(() => TransactionEntity, (transaction) => transaction.remitter, {
-    nullable: true,
-  })
+  users?: TransactionEntity[];
+
   remitterTransactions?: TransactionEntity[];
   @OneToMany(() => ServiceEntity, (service) => service.user, {
     nullable: true,

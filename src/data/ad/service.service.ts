@@ -80,7 +80,6 @@ export class ServiceService extends BaseService {
     return response?.[0] == undefined ? false : response[0];
   }
   public async calculateBuilding(dto: CalculateBuildingDto) {
-    console.log(dto);
     let unitPowerPrice = await this.findFromCJ(
       ServiceDataType.BUILDING,
       dto.usage,

@@ -18,11 +18,8 @@ export class TransactionDao {
   create = async (dto: CreateTransactionDto) => {
     const res = this.db.create({
       ...dto,
-      receiver: {
-        id: dto.receiver as number,
-      },
-      remitter: {
-        id: dto.remitter as number,
+      user: {
+        id: dto.user as number,
       },
       payment: dto.payment
         ? {
@@ -40,7 +37,7 @@ export class TransactionDao {
   };
   findByUser = async (id: number, limit: number, page: number) => {
     const res = await this.db.findAndCount({
-      where: [{ remitter: { id: id } }, { receiver: { id: id } }],
+      where: [{ user: { id: id } }],
       relations: ['remitter', 'receiver'],
       order: {
         createdAt: 'DESC',

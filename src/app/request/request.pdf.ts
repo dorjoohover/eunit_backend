@@ -177,7 +177,7 @@ export const RequestReport = ({
       {
         columns: [
           {
-            text: 'Таны сонгосон орон сууцны м.кв-н үнэ цэн: ',
+            text: 'Таны сонгосон хотхоны м.кв-н үнэ цэн: ',
             style: 'h3',
           },
           {
@@ -269,126 +269,126 @@ export const RequestReport = ({
       },
       { text: '\n\n\n\n' },
       { text: text, fontSize: 9 },
-      { text: '\n\n' },
-      { text: 'Макро мэдээлэл', bold: true, fontSize: 20 },
-      { text: '\n\n' },
-      { text: 'Монгол банкны орон сууцны үнийн индекс', fontSize: 12 },
-      {
-        text: 'Орон сууцны борлуулалт болон түрээсийн үнийн чиг хандлага, сул орон тоо, хүн амын өсөлт хөгжил',
-        fontSize: 9,
-        color: '#7A808D',
-      },
-      { text: '\n\n' },
-      {
-        columnGap: 4,
-        columns: [
-          {
-            columns: [
-              {
-                width: 180,
-                columns: [
-                  [
-                    {
-                      text: 'Сүүлийн 1 жилээр\n',
-                      fontSize: 9,
-                      color: '#7A808D',
-                      margin: 0,
-                    },
-                    {
-                      text: 'Орон сууцны үнийн өсөлт',
-                      margin: 0,
-                      fontSize: 12,
-                    },
-                  ],
-                ],
-              },
-              {
-                columns: [
-                  icons[3],
-                  {
-                    text: `${oronSuutsniiUniinOsolt}%`,
-                    fontSize: 16,
-                    bold: true,
-                  },
-                ],
-              },
-            ],
-          },
-          {
-            columns: [],
-          },
-        ],
-      },
-      { text: '\n' },
-      {
-        columnGap: 4,
-        columns: [
-          {
-            columns: [
-              {
-                width: 180,
-                columns: [
-                  [
-                    {
-                      text: 'Сүүлийн 1 жилээр\n',
-                      fontSize: 9,
-                      color: '#7A808D',
-                      margin: 0,
-                    },
-                    {
-                      text: 'Хүн амын өсөлт хөгжил',
-                      margin: 0,
-                      fontSize: 12,
-                    },
-                  ],
-                ],
-              },
-              {
-                columns: [
-                  icons[4],
-                  {
-                    text: `${hunAminOsoltHugjil}%`,
-                    fontSize: 16,
-                    bold: true,
-                  },
-                ],
-              },
-            ],
-          },
-          {
-            columns: [
-              {
-                width: 180,
-                columns: [
-                  [
-                    {
-                      text: 'Сүүлийн 1 жилээр\n',
-                      fontSize: 9,
-                      color: '#7A808D',
-                      margin: 0,
-                    },
-                    {
-                      text: 'Хэрэглээний үнийн индекс',
-                      margin: 0,
-                      fontSize: 12,
-                    },
-                  ],
-                ],
-              },
-              {
-                columns: [
-                  icons[5],
-                  {
-                    text: `${heregleeniiUniinIndex}%`,
-                    fontSize: 16,
-                    bold: true,
-                  },
-                ],
-              },
-            ],
-          },
-        ],
-      },
+      // { text: '\n\n' },
+      // { text: 'Макро мэдээлэл', bold: true, fontSize: 20 },
+      // { text: '\n\n' },
+      // { text: 'Монгол банкны орон сууцны үнийн индекс', fontSize: 12 },
+      // {
+      //   text: 'Орон сууцны борлуулалт болон түрээсийн үнийн чиг хандлага, сул орон тоо, хүн амын өсөлт хөгжил',
+      //   fontSize: 9,
+      //   color: '#7A808D',
+      // },
+      // { text: '\n\n' },
+      // {
+      //   columnGap: 4,
+      //   columns: [
+      //     {
+      //       columns: [
+      //         {
+      //           width: 180,
+      //           columns: [
+      //             [
+      //               {
+      //                 text: 'Сүүлийн 1 жилээр\n',
+      //                 fontSize: 9,
+      //                 color: '#7A808D',
+      //                 margin: 0,
+      //               },
+      //               {
+      //                 text: 'Орон сууцны үнийн өсөлт',
+      //                 margin: 0,
+      //                 fontSize: 12,
+      //               },
+      //             ],
+      //           ],
+      //         },
+      //         {
+      //           columns: [
+      //             icons[3],
+      //             {
+      //               text: `${oronSuutsniiUniinOsolt}%`,
+      //               fontSize: 16,
+      //               bold: true,
+      //             },
+      //           ],
+      //         },
+      //       ],
+      //     },
+      //     {
+      //       columns: [],
+      //     },
+      //   ],
+      // },
+      // { text: '\n' },
+      // {
+      //   columnGap: 4,
+      //   columns: [
+      //     {
+      //       columns: [
+      //         {
+      //           width: 180,
+      //           columns: [
+      //             [
+      //               {
+      //                 text: 'Сүүлийн 1 жилээр\n',
+      //                 fontSize: 9,
+      //                 color: '#7A808D',
+      //                 margin: 0,
+      //               },
+      //               {
+      //                 text: 'Хүн амын өсөлт хөгжил',
+      //                 margin: 0,
+      //                 fontSize: 12,
+      //               },
+      //             ],
+      //           ],
+      //         },
+      //         {
+      //           columns: [
+      //             icons[4],
+      //             {
+      //               text: `${hunAminOsoltHugjil}%`,
+      //               fontSize: 16,
+      //               bold: true,
+      //             },
+      //           ],
+      //         },
+      //       ],
+      //     },
+      //     {
+      //       columns: [
+      //         {
+      //           width: 180,
+      //           columns: [
+      //             [
+      //               {
+      //                 text: 'Сүүлийн 1 жилээр\n',
+      //                 fontSize: 9,
+      //                 color: '#7A808D',
+      //                 margin: 0,
+      //               },
+      //               {
+      //                 text: 'Хэрэглээний үнийн индекс',
+      //                 margin: 0,
+      //                 fontSize: 12,
+      //               },
+      //             ],
+      //           ],
+      //         },
+      //         {
+      //           columns: [
+      //             icons[5],
+      //             {
+      //               text: `${heregleeniiUniinIndex}%`,
+      //               fontSize: 16,
+      //               bold: true,
+      //             },
+      //           ],
+      //         },
+      //       ],
+      //     },
+      //   ],
+      // },
     ],
     styles: styles,
   };

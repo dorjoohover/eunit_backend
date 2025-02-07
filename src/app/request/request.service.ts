@@ -92,8 +92,7 @@ export class RequestService extends BaseService {
             : 20000;
       const success = await this.transactionService.create({
         point: point,
-        receiver: 'bomarketm@gmail.com',
-        remitter: email,
+        user: email,
         message: 'Худалдан авалт хийсэн',
       });
       if (success?.id) {

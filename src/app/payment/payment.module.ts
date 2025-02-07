@@ -9,9 +9,11 @@ import { BaseModule } from 'src/base/base.module';
 import { TransactionService } from './transaction.service';
 import { UserService } from '../user/user.service';
 import { UserDao } from '../user/user.dao';
+import { QpayService } from './qpay.service';
+import { HttpModule } from '@nestjs/axios';
 
 @Module({
-  imports: [BaseModule, SequenceModule],
+  imports: [BaseModule, HttpModule, SequenceModule],
   controllers: [PaymentController],
   providers: [
     PaymentService,
@@ -21,6 +23,7 @@ import { UserDao } from '../user/user.dao';
     TransactionService,
     UserService,
     UserDao,
+    QpayService,
   ],
 })
 export class PaymentModule {}

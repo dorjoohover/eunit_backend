@@ -11,8 +11,11 @@ import { TransactionDao } from '../payment/dao/transaction.dao';
 import { UserService } from '../user/user.service';
 import { UserDao } from '../user/user.dao';
 import { ServiceDao } from 'src/data/ad/service.dao';
+import { QpayService } from '../payment/qpay.service';
+import { HttpModule, HttpService } from '@nestjs/axios';
 
 @Module({
+  imports: [HttpModule],
   controllers: [RequestController],
   providers: [
     RequestService,
@@ -26,6 +29,7 @@ import { ServiceDao } from 'src/data/ad/service.dao';
     UserService,
     UserDao,
     AppExcel,
+    QpayService,
   ],
 })
 export class RequestModule {}

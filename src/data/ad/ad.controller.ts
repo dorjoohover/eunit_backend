@@ -17,7 +17,7 @@ import {
   ServiceDto,
 } from './dto/create-ad.dto';
 import { UpdateAdDto } from './dto/update-ad.dto';
-import { Public } from 'src/auth/guards/jwt/jwt-auth-guard';
+import { Public } from 'src/auth/guards/jwt/auth-guard';
 import { LocationService } from '../location/location.service';
 import { LocationDao } from '../location/location.dao';
 import locationData from '../../excel/togtool.json';

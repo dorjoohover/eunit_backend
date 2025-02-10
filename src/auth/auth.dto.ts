@@ -10,3 +10,17 @@ export class LoginUserDto {
   @ApiProperty()
   name?: string;
 }
+
+export class RegisterUserDto {
+  @ApiProperty()
+  email: string;
+  @ApiProperty()
+  firstname: string;
+  @ApiProperty()
+  lastname: string;
+}
+
+export class Token {
+  @ApiProperty()
+  token: string;
+}

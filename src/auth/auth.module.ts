@@ -3,21 +3,21 @@ import { AuthService } from './auth.service';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { jwtConstants } from './constants';
-import { JwtStrategy } from './guards/jwt/jwt.strategy';
 import { UserModule } from 'src/app/user/user.module';
-import { FirebaseService } from './firebase.service';
+import { AuthController } from './auth.controller';
+import { ConfigService } from '@nestjs/config';
 @Module({
   imports: [
     UserModule,
 
     PassportModule,
-
     JwtModule.register({
       secret: jwtConstants.secret,
       signOptions: { expiresIn: '30d' },
     }),
   ],
-  providers: [AuthService,FirebaseService, JwtStrategy],
+  controllers: [AuthController],
+  providers: [AuthService, ConfigService],
   exports: [AuthService],
 })
 export class AuthModule {}

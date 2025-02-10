@@ -2,7 +2,6 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
-import { JwtAuthGuard } from './auth/guards/jwt/jwt-auth-guard';
 import { RolesGuard } from './auth/guards/role/role.guard';
 import { AllExceptionsFilter } from './common/all-exceptions.filter';
 import { PostInterceptor } from './post.interceptor';
@@ -16,6 +15,7 @@ import { AdModule } from './data/ad/ad.module';
 import { DatabaseModule } from './database/database.module';
 import { RequestModule } from './app/request/request.module';
 import { AppExcel } from './common/app.excel';
+import { AuthGuard } from './auth/guards/jwt/auth-guard';
 
 @Module({
   imports: [
@@ -33,9 +33,10 @@ import { AppExcel } from './common/app.excel';
   providers: [
     AppService,
     AppExcel,
+
     {
       provide: APP_GUARD,
-      useClass: JwtAuthGuard,
+      useClass: AuthGuard,
     },
     {
       provide: APP_GUARD,

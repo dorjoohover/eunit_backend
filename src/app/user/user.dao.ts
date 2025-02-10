@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
 import { UserEntity } from './entities/user.entity';
@@ -18,14 +18,23 @@ export class UserDao {
   };
 
   add = async (user: CreateUserDto) => {
-    const res = this.db.create({
-      ...user,
-      role: user.role == undefined ? CLIENT : user.role,
-      wallet: 3000,
-    });
-    await this.db.save(res);
-    console.log(res.id);
-    return res;
+    try {
+      const res = this.db.create({
+        ...user,
+        role: user.role == undefined ? CLIENT : user.role,
+        wallet: 3000,
+      });
+      await this.db.save(res);
+      return res;
+    } catch (error) {
+      if (error.message?.includes('duplicate key value')) {
+        throw new HttpException(
+          'Бүртгэлтэй дугаар эсвэл имайл хаяг байна.',
+          HttpStatus.CONFLICT,
+        );
+      }
+      throw error;
+    }
   };
 
   updateUser = async (user: CreateUserDto, id: number) => {
@@ -57,10 +66,10 @@ export class UserDao {
     // );
   };
 
-  getByEmail = async (email: string) => {
+  getByEmail = async (phone: string) => {
     return await this.db.findOne({
       where: {
-        email: email,
+        phone: phone,
       },
     });
   };

@@ -21,7 +21,6 @@ import { DataSource } from 'typeorm';
             synchronize: true,
           });
 
-          console.log('connected');
           return dataSource.initialize();
         } catch (error) {
           console.log(error);

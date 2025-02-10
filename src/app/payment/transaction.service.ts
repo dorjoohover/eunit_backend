@@ -3,6 +3,7 @@ import { TransactionDao } from './dao/transaction.dao';
 import { BaseService } from 'src/base/base.service';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { UserService } from '../user/user.service';
+import { PaymentType } from 'src/base/constants';
 
 @Injectable()
 export class TransactionService extends BaseService {
@@ -15,10 +16,21 @@ export class TransactionService extends BaseService {
 
   public async create(dto: CreateTransactionDto) {
     const user = await this.userService.getUser(dto.user as string);
-    const remitterPoint = user.wallet + dto.point;
-    let success = remitterPoint > 0;
     const date = new Date();
     const right = user.endDate > date;
+
+    if (dto.payment == PaymentType.QPAY) {
+      return (
+        await this.dao.create({
+          ...dto,
+          right: right,
+          user: user.id,
+        })
+      ).id;
+    }
+    const remitterPoint = user.wallet + dto.point;
+    let success = remitterPoint > 0;
+
     if (!success || right) {
       throw new HttpException(
         'Үлдэгдэл хүрэлцэхгүй байна.',

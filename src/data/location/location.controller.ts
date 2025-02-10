@@ -11,7 +11,7 @@ import { LocationService } from './location.service';
 import { CreateLocationDto } from './dto/create-location.dto';
 import { UpdateLocationDto } from './dto/update-location.dto';
 import { ApiParam } from '@nestjs/swagger';
-import { Public } from 'src/auth/guards/jwt/jwt-auth-guard';
+import { Public } from 'src/auth/guards/jwt/auth-guard';
 import { ConstantValue } from 'src/base/constants';
 
 @Controller('location')

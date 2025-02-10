@@ -13,7 +13,7 @@ import { RequestService } from './request.service';
 import { CreateRequestDto } from './dto/create-request.dto';
 import { UpdateRequestDto } from './dto/update-request.dto';
 import { ApiBearerAuth, ApiParam } from '@nestjs/swagger';
-import { Public } from 'src/auth/guards/jwt/jwt-auth-guard';
+import { Public } from 'src/auth/guards/jwt/auth-guard';
 import { Response } from 'express';
 
 @Controller('request')
@@ -36,6 +36,17 @@ export class RequestController {
         status: error.status,
       };
     }
+  }
+
+  @Get('payment/:id/:code')
+  @ApiParam({ name: 'id' })
+  @ApiParam({ name: 'code' })
+  async checkPayment(
+    @Param('id') id: string,
+    @Param('code') code: string,
+    @Request() { user },
+  ) {
+    return this.requestService.checkPayment(+id, code, user['phone']);
   }
   @Public()
   @Get('service/pdf/:id')

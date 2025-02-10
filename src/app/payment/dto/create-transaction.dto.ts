@@ -11,6 +11,8 @@ export class CreateTransactionDto {
   @ApiProperty()
   payment?: number;
   @ApiProperty()
+  paymentType?: number;
+  @ApiProperty()
   message?: string;
   @ApiProperty()
   right?: boolean;

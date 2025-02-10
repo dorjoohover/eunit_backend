@@ -1,4 +1,4 @@
-import { HttpException, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateRequestDto } from './dto/create-request.dto';
 import { UpdateRequestDto } from './dto/update-request.dto';
 import { BaseService } from 'src/base/base.service';
@@ -135,14 +135,15 @@ export class RequestService extends BaseService {
       };
     }
   }
-  public async checkPayment(id: number, code: string, user: number) {
+  public async checkPayment(id: number, code: string, user: string) {
     const payment = await this.qpay.checkPayment(code);
     if (payment.paid_amount) {
       await this.dao.updateStatus(id, PaymentStatus.SUCCESS);
       await this.transactionService.create({
-        payment: PaymentType.QPAY,
+        paymentType: PaymentType.QPAY,
         point: payment.paid_amount,
         user: user,
+        request: id,
         message: 'Худалдан авалт хийсэн.',
       });
       return true;
@@ -164,7 +165,10 @@ export class RequestService extends BaseService {
 
   public async findOne(id: number) {
     const service = await this.dao.findOne(id);
-
+    if (!service)
+      throw new HttpException('Хайлт олдсонгүй.', HttpStatus.BAD_REQUEST);
+    if (service.status != PaymentStatus.SUCCESS)
+      throw new HttpException('Төлбөр төлөөгүй байна.', HttpStatus.BAD_REQUEST);
     const location = await this.locationDao.findById(service.location.id);
     const res = (await this.adService.calcData({
       area: service.area,

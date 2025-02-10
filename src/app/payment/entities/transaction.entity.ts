@@ -16,14 +16,19 @@ export class TransactionEntity {
   id?: number;
   @CreateDateColumn()
   createdAt: Date;
-  @Column()
+  @Column({ nullable: true })
   point: number;
-  @Column()
+  @Column({ nullable: true })
   message: string;
-  @Column({ default: false })
+  @Column({ default: false, nullable: true })
   right: boolean;
+  @Column({ nullable: true })
+  paymentType: number;
   //   huleen avagch
-  @ManyToOne(() => UserEntity, (user) => user.users)
+  @ManyToOne(() => UserEntity, (user) => user.users, {
+    onDelete: 'CASCADE',
+    nullable: true,
+  })
   user: UserEntity;
   @ManyToOne(() => RequestEntity, (request) => request.transactions, {
     nullable: true,

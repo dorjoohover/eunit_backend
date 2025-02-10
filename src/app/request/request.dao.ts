@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { DataSource, Repository } from 'typeorm';
 import { RequestEntity } from './entities/request.entity';
 import { CreateRequestDto } from './dto/create-request.dto';
+import { PaymentStatus } from 'src/base/constants';
 
 @Injectable()
 export class RequestDao {

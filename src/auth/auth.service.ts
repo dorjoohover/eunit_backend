@@ -1,5 +1,7 @@
 import {
   Get,
+  HttpException,
+  HttpStatus,
   Injectable,
   Req,
   UnauthorizedException,
@@ -7,16 +9,88 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from 'src/app/user/user.service';
-import { LoginUserDto } from './auth.dto';
-import { FirebaseAuthGuard } from './firebase.guard';
+import { LoginUserDto, RegisterUserDto } from './auth.dto';
 
+import { ConfigService } from '@nestjs/config';
+import * as admin from 'firebase-admin';
 @Injectable()
 export class AuthService {
+  private app: admin.app.App;
   constructor(
     private usersService: UserService,
     private jwtService: JwtService,
-  ) {}
-  @UseGuards(FirebaseAuthGuard)
+    private configService: ConfigService,
+  ) {
+    if (!admin.apps.length) {
+      this.app = admin.initializeApp({
+        credential: admin.credential.cert({
+          projectId: process.env.FIREBASE_PROJECT_ID,
+          clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+          privateKey: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n'),
+        }),
+      });
+    } else {
+      this.app = admin.app();
+    }
+  }
+
+  async verifyToken(idToken: string) {
+    let user = await this.app.auth().verifyIdToken(idToken);
+    try {
+      if (user?.uid) {
+        const res = await this.usersService.getUser(user.phone_number);
+
+        return {
+          ...res,
+          registered: true,
+        };
+      }
+      throw new HttpException('Амжилтгүй', HttpStatus.BAD_REQUEST);
+    } catch (error) {
+      if (user?.uid) {
+        const { phone_number, ...body } = user;
+        return {
+          ...body,
+          phone: phone_number,
+          registered: false,
+        };
+      }
+      throw error;
+    }
+  }
+
+  async register(dto: RegisterUserDto, phone: string) {
+    return await this.usersService.create({
+      ...dto,
+      phone,
+    });
+  }
+  async generateTokens(userId: string, email: string) {
+    const payload = { sub: userId, email };
+
+    const accessToken = this.jwtService.sign(payload, {
+      secret: this.configService.get<string>('JWT_ACCESS_SECRET'),
+      expiresIn: '15m',
+    });
+
+    const refreshToken = this.jwtService.sign(payload, {
+      secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
+      expiresIn: '7d',
+    });
+
+    return { accessToken, refreshToken };
+  }
+
+  async verifyRefreshToken(token: string) {
+    try {
+      return this.jwtService.verify(token, {
+        secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
+      });
+    } catch (error) {
+      throw new UnauthorizedException('Invalid refresh token');
+    }
+  }
+  // @UseGuards(AuthGuard)
   @Get('profile')
   getProfile(@Req() req) {
     return { message: 'Authenticated User', user: req.user };

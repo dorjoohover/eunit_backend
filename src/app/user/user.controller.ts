@@ -11,10 +11,10 @@ import {
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto, WalletUserDto } from './dto/create-user.dto';
-import { Public } from 'src/auth/guards/jwt/jwt-auth-guard';
 import { Roles } from 'src/auth/guards/role/role.decorator';
 import { Role } from 'src/auth/guards/role/role.enum';
 import { ApiBearerAuth } from '@nestjs/swagger';
+import { Public } from 'src/auth/guards/jwt/auth-guard';
 
 @Controller('user')
 export class UserController {

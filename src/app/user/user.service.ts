@@ -14,7 +14,7 @@ export class UserService extends BaseService {
   }
   public async create(dto: CreateUserDto) {
     const user = await this.userDao.add(dto);
-    const res = await this.transaction.create({
+    await this.transaction.create({
       point: 3000,
       user: user.id,
       message: 'Шинэ хэрэглэгчийн урамшуулал',
@@ -50,10 +50,13 @@ export class UserService extends BaseService {
       id,
     );
   }
-  async getUser(username: string) {
-    const res = await this.userDao.getByEmail(username);
-    // if (!res)
-    //   throw new HttpException('Хэрэглэгч олдсонгүй', HttpStatus.NOT_FOUND);
+  async getUser(phone: string) {
+    let res = await this.userDao.getByEmail(phone);
+    if (!res)
+      throw new HttpException(
+        'Бүртгэлгүй хэрэглэгч байна.',
+        HttpStatus.NOT_FOUND,
+      );
     return res;
   }
 

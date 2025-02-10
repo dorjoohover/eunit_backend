@@ -18,7 +18,7 @@ export class UserEntity {
 
   @Column({ unique: true })
   email: string;
-  @Column()
+  @Column({ nullable: true })
   name: string;
   @Column({ nullable: true })
   firstname: string;
@@ -26,7 +26,7 @@ export class UserEntity {
   lastname: string;
   @Column({ nullable: true })
   profile: string;
-  @Column({ nullable: true })
+  @Column({ unique: true })
   phone: string;
   @Column({ nullable: true })
   endDate: Date;

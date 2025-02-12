@@ -19,7 +19,11 @@ export class TransactionService extends BaseService {
     const date = new Date();
     const right = user.endDate > date;
 
-    if (dto.payment == PaymentType.QPAY) {
+    if (dto.paymentType == PaymentType.QPAY) {
+      await this.userService.updateUser(
+        { ...user, wallet: dto.point * 0.1 },
+        user.id,
+      );
       return (
         await this.dao.create({
           ...dto,

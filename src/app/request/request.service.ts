@@ -103,7 +103,7 @@ export class RequestService extends BaseService {
 
       if (dto.payment == PaymentType.POINT) {
         const transaction = await this.transactionService.create({
-          point: point,
+          point: -point,
           paymentType: dto.payment,
           user: email,
           message: 'Худалдан авалт хийсэн',

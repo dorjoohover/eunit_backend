@@ -38,8 +38,13 @@ export class AuthService {
     let user = await this.app.auth().verifyIdToken(idToken);
     try {
       if (user?.uid) {
-        const res = await this.usersService.getUser(user.phone_number);
-
+        let res = await this.usersService.getUser(user.phone_number);
+        if (!res)
+          res = await this.usersService.create({
+            email: user.email,
+            phone: user.phone_number,
+            profile: user.picture,
+          });
         return {
           ...res,
           registered: true,

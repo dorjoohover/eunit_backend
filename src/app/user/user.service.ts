@@ -52,11 +52,7 @@ export class UserService extends BaseService {
   }
   async getUser(phone: string) {
     let res = await this.userDao.getByEmail(phone);
-    if (!res)
-      throw new HttpException(
-        'Бүртгэлгүй хэрэглэгч байна.',
-        HttpStatus.NOT_FOUND,
-      );
+
     return res;
   }
 

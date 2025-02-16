@@ -21,7 +21,7 @@ export class TransactionService extends BaseService {
 
     if (dto.paymentType == PaymentType.QPAY) {
       await this.userService.updateUser(
-        { ...user, wallet: dto.point * 0.1 },
+        { ...user, wallet: (user.wallet += dto.point * 0.1) },
         user.id,
       );
       return (

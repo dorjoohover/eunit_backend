@@ -26,7 +26,7 @@ export class RequestController {
     try {
       return this.requestService.create(
         createRequestDto,
-        user['email'],
+        user['phone'],
         user['id'],
       );
     } catch (error) {

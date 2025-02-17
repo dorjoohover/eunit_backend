@@ -58,7 +58,7 @@ export const ServiceDataType = {
 export const PaymentType = {
   QPAY: 1,
   POINT: 2,
-  MOBILE: 3,
+  LOYALTY: 3,
   LOAN: 4,
   SOCIAL: 5,
 };

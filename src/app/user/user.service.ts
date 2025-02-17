@@ -3,6 +3,7 @@ import { UserDao } from './user.dao';
 import { BaseService } from 'src/base/base.service';
 import { CreateUserDto, WalletUserDto } from './dto/create-user.dto';
 import { TransactionDao } from '../payment/dao/transaction.dao';
+import { PaymentType } from 'src/base/constants';
 
 @Injectable()
 export class UserService extends BaseService {
@@ -18,6 +19,7 @@ export class UserService extends BaseService {
       point: 3000,
       user: user.id,
       message: 'Шинэ хэрэглэгчийн урамшуулал',
+      paymentType: PaymentType.LOYALTY
     });
     return user;
   }

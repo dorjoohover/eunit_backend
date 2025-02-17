@@ -24,16 +24,22 @@ export class TransactionService extends BaseService {
         { ...user, wallet: (user.wallet += dto.point * 0.1) },
         user.id,
       );
+      await this.create({
+        point: dto.point * 0.1,
+        user: dto.user,
+        paymentType: PaymentType.LOYALTY,
+        message: 'Худалдан авалтын урамшуулал'
+      });
       return (
         await this.dao.create({
           ...dto,
+          point: -dto.point,
           right: right,
           user: user.id,
         })
       ).id;
     }
     const remitterPoint = user.wallet + dto.point;
-    console.log(remitterPoint);
     let success = remitterPoint > 0;
 
     if (!success || right) {
@@ -44,6 +50,7 @@ export class TransactionService extends BaseService {
     }
     const res = await this.dao.create({
       ...dto,
+
       right: right,
       user: user.id,
     });

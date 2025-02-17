@@ -14,7 +14,7 @@ export class TransactionService extends BaseService {
     super();
   }
 
-  public async create(dto: CreateTransactionDto) {
+  public async create(dto: CreateTransactionDto, add = true) {
     const user = await this.userService.getUser(dto.user as string);
     const date = new Date();
     const right = user.endDate > date;
@@ -24,12 +24,15 @@ export class TransactionService extends BaseService {
         { ...user, wallet: (user.wallet += dto.point * 0.1) },
         user.id,
       );
-      await this.create({
-        point: dto.point * 0.1,
-        user: dto.user,
-        paymentType: PaymentType.LOYALTY,
-        message: 'Худалдан авалтын урамшуулал'
-      });
+      await this.create(
+        {
+          point: dto.point * 0.1,
+          user: dto.user,
+          paymentType: PaymentType.LOYALTY,
+          message: 'Худалдан авалтын урамшуулал',
+        },
+        false,
+      );
       return (
         await this.dao.create({
           ...dto,
@@ -54,10 +57,11 @@ export class TransactionService extends BaseService {
       right: right,
       user: user.id,
     });
-    await this.userService.updateUser(
-      { ...user, wallet: remitterPoint },
-      user.id,
-    );
+    if (add)
+      await this.userService.updateUser(
+        { ...user, wallet: remitterPoint },
+        user.id,
+      );
     return res.id;
   }
 

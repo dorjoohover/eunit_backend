@@ -39,8 +39,8 @@ export class RequestDao {
       where: {
         user: {
           id: id,
-          status: PaymentStatus.SUCCESS,
         },
+        status: PaymentStatus.SUCCESS,
       },
       relations: ['location'],
       take: limit,

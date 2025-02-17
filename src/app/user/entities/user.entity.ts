@@ -63,7 +63,6 @@ export class UserEntity {
   })
   users?: TransactionEntity[];
 
-  remitterTransactions?: TransactionEntity[];
   @OneToMany(() => ServiceEntity, (service) => service.user, {
     nullable: true,
   })

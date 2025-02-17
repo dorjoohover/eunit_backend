@@ -38,7 +38,7 @@ export class TransactionDao {
   findByUser = async (id: number, limit: number, page: number) => {
     const res = await this.db.findAndCount({
       where: [{ user: { id: id } }],
-      relations: ['remitter', 'receiver'],
+      relations: ['user'],
       order: {
         createdAt: 'DESC',
       },

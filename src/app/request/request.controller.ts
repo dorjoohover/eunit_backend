@@ -24,6 +24,7 @@ export class RequestController {
   @Post()
   create(@Body() createRequestDto: CreateRequestDto, @Request() { user }) {
     try {
+      console.log(user)
       return this.requestService.create(
         createRequestDto,
         user['phone'],

@@ -26,7 +26,7 @@ export class UserEntity {
   lastname: string;
   @Column({ nullable: true })
   profile: string;
-  @Column({ unique: true })
+  @Column({ nullable: true })
   phone: string;
   @Column({ nullable: true })
   endDate: Date;

@@ -19,6 +19,7 @@ export class UserDao {
 
   add = async (user: CreateUserDto) => {
     try {
+      console.log(user)
       const res = this.db.create({
         ...user,
         role: user.role == undefined ? CLIENT : user.role,

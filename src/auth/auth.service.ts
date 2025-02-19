@@ -36,7 +36,6 @@ export class AuthService {
 
   async verifyToken(idToken: string) {
     let user = await this.app.auth().verifyIdToken(idToken);
-    console.log(user);
     try {
       if (user?.uid) {
         let res = await this.usersService.getUser(

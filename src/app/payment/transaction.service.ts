@@ -36,8 +36,6 @@ export class TransactionService extends BaseService {
       ).id;
     }
     const remitterPoint = user.wallet + dto.point;
-    console.log(user);
-    console.log(dto.point);
     let success = remitterPoint > 0;
 
     if (!success || right) {

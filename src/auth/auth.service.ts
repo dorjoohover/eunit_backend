@@ -48,6 +48,8 @@ export class AuthService {
             email: user.email,
             phone: user.phone_number,
             profile: user.picture,
+            name: user.name,
+            lastname: user.name,
           });
         return {
           ...res,

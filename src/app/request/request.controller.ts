@@ -24,10 +24,10 @@ export class RequestController {
   @Post()
   create(@Body() createRequestDto: CreateRequestDto, @Request() { user }) {
     try {
-      console.log(user)
+      console.log(user);
       return this.requestService.create(
         createRequestDto,
-        user['phone'],
+        user['phone'] ?? user['email'],
         user['id'],
       );
     } catch (error) {

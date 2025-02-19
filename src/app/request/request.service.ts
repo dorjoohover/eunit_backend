@@ -119,7 +119,7 @@ export class RequestService extends BaseService {
         const qpay = await this.qpay.createPayment(
           point,
           res.toString(),
-          user['id'],
+          user,
         );
         await this.dao.updateCode(res, qpay.invoice_id);
         return {

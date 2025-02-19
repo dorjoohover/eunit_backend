@@ -42,7 +42,7 @@ export class AuthService {
         let res = await this.usersService.getUser(
           user.phone_number ?? user.email,
         );
-        console.log(res);
+
         if (!res)
           res = await this.usersService.create({
             email: user.email,

@@ -19,7 +19,7 @@ export class UserDao {
 
   add = async (user: CreateUserDto) => {
     try {
-      console.log(user)
+      console.log(user);
       const res = this.db.create({
         ...user,
         role: user.role == undefined ? CLIENT : user.role,
@@ -68,16 +68,18 @@ export class UserDao {
   };
 
   getByEmail = async (phone: string) => {
-    return await this.db.findOne({
-      where: [
-        {
-          phone: phone,
-        },
-        {
+    let res = await this.db.findOne({
+      where: {
+        phone: phone,
+      },
+    });
+    if (!res)
+      res = await this.db.findOne({
+        where: {
           email: phone,
         },
-      ],
-    });
+      });
+    return res;
   };
 
   getUserInfo = async (id: any) => {

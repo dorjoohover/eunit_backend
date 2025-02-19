@@ -68,9 +68,14 @@ export class UserDao {
 
   getByEmail = async (phone: string) => {
     return await this.db.findOne({
-      where: {
-        phone: phone,
-      },
+      where: [
+        {
+          phone: phone,
+        },
+        {
+          email: phone,
+        },
+      ],
     });
   };
 

@@ -36,9 +36,11 @@ export class AuthService {
 
   async verifyToken(idToken: string) {
     let user = await this.app.auth().verifyIdToken(idToken);
+    console.log(user);
     try {
       if (user?.uid) {
         let res = await this.usersService.getUser(user.phone_number);
+        if (!res) res = await this.usersService.getUser(user.email);
         if (!res)
           res = await this.usersService.create({
             email: user.email,

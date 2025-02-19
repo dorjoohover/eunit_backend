@@ -116,11 +116,10 @@ export class RequestService extends BaseService {
       }
 
       if (dto.payment == PaymentType.QPAY) {
-        console.log(point, res.toString(), user['id']);
         const qpay = await this.qpay.createPayment(
           point,
           res.toString(),
-          user['id'],
+          user,
         );
         await this.dao.updateCode(res, qpay.invoice_id);
         return {

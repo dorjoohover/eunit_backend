@@ -32,10 +32,10 @@ export class RequestDao {
           user: dto.user ? { id: dto.user } : Not(IsNull()),
         },
         {
-          user: dto.email ? { email: Like(`%${dto.email}%`) } : Not(IsNull()),
+          user: dto.email ? { email: Like(`%${dto.email}%`) } : Not('0'),
         },
         {
-          user: dto.phone ? { phone: Like(`%${dto.phone}%`) } : Not(IsNull()),
+          user: dto.phone ? { phone: Like(`%${dto.phone}%`) } : Not('0'),
         },
         {
           service: dto.service ? dto.service : Not(IsNull()),

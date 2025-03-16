@@ -13,25 +13,30 @@ export class UserDao {
   }
 
   find = async (dto: UserFindDto) => {
+    const where = [];
+    if (dto.firstname)
+      where.push({
+        name: Like(`%${dto.firstname}%`),
+        firstname: Like(`%${dto.firstname}%`),
+      });
+    if (dto.lastname)
+      where.push({
+        lastname: Like(`%${dto.lastname}%`),
+      });
+    if (dto.email)
+      where.push({
+        email: Like(`%${dto.email}%`),
+      });
+    if (dto.phone)
+      where.push({
+        phone: Like(`%${dto.phone}%`),
+      });
+    if (dto.createdAt)
+      where.push({
+        createdAt: new Date(dto.createdAt),
+      });
     const res = await this.db.find({
-      where: [
-        {
-          name: dto.firstname ? Like(`%${dto.firstname}%`) : Not(IsNull()),
-          firstname: dto.firstname ? Like(`%${dto.firstname}%`) : Not(IsNull()),
-        },
-        {
-          lastname: dto.lastname ? Like(`%${dto.lastname}%`) : Not(IsNull()),
-        },
-        {
-          email: dto.email ? Like(`%${dto.email}%`) : Not(IsNull()),
-        },
-        {
-          phone: dto.phone ? Like(`%${dto.phone}%`) : Not(IsNull()),
-        },
-        {
-          createdAt: dto.createdAt ? new Date(dto.createdAt) : Not(IsNull()),
-        },
-      ],
+      where: where,
       take: dto.limit,
       skip: (dto.page - 1) * dto.limit,
     });

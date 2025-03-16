@@ -26,27 +26,15 @@ export class RequestDao {
   };
 
   findAll = async (dto: RequetsFindDto) => {
+    const where = [];
+    if (dto.user) where.push({ user: { id: dto.user } });
+    if (dto.service) where.push({ service: dto.service });
+    if (dto.status) where.push({ status: dto.status });
+    if (dto.date) where.push({ createdAt: new Date(dto.date) });
+    if (dto.email) where.push({ user: { email: Like(`%${dto.email}%`) } });
+    if (dto.phone) where.push({ user: { phone: Like(`%${dto.phone}%`) } });
     return await this.db.find({
-      where: [
-        {
-          user: dto.user ? { id: dto.user } : Not(IsNull()),
-        },
-        {
-          user: dto.email ? { email: Like(`%${dto.email}%`) } : Not('0'),
-        },
-        {
-          user: dto.phone ? { phone: Like(`%${dto.phone}%`) } : Not('0'),
-        },
-        {
-          service: dto.service ? dto.service : Not(IsNull()),
-        },
-        {
-          createdAt: dto.date ? new Date(dto.date) : Not(IsNull()),
-        },
-        {
-          status: dto.status ? dto.status : Not(IsNull()),
-        },
-      ],
+      where: where,
       skip: (dto.page - 1) * dto.limit,
       relations: ['user', 'transactions'],
       take: dto.limit,

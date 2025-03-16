@@ -152,8 +152,6 @@ export class RequestService extends BaseService {
 
   async findAll(dto: RequetsFindDto) {
     const res = await this.dao.findAll(dto);
-    console.log(res);
-    console.log(dto);
     const responses = [];
     for (const r of res) {
       responses.push({

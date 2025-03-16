@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { DataSource, IsNull, Not, Repository } from 'typeorm';
+import { DataSource, IsNull, Like, Not, Repository } from 'typeorm';
 import { RequestEntity } from './entities/request.entity';
 import { CreateRequestDto, RequetsFindDto } from './dto/create-request.dto';
 import { PaymentStatus } from 'src/base/constants';
@@ -32,10 +32,10 @@ export class RequestDao {
           user: dto.user ? { id: dto.user } : Not(IsNull()),
         },
         {
-          user: dto.email ? { email: dto.email } : Not(IsNull()),
+          user: dto.email ? { email: Like(`%${dto.email}%`) } : Not(IsNull()),
         },
         {
-          user: dto.phone ? { phone: dto.phone } : Not(IsNull()),
+          user: dto.phone ? { phone: Like(`%${dto.phone}%`) } : Not(IsNull()),
         },
         {
           service: dto.service ? dto.service : Not(IsNull()),

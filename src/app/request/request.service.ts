@@ -1,5 +1,5 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { CreateRequestDto } from './dto/create-request.dto';
+import { CreateRequestDto, RequetsFindDto } from './dto/create-request.dto';
 import { UpdateRequestDto } from './dto/update-request.dto';
 import { BaseService } from 'src/base/base.service';
 import { RequestDao } from './request.dao';
@@ -116,11 +116,7 @@ export class RequestService extends BaseService {
       }
 
       if (dto.payment == PaymentType.QPAY) {
-        const qpay = await this.qpay.createPayment(
-          point,
-          res.toString(),
-          user,
-        );
+        const qpay = await this.qpay.createPayment(point, res.toString(), user);
         await this.dao.updateCode(res, qpay.invoice_id);
         return {
           res,
@@ -140,20 +136,34 @@ export class RequestService extends BaseService {
     const payment = await this.qpay.checkPayment(code);
     if (payment.paid_amount) {
       await this.dao.updateStatus(id, PaymentStatus.SUCCESS);
-      await this.transactionService.create({
-        paymentType: PaymentType.QPAY,
-        point: payment.paid_amount,
-        user: user,
-        request: id,
-        message: 'Худалдан авалт хийсэн.',
-      });
+      const transaction = await this.transactionService.findOneByRequest(id);
+      if (!transaction)
+        await this.transactionService.create({
+          paymentType: PaymentType.QPAY,
+          point: payment.paid_amount,
+          user: user,
+          request: id,
+          message: 'Худалдан авалт хийсэн.',
+        });
       return true;
     }
     return false;
   }
 
-  async findAll() {
-    return await this.dao.findAll();
+  async findAll(dto: RequetsFindDto) {
+    const res = await this.dao.findAll(dto);
+    const responses = [];
+    for (const r of res) {
+      responses.push({
+        id: r.id,
+        user: r.user,
+        price: r.transactions?.[0]?.point ?? 0,
+        method: r.transactions?.[0]?.paymentType,
+        date: r.createdAt,
+        type: r.service,
+      });
+    }
+    return responses;
   }
 
   async findByUser(id: number, page: number, limit = 10) {

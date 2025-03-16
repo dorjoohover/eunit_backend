@@ -13,7 +13,9 @@ export class TransactionService extends BaseService {
   ) {
     super();
   }
-
+  public async findOneByRequest(id: number) {
+    return await this.dao.findOne(id);
+  }
   public async create(dto: CreateTransactionDto) {
     const user = await this.userService.getUser(dto.user as string);
     const date = new Date();

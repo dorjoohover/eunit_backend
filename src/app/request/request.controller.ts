@@ -8,11 +8,12 @@ import {
   Delete,
   Request,
   Res,
+  Query,
 } from '@nestjs/common';
 import { RequestService } from './request.service';
 import { CreateRequestDto } from './dto/create-request.dto';
 import { UpdateRequestDto } from './dto/update-request.dto';
-import { ApiBearerAuth, ApiParam } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiParam, ApiQuery } from '@nestjs/swagger';
 import { Public } from 'src/auth/guards/jwt/auth-guard';
 import { Response } from 'express';
 
@@ -59,11 +60,6 @@ export class RequestController {
     pdfDoc.pipe(response);
     pdfDoc.end();
   }
-  @Get()
-  @Public()
-  findAll() {
-    return this.requestService.findAll();
-  }
 
   // user all count
 
@@ -86,6 +82,36 @@ export class RequestController {
   @Get('service/:id')
   findOne(@Param('id') id: string) {
     return this.requestService.findOne(+id);
+  }
+  @Public()
+  @ApiQuery({ name: 'page' })
+  @ApiQuery({ name: 'limit' })
+  @ApiQuery({ name: 'user' })
+  @ApiQuery({ name: 'phone' })
+  @ApiQuery({ name: 'email' })
+  @ApiQuery({ name: 'service' })
+  @ApiQuery({ name: 'date' })
+  @Get()
+  findAll(
+    @Query('page') page: number,
+    @Query('limit') limit: number,
+    @Query('user') user: number,
+    @Query('phone') phone: string,
+    @Query('email') email: string,
+    @Query('service') service: number,
+    @Query('status') status: number,
+    @Query('date') date: string,
+  ) {
+    return this.requestService.findAll({
+      page,
+      limit,
+      status,
+      email,
+      phone,
+      user,
+      date,
+      service,
+    });
   }
 
   @Patch(':id')

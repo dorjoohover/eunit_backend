@@ -29,3 +29,13 @@ export class WalletUserDto {
   @ApiProperty()
   wallet: number;
 }
+
+export class UserFindDto {
+  limit: number;
+  page: number;
+  email?: string;
+  lastname?: string;
+  firstname?: string;
+  phone?: string;
+  createdAt?: string;
+}

@@ -8,12 +8,13 @@ import {
   Delete,
   Request,
   Put,
+  Query,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto, WalletUserDto } from './dto/create-user.dto';
 import { Roles } from 'src/auth/guards/role/role.decorator';
 import { Role } from 'src/auth/guards/role/role.enum';
-import { ApiBearerAuth } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
 import { Public } from 'src/auth/guards/jwt/auth-guard';
 
 @Controller('user')
@@ -25,9 +26,32 @@ export class UserController {
     return this.userService.create(createUserDto);
   }
   @Public()
+  @ApiQuery({ name: 'page' })
+  @ApiQuery({ name: 'limit' })
+  @ApiQuery({ name: 'email' })
+  @ApiQuery({ name: 'phone' })
+  @ApiQuery({ name: 'lastname' })
+  @ApiQuery({ name: 'firstname' })
+  @ApiQuery({ name: 'date' })
   @Get()
-  findAll() {
-    return this.userService.findAll();
+  findAll(
+    @Query('page') page: number,
+    @Query('limit') limit: number,
+    @Query('email') email: string,
+    @Query('phone') phone: string,
+    @Query('lastname') lastname: string,
+    @Query('firstname') firstname: string,
+    @Query('createdAt') createdAt: string,
+  ) {
+    return this.userService.findAll({
+      page,
+      limit,
+      email,
+      phone,
+      lastname,
+      firstname,
+      createdAt,
+    });
   }
 
   @Get('me')

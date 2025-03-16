@@ -52,7 +52,15 @@ export class TransactionDao {
       //   relations: [''],
     });
   };
-
+  findByService = async (id: number) => {
+    return await this.db.findOne({
+      where: {
+        request: {
+          id,
+        },
+      },
+    });
+  };
   findOne = async (id: number) => {
     return await this.db.findOne({
       where: {

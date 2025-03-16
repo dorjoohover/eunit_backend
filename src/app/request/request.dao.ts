@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { DataSource, Repository } from 'typeorm';
+import { DataSource, IsNull, Not, Repository } from 'typeorm';
 import { RequestEntity } from './entities/request.entity';
-import { CreateRequestDto } from './dto/create-request.dto';
+import { CreateRequestDto, RequetsFindDto } from './dto/create-request.dto';
 import { PaymentStatus } from 'src/base/constants';
 
 @Injectable()
@@ -25,9 +25,31 @@ export class RequestDao {
     return res.id;
   };
 
-  findAll = async () => {
+  findAll = async (dto: RequetsFindDto) => {
     return await this.db.find({
-      //   relations: [''],
+      where: [
+        {
+          user: dto.user ? { id: dto.user } : Not(IsNull()),
+        },
+        {
+          user: dto.email ? { email: dto.email } : Not(IsNull()),
+        },
+        {
+          user: dto.phone ? { phone: dto.phone } : Not(IsNull()),
+        },
+        {
+          service: dto.service ? dto.service : Not(IsNull()),
+        },
+        {
+          createdAt: dto.date ? new Date(dto.date) : Not(IsNull()),
+        },
+        {
+          status: dto.status ? dto.status : Not(IsNull()),
+        },
+      ],
+      skip: (dto.page - 1) * dto.limit,
+      relations: ['user', 'transactions'],
+      take: dto.limit,
     });
   };
 

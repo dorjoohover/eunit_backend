@@ -1,8 +1,8 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DataSource, Repository } from 'typeorm';
+import { Between, DataSource, IsNull, Like, Not, Repository } from 'typeorm';
 import { UserEntity } from './entities/user.entity';
-import { CreateUserDto } from './dto/create-user.dto';
+import { CreateUserDto, UserFindDto } from './dto/create-user.dto';
 import { CLIENT } from 'src/base/constants';
 
 @Injectable()
@@ -12,8 +12,29 @@ export class UserDao {
     this.db = this.dataSource.getRepository(UserEntity);
   }
 
-  find = async () => {
-    const res = await this.db.find();
+  find = async (dto: UserFindDto) => {
+    const res = await this.db.find({
+      where: [
+        {
+          name: dto.firstname ? Like(`%${dto.firstname}%`) : Not(IsNull()),
+          firstname: dto.firstname ? Like(`%${dto.firstname}%`) : Not(IsNull()),
+        },
+        {
+          lastname: dto.lastname ? Like(`%${dto.lastname}%`) : Not(IsNull()),
+        },
+        {
+          email: dto.email ? Like(`%${dto.email}%`) : Not(IsNull()),
+        },
+        {
+          phone: dto.phone ? Like(`%${dto.phone}%`) : Not(IsNull()),
+        },
+        {
+          createdAt: dto.createdAt ? new Date(dto.createdAt) : Not(IsNull()),
+        },
+      ],
+      take: dto.limit,
+      skip: (dto.page - 1) * dto.limit,
+    });
     return res;
   };
 

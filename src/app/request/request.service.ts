@@ -153,7 +153,8 @@ export class RequestService extends BaseService {
   async findAll(dto: RequetsFindDto) {
     const res = await this.dao.findAll(dto);
     const responses = [];
-    for (const r of res) {
+    const { data, ...body } = res;
+    for (const r of data) {
       responses.push({
         id: r.id,
         user: r.user,
@@ -163,7 +164,10 @@ export class RequestService extends BaseService {
         type: r.service,
       });
     }
-    return responses;
+    return {
+      data: responses,
+      ...body,
+    };
   }
 
   async findByUser(id: number, page: number, limit = 10) {

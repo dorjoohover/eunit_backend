@@ -35,12 +35,17 @@ export class UserDao {
       where.push({
         createdAt: new Date(dto.createdAt),
       });
-    const res = await this.db.find({
+    const res = await this.db.findAndCount({
       where: where,
       take: dto.limit,
       skip: (dto.page - 1) * dto.limit,
     });
-    return res;
+    return {
+      data: res[0],
+      total: res[1],
+      currentPage: dto.page ?? 1,
+      totalPage: Math.ceil(res[1] / dto.limit),
+    };
   };
 
   add = async (user: CreateUserDto) => {

@@ -33,12 +33,18 @@ export class RequestDao {
     if (dto.date) where.push({ createdAt: new Date(dto.date) });
     if (dto.email) where.push({ user: { email: Like(`%${dto.email}%`) } });
     if (dto.phone) where.push({ user: { phone: Like(`%${dto.phone}%`) } });
-    return await this.db.find({
+    const res = await this.db.findAndCount({
       where: where,
       skip: (dto.page - 1) * dto.limit,
       relations: ['user', 'transactions'],
       take: dto.limit,
     });
+    return {
+      total: res[1],
+      data: res[0],
+      currentPage: dto.page,
+      totalPage: Math.ceil(res[1] / dto.limit),
+    };
   };
 
   findAllUser = async (id: number) => {

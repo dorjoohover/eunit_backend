@@ -39,6 +39,7 @@ export class RequestDao {
       relations: ['user', 'transactions'],
       take: dto.limit,
     });
+    console.log(res)
     return {
       total: res[1],
       data: res[0],

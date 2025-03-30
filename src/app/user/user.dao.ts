@@ -54,7 +54,7 @@ export class UserDao {
       const res = this.db.create({
         ...user,
         role: user.role == undefined ? CLIENT : user.role,
-        wallet: 3000,
+        wallet: 2000,
       });
       await this.db.save(res);
       return res;

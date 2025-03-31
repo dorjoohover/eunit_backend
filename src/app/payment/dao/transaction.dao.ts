@@ -76,10 +76,13 @@ export class TransactionDao {
     }
 
     if (dto.date) {
-      where.createdAt = Between(
-        new Date(dto.date).setUTCHours(0, 0, 0, 0) - 86400000, // Subtract 1 day
-        new Date(dto.date).setUTCHours(23, 59, 59, 999), // End of the given date
+      const startDate = new Date(dto.date);
+      const endDate = new Date(
+        startDate.getFullYear(),
+        startDate.getMonth() - 1,
+        startDate.getDate() + 1,
       );
+      where.createdAt = Between(startDate, endDate);
     }
 
     if (dto.email) {

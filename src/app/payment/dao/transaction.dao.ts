@@ -124,7 +124,6 @@ export class TransactionDao {
     query.groupBy('transaction."userId"');
 
     const res = await query.getRawMany();
-    console.log(res);
     return res;
   };
 

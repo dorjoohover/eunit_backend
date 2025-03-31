@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { DataSource, Repository } from 'typeorm';
+import { DataSource, Like, Repository } from 'typeorm';
 import { TransactionEntity } from '../entities/transaction.entity';
 import { CreateTransactionDto } from '../dto/create-transaction.dto';
+import { RequetsFindDto } from 'src/app/request/dto/create-request.dto';
 
 @Injectable()
 export class TransactionDao {
@@ -47,6 +48,32 @@ export class TransactionDao {
     });
     return res;
   };
+
+  findAll = async (dto: RequetsFindDto) => {
+    const where = [];
+    if (dto.user) where.push({ user: { id: dto.user } });
+    if (dto.service) where.push({ request: { service: dto.service } });
+    if (dto.status) where.push({ request: { status: dto.status } });
+    if (dto.date) where.push({ createdAt: new Date(dto.date) });
+    if (dto.email) where.push({ user: { email: Like(`%${dto.email}%`) } });
+    if (dto.phone) where.push({ user: { phone: Like(`%${dto.phone}%`) } });
+    const res = await this.db.findAndCount({
+      where: where,
+      skip: (dto.page - 1) * dto.limit,
+      relations: ['user', 'request'],
+      take: dto.limit,
+      order: {
+        createdAt: 'desc',
+      },
+    });
+    return {
+      total: res[1],
+      data: res[0],
+      currentPage: dto.page,
+      totalPage: Math.ceil(res[1] / dto.limit),
+    };
+  };
+
   getTotalPrice = async (id?: number, method?: number) => {
     const query = this.db
       .createQueryBuilder('transaction')
@@ -67,11 +94,6 @@ export class TransactionDao {
     return res;
   };
 
-  findAll = async () => {
-    return await this.db.find({
-      //   relations: [''],
-    });
-  };
   findByService = async (id: number) => {
     return await this.db.findOne({
       where: {

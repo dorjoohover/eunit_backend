@@ -4,6 +4,7 @@ import { UpdatePaymentDto } from './dto/update-payment.dto';
 import { BaseService } from 'src/base/base.service';
 import { PaymentDao } from './dao/payment.dao';
 import { TransactionDao } from './dao/transaction.dao';
+import { RequetsFindDto } from '../request/dto/create-request.dto';
 
 @Injectable()
 export class PaymentService extends BaseService {
@@ -19,10 +20,6 @@ export class PaymentService extends BaseService {
 
   public async findByUser(id: number, limit: number, page: number) {
     return this.transactionDao.findByUser(id, limit, page);
-  }
-
-  findAll() {
-    return `This action returns all payment`;
   }
 
   findOne(id: number) {

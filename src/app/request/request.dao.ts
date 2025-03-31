@@ -24,7 +24,7 @@ export class RequestDao {
     await this.db.save(res);
     return res.id;
   };
-  7;
+
   findAll = async (dto: RequetsFindDto) => {
     const where = [];
     if (dto.user) where.push({ user: { id: dto.user } });

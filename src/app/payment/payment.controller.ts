@@ -7,13 +7,15 @@ import {
   Param,
   Delete,
   Request,
+  Query,
 } from '@nestjs/common';
 import { PaymentService } from './payment.service';
 import { CreatePaymentDto } from './dto/create-payment.dto';
 import { UpdatePaymentDto } from './dto/update-payment.dto';
-import { ApiBearerAuth, ApiParam } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiParam, ApiQuery } from '@nestjs/swagger';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { TransactionService } from './transaction.service';
+import { Public } from 'src/auth/guards/jwt/auth-guard';
 @ApiBearerAuth('access-token')
 @Controller('payment')
 export class PaymentController {
@@ -42,9 +44,35 @@ export class PaymentController {
     }
   }
 
+  @Public()
+  @ApiQuery({ name: 'page' })
+  @ApiQuery({ name: 'limit' })
+  @ApiQuery({ name: 'user' })
+  @ApiQuery({ name: 'phone' })
+  @ApiQuery({ name: 'email' })
+  @ApiQuery({ name: 'service' })
+  @ApiQuery({ name: 'date' })
   @Get()
-  findAll() {
-    return this.paymentService.findAll();
+  findAll(
+    @Query('page') page: number,
+    @Query('limit') limit: number,
+    @Query('user') user: number,
+    @Query('phone') phone: string,
+    @Query('email') email: string,
+    @Query('service') service: number,
+    @Query('status') status: number,
+    @Query('date') date: string,
+  ) {
+    return this.transactionService.findAll({
+      page,
+      limit,
+      status,
+      email,
+      phone,
+      user,
+      date,
+      service,
+    });
   }
 
   @Get('user/:limit/:page')

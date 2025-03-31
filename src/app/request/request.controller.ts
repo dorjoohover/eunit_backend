@@ -83,36 +83,6 @@ export class RequestController {
   findOne(@Param('id') id: string) {
     return this.requestService.findOne(+id);
   }
-  @Public()
-  @ApiQuery({ name: 'page' })
-  @ApiQuery({ name: 'limit' })
-  @ApiQuery({ name: 'user' })
-  @ApiQuery({ name: 'phone' })
-  @ApiQuery({ name: 'email' })
-  @ApiQuery({ name: 'service' })
-  @ApiQuery({ name: 'date' })
-  @Get()
-  findAll(
-    @Query('page') page: number,
-    @Query('limit') limit: number,
-    @Query('user') user: number,
-    @Query('phone') phone: string,
-    @Query('email') email: string,
-    @Query('service') service: number,
-    @Query('status') status: number,
-    @Query('date') date: string,
-  ) {
-    return this.requestService.findAll({
-      page,
-      limit,
-      status,
-      email,
-      phone,
-      user,
-      date,
-      service,
-    });
-  }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateRequestDto: UpdateRequestDto) {

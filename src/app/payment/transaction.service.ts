@@ -4,6 +4,7 @@ import { BaseService } from 'src/base/base.service';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { UserService } from '../user/user.service';
 import { PaymentType } from 'src/base/constants';
+import { RequetsFindDto } from '../request/dto/create-request.dto';
 
 @Injectable()
 export class TransactionService extends BaseService {
@@ -13,6 +14,10 @@ export class TransactionService extends BaseService {
   ) {
     super();
   }
+  async findAll(dto: RequetsFindDto) {
+    return await this.dao.findAll(dto);
+  }
+
   public async findOneByRequest(id: number) {
     return await this.dao.findOne(id);
   }

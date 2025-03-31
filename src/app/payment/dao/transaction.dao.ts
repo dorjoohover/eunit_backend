@@ -90,7 +90,6 @@ export class TransactionDao {
       if (!where.user) where.user = {};
       where.user.phone = Like(`%${dto.phone}%`);
     }
-    console.log(JSON.stringify(where));
 
     const [data, total] = await this.db.findAndCount({
       where: { ...where, point: LessThan(0) },

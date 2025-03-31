@@ -13,28 +13,17 @@ export class UserDao {
   }
 
   find = async (dto: UserFindDto) => {
-    const where = [];
-    if (dto.firstname)
-      where.push({
-        name: Like(`%${dto.firstname}%`),
-        firstname: Like(`%${dto.firstname}%`),
-      });
-    if (dto.lastname)
-      where.push({
-        lastname: Like(`%${dto.lastname}%`),
-      });
-    if (dto.email)
-      where.push({
-        email: Like(`%${dto.email}%`),
-      });
-    if (dto.phone)
-      where.push({
-        phone: Like(`%${dto.phone}%`),
-      });
-    if (dto.createdAt)
-      where.push({
-        createdAt: new Date(dto.createdAt),
-      });
+    const where: Record<string, any> = {};
+    if (dto.firstname) where.firstname = Like(`%${dto.firstname}%`);
+    if (dto.lastname) where.lastname = Like(`%${dto.lastname}%`);
+    if (dto.email) where.email = Like(`%${dto.email}%`);
+
+    if (dto.phone) where.phone = Like(`%${dto.phone}%`);
+    if (dto.createdAt) {
+      const startDate = new Date(dto.createdAt);
+      const endDate = new Date(startDate.setDate(startDate.getDate() + 1));
+      where.createdAt = Between(new Date(dto.createdAt), endDate);
+    }
     const res = await this.db.findAndCount({
       where: where,
       take: dto.limit,

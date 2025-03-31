@@ -60,9 +60,8 @@ export class TransactionDao {
   findAll = async (dto: RequetsFindDto, all: number) => {
     const where: Record<string, any> = {}; // Ensure it's an object
 
-    if (dto.user) {
-      if (!where.user) where.user = {};
-      where.user.id = dto.user;
+    if (dto.payment) {
+      where.paymentType = dto.payment;
     }
 
     if (dto.service) {
@@ -88,6 +87,7 @@ export class TransactionDao {
       if (!where.user) where.user = {};
       where.user.phone = Like(`%${dto.phone}%`);
     }
+    console.log(JSON.stringify(where));
 
     const [data, total] = await this.db.findAndCount({
       where: { ...where, point: LessThan(0) },

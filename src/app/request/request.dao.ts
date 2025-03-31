@@ -25,29 +25,30 @@ export class RequestDao {
     return res.id;
   };
 
-  findAll = async (dto: RequetsFindDto) => {
-    const where = [];
-    if (dto.user) where.push({ user: { id: dto.user } });
-    if (dto.service) where.push({ service: dto.service });
-    if (dto.status) where.push({ status: dto.status });
-    if (dto.date) where.push({ createdAt: new Date(dto.date) });
-    if (dto.email) where.push({ user: { email: Like(`%${dto.email}%`) } });
-    if (dto.phone) where.push({ user: { phone: Like(`%${dto.phone}%`) } });
-    const res = await this.db.findAndCount({
-      where: where,
-      skip: (dto.page - 1) * dto.limit,
-      relations: ['user', 'transactions'],
-      take: dto.limit,
-      order: {
-        createdAt: 'desc',
-      },
-    });
-    return {
-      total: res[1],
-      data: res[0],
-      currentPage: dto.page,
-      totalPage: Math.ceil(res[1] / dto.limit),
-    };
+  findAll = async () => {
+    return await this.db.find();
+    // const where = [];
+    // if (dto.user) where.push({ user: { id: dto.user } });
+    // if (dto.service) where.push({ service: dto.service });
+    // if (dto.status) where.push({ status: dto.status });
+    // if (dto.date) where.push({ createdAt: new Date(dto.date) });
+    // if (dto.email) where.push({ user: { email: Like(`%${dto.email}%`) } });
+    // if (dto.phone) where.push({ user: { phone: Like(`%${dto.phone}%`) } });
+    // const res = await this.db.findAndCount({
+    //   where: where,
+    //   skip: (dto.page - 1) * dto.limit,
+    //   relations: ['user', 'transactions'],
+    //   take: dto.limit,
+    //   order: {
+    //     createdAt: 'desc',
+    //   },
+    // });
+    // return {
+    //   total: res[1],
+    //   data: res[0],
+    //   currentPage: dto.page,
+    //   totalPage: Math.ceil(res[1] / dto.limit),
+    // };
   };
 
   findAllUser = async (id: number) => {

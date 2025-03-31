@@ -4,7 +4,7 @@ import { PaymentType } from 'src/base/constants';
 
 export class RequetsFindDto {
   service?: number;
-  user?: number;
+  payment?: number;
   page: number;
   limit: number;
   phone?: string;

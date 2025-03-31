@@ -150,25 +150,26 @@ export class RequestService extends BaseService {
     return false;
   }
 
-  async findAll(dto: RequetsFindDto) {
-    const res = await this.dao.findAll(dto);
-    const responses = [];
-    const { data, ...body } = res;
-    for (const r of data) {
-      console.log(r)
-      responses.push({
-        id: r.id,
-        user: r.user,
-        price: r.transactions?.[0]?.point ?? 0,
-        method: r.transactions?.[0]?.paymentType,
-        date: r.createdAt,
-        type: r.service,
-      });
-    }
-    return {
-      data: responses,
-      ...body,
-    };
+  async findAll() {
+    const res = await this.dao.findAll();
+    return res;
+    // const responses = [];
+    // const { data, ...body } = res;
+    // for (const r of data) {
+    //   console.log(r)
+    //   responses.push({
+    //     id: r.id,
+    //     user: r.user,
+    //     price: r.transactions?.[0]?.point ?? 0,
+    //     method: r.transactions?.[0]?.paymentType,
+    //     date: r.createdAt,
+    //     type: r.service,
+    //   });
+    // }
+    // return {
+    //   data: responses,
+    //   ...body,
+    // };
   }
 
   async findByUser(id: number, page: number, limit = 10) {

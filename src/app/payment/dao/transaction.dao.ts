@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { DataSource, Like, MoreThan, Repository } from 'typeorm';
+import { DataSource, IsNull, Like, MoreThan, Not, Repository } from 'typeorm';
 import { TransactionEntity } from '../entities/transaction.entity';
 import { CreateTransactionDto } from '../dto/create-transaction.dto';
 import { RequetsFindDto } from 'src/app/request/dto/create-request.dto';
@@ -59,10 +59,6 @@ export class TransactionDao {
       where.user.id = dto.user;
     }
 
-    if (!all) {
-      where.point = MoreThan(0);
-    }
-
     if (dto.service) {
       if (!where.request) where.request = {};
       where.request.service = dto.service;
@@ -90,7 +86,7 @@ export class TransactionDao {
     console.log('Final WHERE Object:', JSON.stringify(where, null, 2));
 
     const [data, total] = await this.db.findAndCount({
-      where,
+      where: { ...where, point: all ? Not(IsNull()) : MoreThan(0) },
       skip: (dto.page - 1) * dto.limit,
       take: dto.limit,
       relations: ['user', 'request'],

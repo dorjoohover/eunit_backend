@@ -112,9 +112,9 @@ export class TransactionDao {
     const query = this.db
       .createQueryBuilder('transaction')
       .select('SUM(transaction.point)', 'totalPrice');
-
+    query.where('transaction.point < 0');
     if (id !== undefined && id !== null && id !== 0) {
-      query.where('transaction."userId" = :id', { id });
+      query.andWhere('transaction."userId" = :id', { id });
     }
 
     if (method !== undefined && method !== null && method !== 0) {

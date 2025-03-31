@@ -53,10 +53,10 @@ export class UserService extends BaseService {
           d.id,
           dto.method ?? PaymentType.QPAY,
         );
-        const totalPrice = response?.[0]?.totalPrice ?? 0;
+        const totalPrice = response?.[0]?.totalPrice ?? '0';
         return {
           ...d,
-          totalPrice,
+          totalPrice: +totalPrice,
         };
       }),
     );

@@ -38,4 +38,5 @@ export class UserFindDto {
   firstname?: string;
   phone?: string;
   createdAt?: string;
+  method?: number
 }

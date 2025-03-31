@@ -24,7 +24,7 @@ export class RequestDao {
     await this.db.save(res);
     return res.id;
   };
-
+  7;
   findAll = async (dto: RequetsFindDto) => {
     const where = [];
     if (dto.user) where.push({ user: { id: dto.user } });
@@ -38,6 +38,9 @@ export class RequestDao {
       skip: (dto.page - 1) * dto.limit,
       relations: ['user', 'transactions'],
       take: dto.limit,
+      order: {
+        createdAt: 'desc',
+      },
     });
     return {
       total: res[1],

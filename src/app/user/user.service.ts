@@ -45,7 +45,24 @@ export class UserService extends BaseService {
   }
 
   public async findAll(dto: UserFindDto) {
-    return await this.userDao.find(dto);
+    const res = await this.userDao.find(dto);
+    let { data, ...body } = res;
+    data = await Promise.all(
+      data.map(async (d) => {
+        const totalPrice = await this.transaction.getTotalPrice(
+          d.id,
+          dto.method ?? PaymentType.QPAY,
+        );
+        return {
+          ...d,
+          totalPrice,
+        };
+      }),
+    );
+    return {
+      data,
+      ...body,
+    };
   }
 
   public async updateUser(user: CreateUserDto, id: number) {

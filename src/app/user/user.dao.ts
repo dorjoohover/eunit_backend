@@ -39,6 +39,9 @@ export class UserDao {
       where: where,
       take: dto.limit,
       skip: (dto.page - 1) * dto.limit,
+      order: {
+        createdAt: 'DESC',
+      },
     });
     return {
       data: res[0],

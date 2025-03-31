@@ -33,6 +33,7 @@ export class UserController {
   @ApiQuery({ name: 'lastname' })
   @ApiQuery({ name: 'firstname' })
   @ApiQuery({ name: 'date' })
+  @ApiQuery({ name: 'method' })
   @Get()
   findAll(
     @Query('page') page: number,
@@ -42,6 +43,7 @@ export class UserController {
     @Query('lastname') lastname: string,
     @Query('firstname') firstname: string,
     @Query('createdAt') createdAt: string,
+    @Query('method') method: number,
   ) {
     return this.userService.findAll({
       page,
@@ -51,6 +53,7 @@ export class UserController {
       lastname,
       firstname,
       createdAt,
+      method,
     });
   }
 

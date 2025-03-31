@@ -47,6 +47,26 @@ export class TransactionDao {
     });
     return res;
   };
+  getTotalPrice = async (id?: number, method?: number) => {
+    const query = this.db
+      .createQueryBuilder('transaction')
+      .select('SUM(transaction.point)', 'totalPrice');
+
+    if (id !== undefined && id !== null && id !== 0) {
+      query.where('transaction."userId" = :id', { id });
+    }
+
+    if (method !== undefined && method !== null && method !== 0) {
+      query.andWhere('transaction."paymentType" = :method', { method });
+    }
+
+    query.groupBy('transaction."userId"');
+
+    const res = await query.getRawMany();
+    console.log(res);
+    return res;
+  };
+
   findAll = async () => {
     return await this.db.find({
       //   relations: [''],

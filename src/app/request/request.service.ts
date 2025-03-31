@@ -155,6 +155,7 @@ export class RequestService extends BaseService {
     const responses = [];
     const { data, ...body } = res;
     for (const r of data) {
+      console.log(r)
       responses.push({
         id: r.id,
         user: r.user,

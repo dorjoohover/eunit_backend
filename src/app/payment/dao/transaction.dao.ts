@@ -50,30 +50,35 @@ export class TransactionDao {
   };
 
   findAll = async (dto: RequetsFindDto, all: boolean) => {
-    const where = [];
-    console.log(dto, all)
-    if (dto.user) where.push({ user: { id: dto.user } });
-    if (!all) where.push({ point: MoreThan(0) });
-    if (dto.service) where.push({ request: { service: dto.service } });
-    if (dto.status) where.push({ request: { status: dto.status } });
-    if (dto.date) where.push({ createdAt: new Date(dto.date) });
-    if (dto.email) where.push({ user: { email: Like(`%${dto.email}%`) } });
-    if (dto.phone) where.push({ user: { phone: Like(`%${dto.phone}%`) } });
-    console.log(where)
-    const res = await this.db.findAndCount({
-      where: where,
+    const where: any = {}; // Use an object instead of an array
+
+    console.log(dto, all);
+
+    if (dto.user) where.user = { id: dto.user };
+    if (!all) where.point = MoreThan(0);
+    if (dto.service) where.request = { ...where.request, service: dto.service };
+    if (dto.status) where.request = { ...where.request, status: dto.status };
+    if (dto.date) where.createdAt = new Date(dto.date);
+    if (dto.email)
+      where.user = { ...where.user, email: Like(`%${dto.email}%`) };
+    if (dto.phone)
+      where.user = { ...where.user, phone: Like(`%${dto.phone}%`) };
+
+    console.log(where); // Debugging output
+
+    const [data, total] = await this.db.findAndCount({
+      where,
       skip: (dto.page - 1) * dto.limit,
-      relations: ['user', 'request'],
       take: dto.limit,
-      order: {
-        createdAt: 'desc',
-      },
+      relations: ['user', 'request'],
+      order: { createdAt: 'desc' },
     });
+
     return {
-      total: res[1],
-      data: res[0],
+      total,
+      data,
       currentPage: dto.page,
-      totalPage: Math.ceil(res[1] / dto.limit),
+      totalPage: Math.ceil(total / dto.limit),
     };
   };
 

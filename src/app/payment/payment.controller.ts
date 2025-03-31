@@ -45,6 +45,7 @@ export class PaymentController {
   }
 
   @Public()
+  @Get('transactions/:all')
   @ApiQuery({ name: 'page' })
   @ApiQuery({ name: 'limit' })
   @ApiQuery({ name: 'user' })
@@ -52,7 +53,7 @@ export class PaymentController {
   @ApiQuery({ name: 'email' })
   @ApiQuery({ name: 'service' })
   @ApiQuery({ name: 'date' })
-  @Get()
+  @ApiParam({ name: 'all' })
   findAll(
     @Query('page') page: number,
     @Query('limit') limit: number,
@@ -62,17 +63,21 @@ export class PaymentController {
     @Query('service') service: number,
     @Query('status') status: number,
     @Query('date') date: string,
+    @Param('all') all: boolean,
   ) {
-    return this.transactionService.findAll({
-      page,
-      limit,
-      status,
-      email,
-      phone,
-      user,
-      date,
-      service,
-    });
+    return this.transactionService.findAll(
+      {
+        page,
+        limit,
+        status,
+        email,
+        phone,
+        user,
+        date,
+        service,
+      },
+      all,
+    );
   }
 
   @Get('user/:limit/:page')

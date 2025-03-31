@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { DataSource, Like, Repository } from 'typeorm';
+import { DataSource, Like, MoreThan, Repository } from 'typeorm';
 import { TransactionEntity } from '../entities/transaction.entity';
 import { CreateTransactionDto } from '../dto/create-transaction.dto';
 import { RequetsFindDto } from 'src/app/request/dto/create-request.dto';
@@ -49,9 +49,10 @@ export class TransactionDao {
     return res;
   };
 
-  findAll = async (dto: RequetsFindDto) => {
+  findAll = async (dto: RequetsFindDto, all: boolean) => {
     const where = [];
     if (dto.user) where.push({ user: { id: dto.user } });
+    if (!all) where.push({ point: MoreThan(0) });
     if (dto.service) where.push({ request: { service: dto.service } });
     if (dto.status) where.push({ request: { status: dto.status } });
     if (dto.date) where.push({ createdAt: new Date(dto.date) });

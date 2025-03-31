@@ -37,6 +37,6 @@ export class UserFindDto {
   lastname?: string;
   firstname?: string;
   phone?: string;
-  createdAt?: string;
+  date?: string;
   method?: number
 }

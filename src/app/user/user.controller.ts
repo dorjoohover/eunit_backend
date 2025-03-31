@@ -42,7 +42,7 @@ export class UserController {
     @Query('phone') phone: string,
     @Query('lastname') lastname: string,
     @Query('firstname') firstname: string,
-    @Query('createdAt') createdAt: string,
+    @Query('date') date: string,
     @Query('method') method: number,
   ) {
     return this.userService.findAll({
@@ -52,7 +52,7 @@ export class UserController {
       phone,
       lastname,
       firstname,
-      createdAt,
+      date,
       method,
     });
   }

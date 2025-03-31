@@ -19,10 +19,10 @@ export class UserDao {
     if (dto.email) where.email = Like(`%${dto.email}%`);
 
     if (dto.phone) where.phone = Like(`%${dto.phone}%`);
-    if (dto.createdAt) {
-      const startDate = new Date(dto.createdAt);
+    if (dto.date) {
+      const startDate = new Date(dto.date);
       const endDate = new Date(startDate.setDate(startDate.getDate() + 1));
-      where.createdAt = Between(new Date(dto.createdAt), endDate);
+      where.createdAt = Between(new Date(dto.date), endDate);
     }
     const res = await this.db.findAndCount({
       where: where,

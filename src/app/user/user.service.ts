@@ -49,10 +49,7 @@ export class UserService extends BaseService {
     let { data, ...body } = res;
     data = await Promise.all(
       data.map(async (d) => {
-        const response = await this.transaction.getTotalPrice(
-          d.id,
-          dto.method ?? PaymentType.QPAY,
-        );
+        const response = await this.transaction.getTotalPrice(d.id, dto.method);
         const totalPrice = response?.[0]?.totalPrice ?? '0';
         return {
           ...d,

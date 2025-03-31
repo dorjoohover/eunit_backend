@@ -77,8 +77,8 @@ export class TransactionDao {
 
     if (dto.date) {
       const startDate = new Date(dto.date);
-      const endDate = new Date(startDate.setDate(startDate.getDate() + 1));
-      where.createdAt = Between(startDate, endDate);
+      const endDate = new Date(startDate.getDate() + 1);
+      where.createdAt = Between(new Date(dto.date), endDate);
     }
 
     if (dto.email) {

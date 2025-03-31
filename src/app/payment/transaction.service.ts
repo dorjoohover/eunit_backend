@@ -14,7 +14,7 @@ export class TransactionService extends BaseService {
   ) {
     super();
   }
-  async findAll(dto: RequetsFindDto, all: boolean) {
+  async findAll(dto: RequetsFindDto, all: number) {
     return await this.dao.findAll(dto, all);
   }
 

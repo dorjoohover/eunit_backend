@@ -63,7 +63,7 @@ export class PaymentController {
     @Query('service') service: number,
     @Query('status') status: number,
     @Query('date') date: string,
-    @Param('all') all: boolean,
+    @Param('all') all: number,
   ) {
     return this.transactionService.findAll(
       {

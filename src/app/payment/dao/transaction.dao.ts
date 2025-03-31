@@ -57,7 +57,7 @@ export class TransactionDao {
     return res;
   };
 
-  findAll = async (dto: RequetsFindDto, all: boolean) => {
+  findAll = async (dto: RequetsFindDto, all: number) => {
     const where: Record<string, any> = {}; // Ensure it's an object
 
     console.log('DTO Received:', dto);
@@ -94,7 +94,7 @@ export class TransactionDao {
     console.log('Final WHERE Object:', JSON.stringify(where, null, 2));
 
     const [data, total] = await this.db.findAndCount({
-      where: { ...where, point: LessThan(0) },
+      where: { ...where, point: all == 0 ? Not(IsNull()) : LessThan(0) },
       skip: (dto.page - 1) * dto.limit,
       take: dto.limit,
       relations: ['user', 'request'],

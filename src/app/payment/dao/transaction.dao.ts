@@ -58,6 +58,7 @@ export class TransactionDao {
     if (dto.date) where.push({ createdAt: new Date(dto.date) });
     if (dto.email) where.push({ user: { email: Like(`%${dto.email}%`) } });
     if (dto.phone) where.push({ user: { phone: Like(`%${dto.phone}%`) } });
+    console.log(where)
     const res = await this.db.findAndCount({
       where: where,
       skip: (dto.page - 1) * dto.limit,

@@ -51,6 +51,7 @@ export class TransactionDao {
 
   findAll = async (dto: RequetsFindDto, all: boolean) => {
     const where = [];
+    console.log(dto, all)
     if (dto.user) where.push({ user: { id: dto.user } });
     if (!all) where.push({ point: MoreThan(0) });
     if (dto.service) where.push({ request: { service: dto.service } });

@@ -50,21 +50,44 @@ export class TransactionDao {
   };
 
   findAll = async (dto: RequetsFindDto, all: boolean) => {
-    const where: any = {}; // Use an object instead of an array
+    const where: Record<string, any> = {}; // Ensure it's an object
 
-    console.log(dto, all);
+    console.log('DTO Received:', dto);
 
-    if (dto.user) where.user = { id: dto.user };
-    if (!all) where.point = MoreThan(0);
-    if (dto.service) where.request = { ...where.request, service: dto.service };
-    if (dto.status) where.request = { ...where.request, status: dto.status };
-    if (dto.date) where.createdAt = new Date(dto.date);
-    if (dto.email)
-      where.user = { ...where.user, email: Like(`%${dto.email}%`) };
-    if (dto.phone)
-      where.user = { ...where.user, phone: Like(`%${dto.phone}%`) };
+    if (dto.user) {
+      if (!where.user) where.user = {};
+      where.user.id = dto.user;
+    }
 
-    console.log(where); // Debugging output
+    if (!all) {
+      where.point = MoreThan(0);
+    }
+
+    if (dto.service) {
+      if (!where.request) where.request = {};
+      where.request.service = dto.service;
+    }
+
+    if (dto.status) {
+      if (!where.request) where.request = {};
+      where.request.status = dto.status;
+    }
+
+    if (dto.date) {
+      where.createdAt = new Date(dto.date);
+    }
+
+    if (dto.email) {
+      if (!where.user) where.user = {};
+      where.user.email = Like(`%${dto.email}%`);
+    }
+
+    if (dto.phone) {
+      if (!where.user) where.user = {};
+      where.user.phone = Like(`%${dto.phone}%`);
+    }
+
+    console.log('Final WHERE Object:', JSON.stringify(where, null, 2));
 
     const [data, total] = await this.db.findAndCount({
       where,

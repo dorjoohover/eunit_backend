@@ -38,6 +38,7 @@ export class TransactionService extends BaseService {
           ...dto,
           point: -dto.point,
           right: right,
+          request: dto.request,
           user: user.id,
         })
       ).id;

@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import {
+  Between,
   DataSource,
   IsNull,
   LessThan,
@@ -75,7 +76,10 @@ export class TransactionDao {
     }
 
     if (dto.date) {
-      where.createdAt = new Date(dto.date);
+      where.createdAt = Between(
+        new Date(dto.date).setUTCHours(0, 0, 0, 0) - 86400000, // Subtract 1 day
+        new Date(dto.date).setUTCHours(23, 59, 59, 999), // End of the given date
+      );
     }
 
     if (dto.email) {

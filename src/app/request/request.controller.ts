@@ -16,6 +16,7 @@ import { UpdateRequestDto } from './dto/update-request.dto';
 import { ApiBearerAuth, ApiParam, ApiQuery } from '@nestjs/swagger';
 import { Public } from 'src/auth/guards/jwt/auth-guard';
 import { Response } from 'express';
+import fs from 'fs';
 
 @Controller('request')
 export class RequestController {
@@ -52,13 +53,32 @@ export class RequestController {
   @Public()
   @Get('service/pdf/:id')
   @ApiParam({ name: 'id' })
-  async requestPdf(@Res() response: Response, @Param('id') id: string) {
-    const pdfDoc = await this.requestService.getPdf(+id);
+  async requestPdf(@Res() res: Response, @Param('id') id: string) {
+    // const role = user?.['role'];
+    let filePath: any;
+    try {
+      filePath = await this.requestService.getPdf(+id);
 
-    response.setHeader('Content-Type', 'application/pdf');
-    pdfDoc.info.Title = 'Report';
-    pdfDoc.pipe(response);
-    pdfDoc.end();
+      res.setHeader('Content-disposition', 'attachment; filename=output.pdf');
+      res.setHeader('Content-type', 'application/pdf');
+
+      res.sendFile(filePath, { root: process.cwd() }, (err) => {
+        if (err) {
+          console.error(err);
+        }
+        fs.unlinkSync(filePath);
+      });
+      // return res.redirect('https://hire.mn');
+    } catch (err) {
+      console.log('Error generating PDF:', err);
+      throw err;
+    }
+    // const pdfDoc = await this.requestService.getPdf(+id);
+
+    // response.setHeader('Content-Type', 'application/pdf');
+    // pdfDoc.info.Title = 'Report';
+    // pdfDoc.pipe(response);
+    // pdfDoc.end();
   }
 
   // user all count

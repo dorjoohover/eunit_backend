@@ -32,6 +32,7 @@ export class TransactionEntity {
   user: UserEntity;
   @ManyToOne(() => RequestEntity, (request) => request.transactions, {
     nullable: true,
+    eager: true,
   })
   request: RequestEntity;
   @ManyToOne(() => PaymentEntity, (payment) => payment.transactions, {

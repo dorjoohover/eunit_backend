@@ -12,6 +12,7 @@ import { TDocumentDefinitions } from 'pdfmake/interfaces';
 import { RequestReport } from './request.pdf';
 import { Formatter } from './formatter';
 import { QpayService } from '../payment/qpay.service';
+import { PdfService } from './pdf';
 const fonts = {
   Roboto: {
     normal: 'src/fonts/Roboto-Regular.ttf',
@@ -28,6 +29,7 @@ export class RequestService extends BaseService {
     private locationDao: LocationDao,
     private transactionService: TransactionService,
     private qpay: QpayService,
+    private pdfService: PdfService,
   ) {
     super();
   }
@@ -38,51 +40,55 @@ export class RequestService extends BaseService {
     return this.printer.createPdfKitDocument(docDefinition);
   }
 
-  async getPdf(id: number): Promise<PDFKit.PDFDocument> {
+  async getPdf(id: number) {
     const res = await this.findOne(id);
-    const docDefinition = RequestReport({
-      location: Formatter.location(
-        res.location.city,
-        res.location.district,
-        res.location.town,
-        res.location.khoroo,
-      ),
-      text: Formatter.text(
-        res.location.city,
-        res.location.district,
-        res.location.khoroo,
-        res.location.zipcode,
-        res.location.town,
-        Math.round(
-          (Number(res?.data.avg) || 0) *
-            (parseFloat(`${res?.data.area}` || '0') || 0),
-        ),
 
-        res.data.area,
-        res.data.room,
-        res.data.floor,
-        res.data.no,
-      ),
-      town: res.location.town,
-      type: 'Орон сууц',
-      user: {
-        email: res.user.email,
-        name: Formatter.userName(
-          res.user.name,
-          res.user.lastname,
-          res.user.firstname,
-        ),
-        phone: res.user.phone ?? '',
-      },
-      value: {
-        area: res.data.area,
-        avg: res.data.avg,
-        max: res.data.max,
-        min: res.data.min,
-      },
-    });
+    return await this.pdfService.createPdf(res);
 
-    return this.createPdf(docDefinition);
+    // const res = await this.findOne(id);
+    // const docDefinition = RequestReport({
+    //   location: Formatter.location(
+    //     res.location.city,
+    //     res.location.district,
+    //     res.location.town,
+    //     res.location.khoroo,
+    //   ),
+    //   text: Formatter.text(
+    //     res.location.city,
+    //     res.location.district,
+    //     res.location.khoroo,
+    //     res.location.zipcode,
+    //     res.location.town,
+    //     Math.round(
+    //       (Number(res?.data.avg) || 0) *
+    //         (parseFloat(`${res?.data.area}` || '0') || 0),
+    //     ),
+
+    //     res.data.area,
+    //     res.data.room,
+    //     res.data.floor,
+    //     res.data.no,
+    //   ),
+    //   town: res.location.town,
+    //   type: 'Орон сууц',
+    //   user: {
+    //     email: res.user.email,
+    //     name: Formatter.userName(
+    //       res.user.name,
+    //       res.user.lastname,
+    //       res.user.firstname,
+    //     ),
+    //     phone: res.user.phone ?? '',
+    //   },
+    //   value: {
+    //     area: res.data.area,
+    //     avg: res.data.avg,
+    //     max: res.data.max,
+    //     min: res.data.min,
+    //   },
+    // });
+
+    // return this.createPdf(docDefinition);
   }
   public async create(dto: CreateRequestDto, email: string, user: number) {
     try {

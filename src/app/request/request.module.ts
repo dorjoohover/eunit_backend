@@ -13,6 +13,8 @@ import { UserDao } from '../user/user.dao';
 import { ServiceDao } from 'src/data/ad/service.dao';
 import { QpayService } from '../payment/qpay.service';
 import { HttpModule, HttpService } from '@nestjs/axios';
+import { PdfService } from './pdf';
+import { RealstatePdf } from './pdf/realstate';
 
 @Module({
   imports: [HttpModule],
@@ -28,7 +30,9 @@ import { HttpModule, HttpService } from '@nestjs/axios';
     ServiceDao,
     UserService,
     UserDao,
+    PdfService,
     AppExcel,
+    RealstatePdf,
     QpayService,
   ],
 })

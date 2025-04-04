@@ -22,7 +22,7 @@ import { EmailModule } from './auth/guards/email.module';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: `.env.${process.env.NODE_ENV || 'development'}`,
+      // envFilePath: `.env.${process.env.NODE_ENV || 'development'}`,
     }),
     EmailModule,
     DatabaseModule,

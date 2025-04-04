@@ -46,6 +46,10 @@ export class RequestService extends BaseService {
     const res = await this.findOne(id);
 
     return await this.pdfService.createPdf(res);
+    // return {
+    //   data: pdf,
+    //   res,
+    // };
 
     // const res = await this.findOne(id);
     // const docDefinition = RequestReport({
@@ -115,7 +119,7 @@ export class RequestService extends BaseService {
           paymentType: dto.payment,
           user: email,
           message: 'Худалдан авалт хийсэн',
-          request: user
+          request: user,
         });
         await this.dao.updateStatus(res, PaymentStatus.SUCCESS);
         return {

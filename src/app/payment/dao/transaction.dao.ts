@@ -95,7 +95,7 @@ export class TransactionDao {
       where: { ...where, point: LessThan(0) },
       skip: (dto.page - 1) * dto.limit,
       take: dto.limit,
-      relations: ['user', 'request', 'request.location'],
+      relations: ['user', 'request'],
       order: { createdAt: 'desc' },
     });
 

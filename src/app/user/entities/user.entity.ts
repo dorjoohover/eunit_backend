@@ -56,6 +56,7 @@ export class UserEntity {
   payments?: PaymentEntity[];
   @OneToMany(() => RequestEntity, (request) => request.user, {
     nullable: true,
+    onDelete: 'CASCADE',
   })
   requests: RequestEntity[];
   @OneToMany(() => TransactionEntity, (transaction) => transaction.user, {

@@ -54,8 +54,10 @@ export function formatPhoneNumber(phone: string) {
 
 // console.log(formatPhoneNumber('+97688992864')); // Output: "+976 8899-2864"
 
-export const money = (value: string, currency = '') => {
-  return `${currency}${value
+export const money = (value: string, currency = '', round = 1) => {
+  let v = Math.round(+value / round) * round;
+  return `${currency}${v
+    .toString()
     .replaceAll(',', '')
     .toString()
     .replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`;

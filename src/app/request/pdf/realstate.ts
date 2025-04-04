@@ -165,7 +165,7 @@ export class RealstatePdf {
         continued: true,
       })
       .font(font.normal)
-      .text(`₮${money(`${dto.data.avg * dto.data.area}`)}`);
+      .text(`${money(`${dto.data.avg * dto.data.area}`, '₮', 100000)}`);
     doc.y += 15;
     doc.x = marginX;
     doc.fontSize(fz.sm).font(font.bold).text('Тайлбар');
@@ -175,7 +175,7 @@ export class RealstatePdf {
       .fontSize(fz.xs)
       .font(font.thin)
       .text(
-        `Иргэн ${lastname ?? ''} ${dto.user.firstname ?? (dto.user.phone && formatPhoneNumber(dto.user.phone)) } таны ${dto.location.city} хот, ${dto.location.district} дүүрэг, ${dto.location.khoroo}-р хороо, ${dto.location.zipcode}, ${dto.location.town} хотхон, ${dto.data.area}м.кв орон сууцны өнөөгийн зах зээлийн үнэ ${money(`${dto.data.area * dto.data.avg}`)} төгрөг орчим үнэтэй байна. Энэхүү тооцоолол нь өгөгдөлд суурилж тооцоолсон бөгөөд ±5%-ийн хооронд хэлбэлзэх боломжтой.`,
+        `Иргэн ${lastname ?? ''} ${dto.user.firstname ?? (dto.user.phone && formatPhoneNumber(dto.user.phone))} таны ${dto.location.city} хот, ${dto.location.district} дүүрэг, ${dto.location.khoroo}-р хороо, ${dto.location.zipcode}, ${dto.location.town} хотхон, ${dto.data.area}м.кв орон сууцны өнөөгийн зах зээлийн үнэ ${money(`${dto.data.area * dto.data.avg}`, '', 100000)} төгрөг орчим үнэтэй байна. Энэхүү тооцоолол нь өгөгдөлд суурилж тооцоолсон бөгөөд ±5%-ийн хооронд хэлбэлзэх боломжтой.`,
       );
 
     const date = new Date(dto.data.createdAt);

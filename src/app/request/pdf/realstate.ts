@@ -140,15 +140,19 @@ export class RealstatePdf {
         continued: true,
       })
       .font(font.normal)
+      .fillColor(colors.blue)
       .text(`₮${money(dto.data.min.toString())}`, { continued: true })
       .font(font.thin)
+      .fillColor(colors.black)
       .text(`-оос `, {
         continued: true,
       })
       .font(font.normal)
+      .fillColor(colors.blue)
       .text(`₮${money(dto.data.max.toString())}`, {
         continued: true,
       })
+      .fillColor(colors.black)
       .font(font.thin)
       .text(` хооронд`);
     doc.y += 10;
@@ -157,21 +161,25 @@ export class RealstatePdf {
         continued: true,
       })
       .font(font.normal)
+      .fillColor(colors.blue)
       .text(`₮${money(dto.data.avg.toString())}`);
     doc.y += 10;
     doc
+      .fillColor(colors.black)
       .font(font.thin)
       .text(`Таны ${dto.data.area} м.кв орон сууцны нийт үнэ:`, {
         continued: true,
       })
       .font(font.normal)
+      .fillColor(colors.blue)
       .text(`${money(`${dto.data.avg * dto.data.area}`, '₮', 100000)}`);
     doc.y += 15;
     doc.x = marginX;
-    doc.fontSize(fz.sm).font(font.bold).text('Тайлбар');
+    doc.fontSize(fz.sm).fillColor(colors.black).font(font.bold).text('Тайлбар');
     doc.y += 10;
     doc.x += 20;
     doc
+
       .fontSize(fz.xs)
       .font(font.thin)
       .text(

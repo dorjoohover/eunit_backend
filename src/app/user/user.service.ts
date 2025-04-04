@@ -33,7 +33,7 @@ export class UserService extends BaseService {
     await this.userDao.updateUser(
       {
         ...user,
-        wallet: dto.wallet,
+        wallet: +user.wallet + +dto.wallet,
       },
       user.id,
     );

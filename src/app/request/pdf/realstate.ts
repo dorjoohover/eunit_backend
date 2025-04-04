@@ -54,7 +54,7 @@ export class RealstatePdf {
     doc
       .fillColor(colors.black)
       .fontSize(fz.md)
-      .text('ББСБ-Д ЗОРИУЛСАН ХӨРӨНГИЙН ҮНЭЛГЭЭ', {
+      .text('Зах зээлийн үнэ цэний лавлагаа'.toUpperCase(), {
         align: 'center',
       });
     doc.y += 30;
@@ -86,17 +86,21 @@ export class RealstatePdf {
           underline: false,
         })
         .font(font.normal)
-        .text(`${dto.user.email}  `, {
+        .text(`${dto.user.email}`, {
           underline: true,
           continued: true,
+        })
+        .text('  ', {
+          continued: true,
+          underline: false,
         });
+
     if (dto.user?.phone)
       doc
         .font(font.thin)
         .fontSize(fz.xs)
         .text(`Утасны дугаар: `, {
           continued: true,
-          underline: false,
         })
         .font(font.normal)
         .text(`${formatPhoneNumber(dto.user.phone)}`, {
@@ -178,7 +182,7 @@ export class RealstatePdf {
     const dateHeight = doc.heightOfString(d);
 
     const footer =
-      'Энэхүү лавлагаа нь 30 хоногийн хугацаанд хүчинтэй бөгөөд зөвхөн ББСБ-н хөрөнгө барьцаалан зээл олгох хэрэгцээнд зориулагдсан.  Лавлагааг  ямар нэгэн байдлаар олшруулахыг хориглоно.';
+      'Энэхүү лавлагаа нь 7 хоногийн хугацаанд хүчинтэй бөгөөд ямар нэгэн байдлаар олшруулахыг хориглоно.';
 
     const footerHeight = doc.heightOfString(footer);
     const copy = '©2025 www.eunit.mn. Бүх эрх хуулиар хамгаалагдсан.';

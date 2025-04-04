@@ -16,10 +16,15 @@ import { DatabaseModule } from './database/database.module';
 import { RequestModule } from './app/request/request.module';
 import { AppExcel } from './common/app.excel';
 import { AuthGuard } from './auth/guards/jwt/auth-guard';
+import { EmailModule } from './auth/guards/email.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({}),
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: `.env.${process.env.NODE_ENV || 'development'}`,
+    }),
+    EmailModule,
     DatabaseModule,
     UserModule,
     AuthModule,

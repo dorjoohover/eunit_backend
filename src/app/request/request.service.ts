@@ -13,6 +13,7 @@ import { RequestReport } from './request.pdf';
 import { Formatter } from './formatter';
 import { QpayService } from '../payment/qpay.service';
 import { PdfService } from './pdf';
+import { MailerService } from '@nestjs-modules/mailer';
 const fonts = {
   Roboto: {
     normal: 'src/fonts/Roboto-Regular.ttf',
@@ -30,6 +31,7 @@ export class RequestService extends BaseService {
     private transactionService: TransactionService,
     private qpay: QpayService,
     private pdfService: PdfService,
+    private mailService: MailerService,
   ) {
     super();
   }
@@ -136,6 +138,26 @@ export class RequestService extends BaseService {
         message: error.message,
         status: error.status,
       };
+    }
+  }
+
+  public async sendPdf(id: number, email: string) {
+    try {
+      await this.mailService
+        .sendMail({
+          to: email,
+          subject: 'Тайлан хүлээн авах',
+          html: `<div>
+      <p>Та тайлангаа <a href=https://srv666826.hstgr.cloud/api/v1/request/service/pdf/${id}>эндээс</a> татаж авна уу.</p>
+      <p>Тайлан pdf хэлбэрээр татагдах болно.</p>
+       <p>Асууж, тодруулах зүйл байвал <a href=mailto:info@eunit.mn>info@eunit.mn</a> хаягаар, <a href=tel:976-9599 2333>976-9599 2333</a> дугаараар холбогдоорой. </p>
+       <p>Манайхаар үйлчлүүлж байгаад тань баярлалаа.</p>
+       <p>Шуудангийн хаяг: Улаанбаатар хот, Сүхбаатар дүүрэг, 1-р хороо Энхтайвны өргөн чөлөө, UBH center, 12-р давхар, 1225 тоот, 14210, Ш/Н: Улаанбаатар</p>
+       </div>`,
+        })
+        .catch((err) => console.log(err));
+    } catch (error) {
+      console.log(error);
     }
   }
   public async checkPayment(id: number, code: string, user: string) {

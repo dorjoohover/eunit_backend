@@ -15,6 +15,7 @@ import { QpayService } from '../payment/qpay.service';
 import { HttpModule, HttpService } from '@nestjs/axios';
 import { PdfService } from './pdf';
 import { RealstatePdf } from './pdf/realstate';
+import { MailerService } from '@nestjs-modules/mailer';
 
 @Module({
   imports: [HttpModule],
@@ -34,6 +35,7 @@ import { RealstatePdf } from './pdf/realstate';
     AppExcel,
     RealstatePdf,
     QpayService,
+    // MailerService,
   ],
 })
 export class RequestModule {}

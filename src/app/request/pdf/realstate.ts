@@ -183,7 +183,15 @@ export class RealstatePdf {
       .fontSize(fz.xs)
       .font(font.thin)
       .text(
-        `Иргэн ${lastname ?? ''} ${dto.user.firstname ?? (dto.user.phone && formatPhoneNumber(dto.user.phone))} таны ${dto.location.city} хот, ${dto.location.district} дүүрэг, ${dto.location.khoroo}-р хороо, ${dto.location.zipcode}, ${dto.location.town} хотхон, ${dto.data.area}м.кв орон сууцны өнөөгийн зах зээлийн үнэ ${money(`${dto.data.area * dto.data.avg}`, '', 100000)} төгрөг орчим үнэтэй байна. Энэхүү тооцоолол нь өгөгдөлд суурилж тооцоолсон бөгөөд ±5%-ийн хооронд хэлбэлзэх боломжтой.`,
+        `Иргэн ${lastname ?? ''} ${dto.user.firstname ?? (dto.user.phone && formatPhoneNumber(dto.user.phone))} таны ${dto.location.city} хот, ${dto.location.district} дүүрэг, ${dto.location.khoroo}-р хороо, ${dto.location.zipcode}, ${dto.location.town} хотхон, ${dto.data.area}м.кв орон сууцны өнөөгийн зах зээлийн үнэ `,
+      )
+      .font(font.bold)
+      .fillColor(colors.blue)
+      .text(`${money(`${dto.data.area * dto.data.avg}`, '', 100000)} төгрөг`)
+      .font(font.thin)
+      .fillColor(colors.black)
+      .text(
+        ` орчим үнэтэй байна. Энэхүү тооцоолол нь өгөгдөлд суурилж тооцоолсон бөгөөд ±5%-ийн хооронд хэлбэлзэх боломжтой.`,
       );
 
     const date = new Date(dto.data.createdAt);

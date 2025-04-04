@@ -59,7 +59,7 @@ export class RequestController {
     try {
       filePath = await this.requestService.getPdf(+id);
 
-      res.setHeader('Content-disposition', 'attachment; filename=output.pdf');
+      res.setHeader('Content-disposition', 'attachment; filename=Тайлан.pdf');
       res.setHeader('Content-type', 'application/pdf');
 
       res.sendFile(filePath, { root: process.cwd() }, (err) => {

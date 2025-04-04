@@ -184,10 +184,15 @@ export class RealstatePdf {
       .font(font.thin)
       .text(
         `Иргэн ${lastname ?? ''} ${dto.user.firstname ?? (dto.user.phone && formatPhoneNumber(dto.user.phone))} таны ${dto.location.city} хот, ${dto.location.district} дүүрэг, ${dto.location.khoroo}-р хороо, ${dto.location.zipcode}, ${dto.location.town} хотхон, ${dto.data.area}м.кв орон сууцны өнөөгийн зах зээлийн үнэ `,
+        {
+          continued: true,
+        },
       )
       .font(font.bold)
       .fillColor(colors.blue)
-      .text(`${money(`${dto.data.area * dto.data.avg}`, '', 100000)} төгрөг`)
+      .text(`${money(`${dto.data.area * dto.data.avg}`, '', 100000)} төгрөг`, {
+        continued: true,
+      })
       .font(font.thin)
       .fillColor(colors.black)
       .text(

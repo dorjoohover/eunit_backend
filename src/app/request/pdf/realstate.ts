@@ -139,7 +139,7 @@ export class RealstatePdf {
       .text('Таны сонгосон хотхоны м.кв үнэ цэн:', {
         continued: true,
       })
-      .font(font.normal)
+      .font(font.bold)
       .fillColor(colors.blue)
       .text(`₮${money(dto.data.min.toString())}`, { continued: true })
       .font(font.thin)
@@ -147,7 +147,7 @@ export class RealstatePdf {
       .text(`-оос `, {
         continued: true,
       })
-      .font(font.normal)
+      .font(font.bold)
       .fillColor(colors.blue)
       .text(`₮${money(dto.data.max.toString())}`, {
         continued: true,
@@ -160,7 +160,7 @@ export class RealstatePdf {
       .text('Таны сонгосон сууцны м.кв тохиромжит үнэ:', {
         continued: true,
       })
-      .font(font.normal)
+      .font(font.bold)
       .fillColor(colors.blue)
       .text(`₮${money(dto.data.avg.toString())}`);
     doc.y += 10;
@@ -170,7 +170,7 @@ export class RealstatePdf {
       .text(`Таны ${dto.data.area} м.кв орон сууцны нийт үнэ:`, {
         continued: true,
       })
-      .font(font.normal)
+      .font(font.bold)
       .fillColor(colors.blue)
       .text(`${money(`${dto.data.avg * dto.data.area}`, '₮', 100000)}`);
     doc.y += 15;

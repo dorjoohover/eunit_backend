@@ -115,6 +115,7 @@ export class RequestService extends BaseService {
           paymentType: dto.payment,
           user: email,
           message: 'Худалдан авалт хийсэн',
+          request: user
         });
         await this.dao.updateStatus(res, PaymentStatus.SUCCESS);
         return {

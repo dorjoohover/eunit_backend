@@ -37,7 +37,9 @@ export class RequestEntity {
   payment: number;
   @Column({ nullable: true })
   code: string;
-  @ManyToOne(() => UserEntity, (user) => user.requests)
+  @ManyToOne(() => UserEntity, (user) => user.requests, {
+    onDelete: 'CASCADE',
+  })
   user: UserEntity;
   @ManyToOne(() => LocationEntity, (location) => location.request)
   location: LocationEntity;

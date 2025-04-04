@@ -52,7 +52,7 @@ export function formatPhoneNumber(phone: string) {
   return `+976 ${digits.slice(0, 4)}-${digits.slice(4)}`;
 }
 
-console.log(formatPhoneNumber('+97688992864')); // Output: "+976 8899-2864"
+// console.log(formatPhoneNumber('+97688992864')); // Output: "+976 8899-2864"
 
 export const money = (value: string, currency = '') => {
   return `${currency}${value

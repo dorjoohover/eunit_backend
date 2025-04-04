@@ -73,7 +73,7 @@ export class RealstatePdf {
         })
         .font(font.normal)
         .text(
-          `${lastname}${dto.user?.firstname && firstLetterUpper(dto.user?.firstname)}  `,
+          `${lastname} ${dto.user?.firstname && firstLetterUpper(dto.user?.firstname)}  `,
           {
             continued: true,
             underline: true,

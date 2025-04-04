@@ -28,6 +28,8 @@ export class WalletUserDto {
   email: string;
   @ApiProperty()
   wallet: number;
+  @ApiProperty()
+  message: string;
 }
 
 export class UserFindDto {
@@ -38,5 +40,5 @@ export class UserFindDto {
   firstname?: string;
   phone?: string;
   date?: string;
-  method?: number
+  method?: number;
 }

@@ -40,7 +40,7 @@ export class UserService extends BaseService {
     return await this.transaction.create({
       point: dto.wallet,
       user: id,
-      message: 'Test',
+      message: dto.message ?? 'Test',
     });
   }
 

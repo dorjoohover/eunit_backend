@@ -44,7 +44,7 @@ export class TransactionService extends BaseService {
       ).id;
     }
     const remitterPoint = user.wallet + dto.point;
-    let success = remitterPoint > 0;
+    let success = remitterPoint >= 0;
 
     if (!success || right) {
       throw new HttpException(

@@ -74,12 +74,13 @@ export class RealstatePdf {
         })
         .font(font.normal)
         .text(
-          `${lastname} ${dto.user?.firstname && firstLetterUpper(dto.user?.firstname)}  `,
+          `${lastname}${dto.user?.firstname ? ` ${firstLetterUpper(dto.user?.firstname)}` : ''}`,
           {
             continued: true,
             underline: true,
           },
-        );
+        )
+        .text(' ', { underline: false, continued: true });
     }
     if (dto.user?.email)
       doc
@@ -110,15 +111,15 @@ export class RealstatePdf {
         .text(`${formatPhoneNumber(dto.user.phone)}`, {
           underline: true,
         });
-    doc.y += 10;
+    doc.text('', { continued: false, underline: false });
+    doc.y += dto.user?.phone ? 10 : 20;
     let x = doc.x;
     doc.image(assetPath('icons/apartment'), x, doc.y, {
       width: 15,
       height: 15,
     });
-    doc.text('Орон сууц', x + 18, doc.y, {
-      underline: false,
-    });
+    doc.text('Орон сууц', x + 18, doc.y);
+
     doc.y += 10;
     doc.image(assetPath('icons/location'), x, doc.y, {
       width: 15,

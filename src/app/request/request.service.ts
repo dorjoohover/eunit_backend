@@ -100,7 +100,7 @@ export class RequestService extends BaseService {
     try {
       const point =
         dto.service == ServiceType.REVIEW
-          ? 10
+          ? 2000
           : dto.service == ServiceType.DATA
             ? dto.count * 100
             : 20000;

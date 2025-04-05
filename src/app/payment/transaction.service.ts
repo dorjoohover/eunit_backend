@@ -26,23 +26,22 @@ export class TransactionService extends BaseService {
       const user = await this.userService.getUser(dto.user as string);
       const date = new Date();
       const right = user.endDate > date;
-
       if (dto.paymentType == PaymentType.QPAY) {
-        await this.create({
+        await this.dao.create({
           point: dto.point * 0.1,
           user: dto.user,
           paymentType: PaymentType.LOYALTY,
           message: 'Худалдан авалтын урамшуулал',
         });
-        return (
-          await this.dao.create({
-            ...dto,
-            point: -dto.point,
-            right: right,
-            request: dto.request,
-            user: user.id,
-          })
-        ).id;
+
+        const transaction = await this.dao.create({
+          ...dto,
+          point: -dto.point,
+          right: right,
+          request: dto.request,
+          user: user.id,
+        });
+        return transaction.id;
       }
       const remitterPoint = user.wallet + dto.point;
       let success = remitterPoint >= 0;

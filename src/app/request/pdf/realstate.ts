@@ -10,6 +10,7 @@ import {
   marginX,
   money,
   PdfType,
+  reportDescription,
 } from './formatter';
 
 @Injectable()
@@ -183,7 +184,22 @@ export class RealstatePdf {
       .fontSize(fz.xs)
       .font(font.thin)
       .text(
-        `Иргэн ${lastname ?? ''} ${dto.user.firstname ?? (dto.user.phone && formatPhoneNumber(dto.user.phone))} таны ${dto.location.city} хот, ${dto.location.district} дүүрэг, ${dto.location.khoroo}-р хороо, ${dto.location.zipcode}, ${dto.location.town} хотхон, ${dto.data.area}м.кв орон сууцны өнөөгийн зах зээлийн үнэ `,
+        reportDescription(
+          `${dto.user?.lastname ?? ''} ${
+            dto.user?.firstname ??
+            (dto.user?.phone
+              ? formatPhoneNumber(dto.user?.phone)
+              : (dto.user?.email ?? ''))
+          }`,
+          dto.data.area,
+          dto.data.avg,
+          dto.location,
+          {
+            floor: dto.data.floor,
+            no: dto.data.no,
+            room: dto.data.room,
+          },
+        ),
         {
           continued: true,
         },

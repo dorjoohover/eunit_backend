@@ -128,7 +128,7 @@ export class RequestService extends BaseService {
           data: transaction,
         };
       }
-
+      console.log(dto);
       if (dto.payment == PaymentType.QPAY) {
         const qpay = await this.qpay.createPayment(point, res.toString(), user);
         await this.dao.updateCode(res, qpay.invoice_id);
@@ -168,9 +168,11 @@ export class RequestService extends BaseService {
   }
   public async checkPayment(id: number, code: string, user: string) {
     const payment = await this.qpay.checkPayment(code);
+
     if (payment.paid_amount) {
       await this.dao.updateStatus(id, PaymentStatus.SUCCESS);
       const transaction = await this.transactionService.findOneByRequest(id);
+      console.log(transaction);
       if (!transaction) {
         await this.transactionService.create({
           paymentType: PaymentType.QPAY,

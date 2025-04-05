@@ -121,6 +121,7 @@ export class RequestService extends BaseService {
           message: 'Худалдан авалт хийсэн',
           request: user,
         });
+        console.log(dto.payment, email, user, transaction);
         await this.dao.updateStatus(res, PaymentStatus.SUCCESS);
         return {
           res,
@@ -178,6 +179,7 @@ export class RequestService extends BaseService {
           request: id,
           message: 'Худалдан авалт хийсэн.',
         });
+      console.log(payment.paid_amount, user, id, transaction.paymentType);
       return true;
     }
     return false;

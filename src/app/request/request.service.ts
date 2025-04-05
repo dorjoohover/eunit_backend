@@ -100,7 +100,7 @@ export class RequestService extends BaseService {
     try {
       const point =
         dto.service == ServiceType.REVIEW
-          ? 2000
+          ? 10
           : dto.service == ServiceType.DATA
             ? dto.count * 100
             : 20000;
@@ -121,14 +121,12 @@ export class RequestService extends BaseService {
           message: 'Худалдан авалт хийсэн',
           request: user,
         });
-        console.log(dto.payment, email, user, transaction);
         await this.dao.updateStatus(res, PaymentStatus.SUCCESS);
         return {
           res,
           data: transaction,
         };
       }
-      console.log(dto);
       if (dto.payment == PaymentType.QPAY) {
         const qpay = await this.qpay.createPayment(point, res.toString(), user);
         await this.dao.updateCode(res, qpay.invoice_id);
@@ -172,8 +170,7 @@ export class RequestService extends BaseService {
     if (payment.paid_amount) {
       await this.dao.updateStatus(id, PaymentStatus.SUCCESS);
       const transaction = await this.transactionService.findOneByRequest(id);
-      console.log(transaction);
-      if (!transaction) {
+      if (transaction == null) {
         await this.transactionService.create({
           paymentType: PaymentType.QPAY,
           point: payment.paid_amount,

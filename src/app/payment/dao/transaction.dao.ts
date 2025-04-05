@@ -59,45 +59,50 @@ export class TransactionDao {
   };
 
   findAll = async (dto: RequetsFindDto, all: number) => {
-    const where: Record<string, any> = {}; // Ensure it's an object
+    const query = this.db
+      .createQueryBuilder('point')
+      .leftJoinAndSelect('point.user', 'user')
+      .leftJoinAndSelect('point.request', 'request')
+      .where('point.point < :pointLimit', { pointLimit: 0 });
 
     if (dto.payment) {
-      where.paymentType = dto.payment;
+      query.andWhere('point.paymentType = :paymentType', {
+        paymentType: dto.payment,
+      });
     }
 
     if (dto.service) {
-      if (!where.request) where.request = {};
-      where.request.service = dto.service;
+      query.andWhere('request.service = :service', { service: dto.service });
     }
 
     if (dto.status) {
-      if (!where.request) where.request = {};
-      where.request.status = dto.status;
+      query.andWhere('request.status = :status', { status: dto.status });
     }
 
     if (dto.date) {
       const startDate = new Date(dto.date);
-      const endDate = new Date(startDate.setDate(startDate.getDate() + 1));
-      where.createdAt = Between(new Date(dto.date), endDate);
+      const endDate = new Date(startDate);
+      endDate.setDate(startDate.getDate() + 1);
+
+      query.andWhere('point.createdAt BETWEEN :startDate AND :endDate', {
+        startDate,
+        endDate,
+      });
     }
 
     if (dto.email) {
-      if (!where.user) where.user = {};
-      where.user.email = Like(`%${dto.email}%`);
+      query.andWhere('user.email LIKE :email', { email: `%${dto.email}%` });
     }
 
     if (dto.phone) {
-      if (!where.user) where.user = {};
-      where.user.phone = Like(`%${dto.phone}%`);
+      query.andWhere('user.phone LIKE :phone', { phone: `%${dto.phone}%` });
     }
 
-    const [data, total] = await this.db.findAndCount({
-      where: { ...where, point: LessThan(0) },
-      skip: (dto.page - 1) * dto.limit,
-      take: dto.limit,
-      relations: ['user', 'request'],
-      order: { createdAt: 'desc' },
-    });
+    const [data, total] = await query
+      .orderBy('point.createdAt', 'DESC')
+      .skip((dto.page - 1) * dto.limit)
+      .take(dto.limit)
+      .getManyAndCount();
 
     return {
       total,

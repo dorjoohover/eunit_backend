@@ -75,7 +75,6 @@ export class QpayService {
         },
       ),
     );
-    console.log(response.data);
     return response.data;
   }
 }

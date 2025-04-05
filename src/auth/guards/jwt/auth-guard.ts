@@ -30,6 +30,7 @@ export class AuthGuard implements CanActivate {
     if (!authHeader) return false;
 
     const token = authHeader.split(' ')[1];
+    console.log(token);
     try {
       const res = await this.service.verifyToken(token);
       if (!res.registered) {
@@ -40,6 +41,7 @@ export class AuthGuard implements CanActivate {
     } catch (error) {
       console.log(error);
       if (error.code == 'auth/id-token-expired') {
+        // return true
         throw new HttpException('expired', HttpStatus.UNAUTHORIZED);
       }
       return false;

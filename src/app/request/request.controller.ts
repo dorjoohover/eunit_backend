@@ -48,7 +48,7 @@ export class RequestController {
     @Param('code') code: string,
     @Request() { user },
   ) {
-    return this.requestService.checkPayment(+id, code, user['phone']);
+    return this.requestService.checkPayment(+id, code, user['id']);
   }
   @Public()
   @Get('service/pdf/:id')

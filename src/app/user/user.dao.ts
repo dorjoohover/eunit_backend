@@ -102,6 +102,12 @@ export class UserDao {
           email: phone,
         },
       });
+    if (!res)
+      res = await this.db.findOne({
+        where: {
+          id: +phone,
+        },
+      });
     return res;
   };
 

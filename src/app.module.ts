@@ -17,6 +17,7 @@ import { RequestModule } from './app/request/request.module';
 import { AppExcel } from './common/app.excel';
 import { AuthGuard } from './auth/guards/jwt/auth-guard';
 import { EmailModule } from './auth/guards/email.module';
+import { QpayModule } from './app/qpay/qpay.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { EmailModule } from './auth/guards/email.module';
       isGlobal: true,
       // envFilePath: `.env.${process.env.NODE_ENV || 'development'}`,
     }),
+    QpayModule,
     EmailModule,
     DatabaseModule,
     UserModule,

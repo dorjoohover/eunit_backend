@@ -30,7 +30,6 @@ export class AuthGuard implements CanActivate {
     if (!authHeader) return false;
 
     const token = authHeader.split(' ')[1];
-    console.log(token);
     try {
       const res = await this.service.verifyToken(token);
       if (!res.registered) {

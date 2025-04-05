@@ -20,7 +20,7 @@ export class UserService extends BaseService {
   public async create(dto: CreateUserDto) {
     const user = await this.userDao.add(dto);
     await this.transaction.create({
-      point: 3000,
+      point: 2000,
       user: user.id,
       message: 'Шинэ хэрэглэгчийн урамшуулал',
       paymentType: PaymentType.LOYALTY,

@@ -166,19 +166,19 @@ export class RequestService extends BaseService {
   public async checkPayment(id: number, code: string, user: string) {
     const payment = await this.qpay.checkPayment(code);
 
+    console.log(payment);
     if (payment.paid_amount) {
       await this.dao.updateStatus(id, PaymentStatus.SUCCESS);
       const transaction = await this.transactionService.findOneByRequest(id);
-      console.log(transaction)
       if (transaction == null) {
-        await this.transactionService.create({
+        const res = await this.transactionService.create({
           paymentType: PaymentType.QPAY,
           point: payment.paid_amount,
           user: user,
           request: id,
           message: 'Худалдан авалт хийсэн.',
         });
-        console.log(payment.paid_amount, user, id, transaction.paymentType);
+        console.log(payment.paid_amount, user, id, res);
       }
       return true;
     }

@@ -23,7 +23,9 @@ export class TransactionService extends BaseService {
   }
   public async create(dto: CreateTransactionDto) {
     try {
+      console.log(dto);
       const user = await this.userService.getUser(dto.user as string);
+      console.log(user)
       const date = new Date();
       const right = user.endDate > date;
       if (dto.paymentType == PaymentType.QPAY) {
@@ -41,6 +43,7 @@ export class TransactionService extends BaseService {
           request: dto.request,
           user: user.id,
         });
+        console.log(transaction)
         return transaction.id;
       }
       const remitterPoint = user.wallet + dto.point;

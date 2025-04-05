@@ -9,7 +9,6 @@ import { AdService } from 'src/data/ad/ad.service';
 import { LocationDao } from 'src/data/location/location.dao';
 import PdfPrinter from 'pdfmake';
 import { TDocumentDefinitions } from 'pdfmake/interfaces';
-import { RequestReport } from './request.pdf';
 import { Formatter } from './formatter';
 import { QpayService } from '../payment/qpay.service';
 import { PdfService } from './pdf';
@@ -170,6 +169,7 @@ export class RequestService extends BaseService {
     if (payment.paid_amount) {
       await this.dao.updateStatus(id, PaymentStatus.SUCCESS);
       const transaction = await this.transactionService.findOneByRequest(id);
+      console.log(transaction)
       if (transaction == null) {
         await this.transactionService.create({
           paymentType: PaymentType.QPAY,

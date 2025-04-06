@@ -31,6 +31,7 @@ export class TransactionService extends BaseService {
           point: dto.point * 0.1,
           user: dto.user,
           paymentType: PaymentType.LOYALTY,
+          request: dto.request,
           message: 'Худалдан авалтын урамшуулал',
         });
 

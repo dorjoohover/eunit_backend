@@ -73,7 +73,6 @@ export class UserService extends BaseService {
   }
   async getUser(phone: string) {
     let res = await this.userDao.getByEmail(phone);
-    console.log(res)
     return res;
   }
 

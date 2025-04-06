@@ -23,6 +23,7 @@ export class TransactionService extends BaseService {
   }
   public async create(dto: CreateTransactionDto) {
     try {
+      console.log(dto);
       const user = await this.userService.getUser(dto.user as string);
       const date = new Date();
       const right = user.endDate > date;

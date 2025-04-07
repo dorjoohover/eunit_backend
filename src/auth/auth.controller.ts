@@ -30,7 +30,10 @@ export class AuthController {
         HttpStatus.CONFLICT,
       );
     }
-    const res = await this.service.register(dto, user['phone']);
+    const res = await this.service.register(
+      dto,
+      user['phone'] ?? user['email'],
+    );
     return res;
   }
 }

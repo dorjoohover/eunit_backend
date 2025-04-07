@@ -188,9 +188,11 @@ export class RealstatePdf {
         reportDescription(
           `${dto.user?.lastname ?? ''} ${
             dto.user?.firstname ??
-            (dto.user?.phone
-              ? formatPhoneNumber(dto.user?.phone)
-              : (dto.user?.email ?? ''))
+            (dto?.user?.lastname == null
+              ? dto.user?.phone
+                ? formatPhoneNumber(dto.user?.phone)
+                : (dto.user?.email ?? '')
+              : '')
           }`,
           dto.data.area,
           dto.data.avg,

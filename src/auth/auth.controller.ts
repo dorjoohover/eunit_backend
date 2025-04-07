@@ -21,12 +21,15 @@ export class AuthController {
   async phoneLogin(@Request() { user }) {
     if (!user.registered) {
       console.log(user['phone'] ?? user['email'], user['email']);
-      await this.service.register({
-        email: user['email'] ?? null,
-        phone: user['phone'] ?? null,
-        lastname: user['name'] ?? null,
-        firstname: null,
-      });
+      await this.service.register(
+        {
+          email: user['email'] ?? null,
+          phone: user['phone'] ?? null,
+          lastname: user['name'] ?? null,
+          firstname: null,
+        },
+        user['phone'] ?? user['email'],
+      );
     }
     return user;
   }
@@ -40,12 +43,10 @@ export class AuthController {
     //   );
     // }
     console.log(user['phone'] ?? user['email'], user['email']);
-    const res = await this.service.register({
-      email: user['email'] ?? dto.email ?? null,
-      phone: user['phone'] ?? dto.phone ?? null,
-      lastname: user['name'] ?? dto.lastname ?? null,
-      firstname: dto.firstname ?? null,
-    });
+    const res = await this.service.register(
+      dto,
+      user['phone'] ?? user['email'],
+    );
     return res;
   }
 }

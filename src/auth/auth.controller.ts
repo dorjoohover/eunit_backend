@@ -28,7 +28,8 @@ export class AuthController {
           lastname: user['name'] ?? null,
           firstname: null,
         },
-        user['phone'] ?? user['email'],
+        user['phone'] ?? null,
+        user['email'] ?? null,
       );
     }
     return user;
@@ -45,7 +46,8 @@ export class AuthController {
     console.log(user['phone'] ?? user['email'], user['email']);
     const res = await this.service.register(
       dto,
-      user['phone'] ?? user['email'],
+      user['phone'] ?? null,
+      user['email'] ?? null,
     );
     return res;
   }

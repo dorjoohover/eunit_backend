@@ -70,10 +70,11 @@ export class AuthService {
     }
   }
 
-  async register(dto: RegisterUserDto, phone: string) {
+  async register(dto: RegisterUserDto, phone: string, email: string) {
     return await this.usersService.create({
       ...dto,
-      phone,
+      phone: phone,
+      email: email,
     });
   }
   async generateTokens(userId: string, email: string) {

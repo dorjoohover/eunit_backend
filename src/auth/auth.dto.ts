@@ -15,6 +15,8 @@ export class RegisterUserDto {
   @ApiProperty()
   email: string;
   @ApiProperty()
+  phone: string;
+  @ApiProperty()
   firstname: string;
   @ApiProperty()
   lastname: string;

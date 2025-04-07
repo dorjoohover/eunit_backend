@@ -24,12 +24,13 @@ export class AuthController {
 
   @Post('register')
   async register(@Body() dto: RegisterUserDto, @Request() { user }) {
-    if (user.registered) {
-      throw new HttpException(
-        'Бүртгэлтэй хэрэглэгч байна.',
-        HttpStatus.CONFLICT,
-      );
-    }
+    // if (user.registered) {
+    //   throw new HttpException(
+    //     'Бүртгэлтэй хэрэглэгч байна.',
+    //     HttpStatus.CONFLICT,
+    //   );
+    // }
+    console.log(user['phone'] ?? user['email'], user['email']);
     const res = await this.service.register(
       dto,
       user['phone'] ?? user['email'],

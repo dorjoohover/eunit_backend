@@ -19,18 +19,19 @@ export class AuthController {
   constructor(private readonly service: AuthService) {}
   @Get('phone-login')
   async phoneLogin(@Request() { user }) {
-    if (!user.data.registered) {
-      console.log(user['phone'] ?? user['email'], user['email']);
-      await this.service.register(
-        {
-          email: user['email'] ?? null,
-          phone: user['phone'] ?? null,
-          lastname: user['name'] ?? null,
-          firstname: null,
-        },
-        user['phone'] ?? user['email'],
-      );
-    }
+    console.log(user)
+    // if (!user.data.registered) {
+      // console.log(user['phone'] ?? user['email'], user['email']);
+      // await this.service.register(
+      //   {
+      //     email: user['email'] ?? null,
+      //     phone: user['phone'] ?? null,
+      //     lastname: user['name'] ?? null,
+      //     firstname: null,
+      //   },
+      //   user['phone'] ?? user['email'],
+      // );
+    // }
     return user;
   }
 

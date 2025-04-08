@@ -42,7 +42,7 @@ export class UserDao {
 
   add = async (user: CreateUserDto) => {
     try {
-      console.log(user)
+      console.log(user);
       const u = await this.db.findOne({
         where: [
           {
@@ -103,6 +103,7 @@ export class UserDao {
   };
 
   getByEmail = async (phone: string) => {
+    console.log(phone);
     let res = await this.db.findOne({
       where: {
         phone: phone,
@@ -114,12 +115,15 @@ export class UserDao {
           email: phone,
         },
       });
-    if (!res)
-      res = await this.db.findOne({
-        where: {
-          id: +phone,
-        },
-      });
+    if (!res) {
+      if (!isNaN(parseInt(phone))) {
+        res = await this.db.findOne({
+          where: {
+            id: +phone,
+          },
+        });
+      }
+    }
     return res;
   };
 

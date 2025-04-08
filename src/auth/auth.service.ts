@@ -110,14 +110,17 @@ export class AuthService {
   async validateUser(dto: LoginUserDto): Promise<any> {
     const { password, email, name, profile } = dto;
     let user = await this.usersService.getUser(email);
+    console.log(user);
     if (!user) {
       user = await this.usersService.create({
         email: email,
         name,
         profile,
+        wallet: 2000,
         // role: 10,
       });
     }
+    console.log(user);
 
     let isMatch = false;
     // if (user) {

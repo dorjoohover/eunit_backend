@@ -36,6 +36,7 @@ export class AuthService {
   }
 
   async verifyToken(idToken: string) {
+    // let user = await
     let user = await this.app.auth().verifyIdToken(idToken);
     try {
       if (user?.uid) {
@@ -95,11 +96,10 @@ export class AuthService {
 
   async verifyRefreshToken(token: string) {
     try {
-      return this.jwtService.verify(token, {
-        secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
-      });
+      return this.jwtService.verify(token);
     } catch (error) {
-      throw new UnauthorizedException('Invalid refresh token');
+      // throw new UnauthorizedException('Invalid refresh token');
+      return null;
     }
   }
   // @UseGuards(AuthGuard)
@@ -142,6 +142,10 @@ export class AuthService {
     //   return result;
     // }
     return user;
+  }
+
+  async getUser(email: string) {
+    return await this.usersService.getUser(email);
   }
 
   async login(user: any) {

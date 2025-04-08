@@ -35,11 +35,11 @@ export class RequestService extends BaseService {
     super();
   }
 
-  private printer = new PdfPrinter(fonts);
+  // private printer = new PdfPrinter(fonts);
 
-  createPdf(docDefinition: TDocumentDefinitions) {
-    return this.printer.createPdfKitDocument(docDefinition);
-  }
+  // createPdf(docDefinition: TDocumentDefinitions) {
+  //   return this.printer.createPdfKitDocument(docDefinition);
+  // }
 
   async getPdf(id: number) {
     const res = await this.findOne(id);

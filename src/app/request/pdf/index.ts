@@ -35,24 +35,13 @@ export class PdfService {
   }
 
   async createPdf(dto: PdfType) {
-    const filePath = './chart.pdf';
-    const out = fs.createWriteStream(filePath);
     const doc = await this.createDefaultPdf();
 
     try {
-      doc.pipe(out);
       const date = new Date(dto.data.createdAt);
       header(doc, date);
       await this.realstate.template(doc, dto);
-
-      doc.end();
-
-      await new Promise((resolve, reject) => {
-        out.on('finish', resolve);
-        out.on('error', reject);
-      });
-
-      return filePath;
+      return doc
     } catch (error) {
       console.log(error);
       throw new Error('Failed to generate PDF');

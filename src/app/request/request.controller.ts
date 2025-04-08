@@ -55,9 +55,8 @@ export class RequestController {
   @ApiParam({ name: 'id' })
   async requestPdf(@Res() res: Response, @Param('id') id: string) {
     // const role = user?.['role'];
-    let filePath: any;
     try {
-      filePath = await this.requestService.getPdf(+id);
+      const doc = await this.requestService.getPdf(+id);
 
       const fileName = encodeURIComponent('Value Report.pdf');
       res.setHeader(
@@ -65,14 +64,8 @@ export class RequestController {
         `attachment; filename="${fileName}"`,
       );
       res.setHeader('Content-type', 'application/pdf');
-
-      res.sendFile(filePath, { root: process.cwd() }, (err) => {
-        if (err) {
-          console.error(err);
-        }
-        fs.unlinkSync(filePath);
-      });
-      // return res.redirect('https://hire.mn');
+      doc.pipe(res);
+      doc.end();
     } catch (err) {
       console.log('Error generating PDF:', err);
       throw err;

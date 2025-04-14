@@ -1,34 +1,97 @@
 import { HttpService } from '@nestjs/axios';
-import { Injectable } from '@nestjs/common';
-import { lastValueFrom } from 'rxjs';
+import { HttpException, Injectable } from '@nestjs/common';
+import { AxiosError } from 'axios';
+import { firstValueFrom, lastValueFrom } from 'rxjs';
 
 @Injectable()
 export class QpayService {
   private readonly baseUrl = 'https://merchant.qpay.mn/v2'; // Update to the correct QPay API base URL
-  private token = null;
+  private accessToken: string | null = null;
+  private expiresAt = 0;
+  private refreshing: Promise<string> | null = null;
   constructor(private readonly httpService: HttpService) {}
+  public async loginQpay(): Promise<{ token: string; expiredIn: number }> {
+    const now = Date.now();
 
-  async getAccessToken() {
-    if (this.token != null) return this.token;
-    const response = await this.httpService
-      .post(
-        `${this.baseUrl}/auth/token`,
-        {},
-        {
-          auth: {
-            username: process.env.QPAY_CLIENT_ID,
-            password: process.env.QPAY_CLIENT_SECRET,
-          },
-        },
-      )
-      .toPromise();
-    this.token = response.data.access_token;
-    return response.data.access_token;
+    if (now < this.expiresAt + 3600000 * 24 && this.accessToken) {
+      return {
+        token: this.accessToken,
+        expiredIn: Math.floor((this.expiresAt - now) / 1000),
+      };
+    }
+
+    if (this.refreshing) {
+      const token = await this.refreshing;
+      return {
+        token,
+        expiredIn: Math.floor((this.expiresAt - Date.now()) / 1000),
+      };
+    }
+
+    this.refreshing = this._getNewToken().finally(() => {
+      this.refreshing = null;
+    });
+
+    const token = await this.refreshing;
+    return {
+      token,
+      expiredIn: Math.floor((this.expiresAt - Date.now()) / 1000),
+    };
   }
 
-  async createPayment(amount: number, invoiceId: string, userId: number) {
-    const accessToken = await this.getAccessToken();
+  private async _getNewToken(): Promise<string> {
+    const now = Date.now();
 
+    try {
+      const response = await this.httpService
+        .post(
+          `${this.baseUrl}/auth/token`,
+          {},
+          {
+            auth: {
+              username: process.env.QPAY_CLIENT_ID,
+              password: process.env.QPAY_CLIENT_SECRET,
+            },
+          },
+        )
+        .toPromise();
+      const tokenData = response.data;
+      this.accessToken = tokenData.access_token;
+      console.log(tokenData);
+      this.expiresAt = now;
+
+      return this.accessToken;
+    } catch (error) {
+      this.accessToken = null;
+      this.expiresAt = 0;
+      const axiosError = error as AxiosError;
+      throw new HttpException(
+        axiosError.response?.data || 'Authentication failed',
+        500,
+      );
+    }
+  }
+  // async getAccessToken() {
+  //   if (this.accessToken != null) return this.accessToken;
+  //   const response = await this.httpService
+  //     .post(
+  //       `${this.baseUrl}/auth/token`,
+  //       {},
+  //       {
+  //         auth: {
+  //           username: process.env.QPAY_CLIENT_ID,
+  //           password: process.env.QPAY_CLIENT_SECRET,
+  //         },
+  //       },
+  //     )
+  //     .toPromise();
+  //   this.accessToken = response.data.access_token;
+  //   return response.data.access_token;
+  // }
+
+  async createPayment(amount: number, invoiceId: string, userId: number) {
+    const { token } = await this.loginQpay();
+    console.log(token);
     const response = await this.httpService
       .post(
         `${this.baseUrl}/invoice`,
@@ -49,7 +112,7 @@ export class QpayService {
         },
         {
           headers: {
-            Authorization: `Bearer ${accessToken}`,
+            Authorization: `Bearer ${token}`,
           },
         },
       )
@@ -59,7 +122,7 @@ export class QpayService {
   }
 
   async checkPayment(id: string) {
-    const accessToken = await this.getAccessToken();
+    const { token } = await this.loginQpay();
     const response = await lastValueFrom(
       this.httpService.post(
         `${this.baseUrl}/payment/check`,
@@ -69,7 +132,7 @@ export class QpayService {
         },
         {
           headers: {
-            Authorization: `Bearer ${accessToken}`,
+            Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json',
           },
         },

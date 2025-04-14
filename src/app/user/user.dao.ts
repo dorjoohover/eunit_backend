@@ -12,6 +12,10 @@ export class UserDao {
     this.db = this.dataSource.getRepository(UserEntity);
   }
 
+  async findAll() {
+    return await this.db.find()
+  }
+
   find = async (dto: UserFindDto) => {
     const where: Record<string, any> = {};
     if (dto.firstname) where.firstname = Like(`%${dto.firstname}%`);

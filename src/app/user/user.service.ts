@@ -44,6 +44,10 @@ export class UserService extends BaseService {
     });
   }
 
+  public async all() {
+    return await this.userDao.findAll()
+  }
+
   public async findAll(dto: UserFindDto) {
     const res = await this.userDao.find(dto);
     let { data, ...body } = res;

@@ -62,6 +62,11 @@ export class UserController {
   findMe(@Request() { user }) {
     return user;
   }
+  @Get('all')
+  @Public()
+  find(@Request() { user }) {
+    return this.userService.all()
+  }
 
   @Post('wallet')
   @ApiBearerAuth('access-token')

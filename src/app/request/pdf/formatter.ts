@@ -92,7 +92,7 @@ export const reportDescription = (
   const floor = d?.floor ? `${d.floor}-р давхарын ` : '';
   const room = d?.room ? `${d.room} өрөө ` : '';
   const value =
-    category == SERVICE.REALSTATE
+    area != null
       ? `${l?.city} хот, ${l?.district} дүүрэг, ${l?.khoroo}-р хороо, ${
           l?.zipcode
         }, ${l?.town}${
@@ -120,7 +120,9 @@ export const money = (value: string, currency = '', round = 1) => {
 };
 
 export const firstLetterUpper = (text: string) => {
-  return text?.substring(0, 1)?.toUpperCase() + text?.substring(1)?.toLowerCase();
+  return (
+    text?.substring(0, 1)?.toUpperCase() + text?.substring(1)?.toLowerCase()
+  );
 };
 export const dateFormatter = (date: Date): string => {
   const year = date.getFullYear();

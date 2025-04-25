@@ -118,7 +118,7 @@ export class RealstatePdf {
     doc.text('', { continued: false, underline: false });
     doc.y += dto.user?.phone ? 10 : 20;
     let x = doc.x;
-    if (dto.category == SERVICE.REALSTATE) {
+    if (dto.data.area != null) {
       doc.image(assetPath('icons/apartment'), x, doc.y, {
         width: 15,
         height: 15,
@@ -149,7 +149,7 @@ export class RealstatePdf {
     doc.fontSize(fz.sm).font(font.bold).text('Тооцоолол');
     doc.x += 20;
     doc.y += 10;
-    if (dto.category == SERVICE.REALSTATE) {
+    if (dto.data.area != null) {
       doc
         .font(font.thin)
         .fontSize(fz.xs)
@@ -181,6 +181,7 @@ export class RealstatePdf {
         .fillColor(colors.blue)
         .text(`₮${money(dto.data.avg.toString())}`);
       doc.y += 10;
+      console.log(dto.data);
       doc
         .fillColor(colors.black)
         .font(font.thin)
@@ -245,7 +246,11 @@ export class RealstatePdf {
       .font(font.bold)
       .fillColor(colors.blue)
       .text(
-        `${price(dto.category, dto.data.price, dto.data.area * dto.data.avg)} төгрөг`,
+        `${price(
+          dto.data.area != null ? SERVICE.REALSTATE : SERVICE.CAR,
+          dto.data.price,
+          dto.data.area * dto.data.avg,
+        )} төгрөг`,
         {
           continued: true,
         },
@@ -357,7 +362,7 @@ export class RealstatePdf {
       title === 'Гүйлт'
         ? `${money(label)}км`
         : title == 'Багтаамж'
-        ? `${label}л`
+          ? `${label}л`
           : firstLetterUpper(`${label}`),
       doc.x,
       y + 20,

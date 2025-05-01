@@ -8,7 +8,7 @@ export class CarsService {
     return new Promise((resolve, reject) => {
       const env = { ...process.env, PYTHONIOENCODING: 'utf-8' };
       // const py = spawn('python', ['src/app/request/cars/predict.py'], { env });
-      const py = spawn('/venv/bin/python3', ['src/app/request/cars/predict.py'], { env });
+      const py = spawn('/home/hstgr-dev-srv654666/htdocs/dev.srv654666.hstgr.cloud/backend/venv/bin/python', ['src/app/request/cars/predict.py'], { env });
       let result = '';
 
       py.stdin.write(JSON.stringify(inputData));

@@ -7,8 +7,8 @@ export class CarsService {
   predictPrice(inputData: Record<string, any>): Promise<number> {
     return new Promise((resolve, reject) => {
       const env = { ...process.env, PYTHONIOENCODING: 'utf-8' };
-      const py = spawn('python', ['src/app/request/cars/predict.py'], { env });
-      // const py = spawn('python3', ['src/app/request/cars/predict.py'], { env });
+      // const py = spawn('python', ['src/app/request/cars/predict.py'], { env });
+      const py = spawn('python3', ['src/app/request/cars/predict.py'], { env });
       let result = '';
 
       py.stdin.write(JSON.stringify(inputData));

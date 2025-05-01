@@ -46,7 +46,6 @@ export class UserDao {
 
   add = async (user: CreateUserDto) => {
     try {
-      console.log(user);
       const u = await this.db.findOne({
         where: [
           {
@@ -57,7 +56,6 @@ export class UserDao {
           },
         ],
       });
-      console.log(u);
       if (u) throw new HttpException('Бүртгэлтэй хэрэглэгч', 400);
       const res = this.db.create({
         ...user,

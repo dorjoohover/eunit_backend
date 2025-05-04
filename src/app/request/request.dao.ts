@@ -12,6 +12,7 @@ export class RequestDao {
   }
 
   create = async (dto: CreateRequestDto) => {
+    console.log(dto)
     try {
       const res = this.db.create({
         ...dto,

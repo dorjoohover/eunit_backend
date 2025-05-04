@@ -48,8 +48,8 @@ export class RequestEntity {
   brand: string;
   @Column({ nullable: true })
   mark: string;
-  @Column({ type: 'numeric', nullable: true })
-  capacity: number;
+  @Column({  nullable: true })
+  capacity: string;
   @Column({ nullable: true })
   manufacture: number;
   @Column({ nullable: true })

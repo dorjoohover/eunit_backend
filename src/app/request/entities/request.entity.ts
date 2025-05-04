@@ -58,8 +58,8 @@ export class RequestEntity {
   gearbox: string;
   @Column({ nullable: true })
   hurd: string;
-  @Column({ nullable: true })
-  type: string;
+  // @Column({ nullable: true })
+  // type: string;
   @Column({ nullable: true })
   color: string;
   @Column({ nullable: true })

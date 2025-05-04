@@ -71,15 +71,21 @@ def map_mileage_to_distance(mileage):
     return "300000"
 
 def map_engine_capacity(engine_capacity):
-    if engine_capacity <= 2.0:
+    if '+' in engine_capacity:
+        engine = float(engine_capacity.replace('+', ''))
+    elif '-' in engine_capacity:
+        engine = float(engine_capacity.split('-')[1])
+    else:
+        engine = float(engine_capacity)
+    if engine <= 2.0:
         return "0-2.0"
-    elif engine_capacity <= 2.5:
+    elif engine <= 2.5:
         return "2.1-2.5"
-    elif engine_capacity <= 3.0:
+    elif engine <= 3.0:
         return "2.6-3.0"
-    elif engine_capacity <= 3.5:
+    elif engine <= 3.5:
         return "3.1-3.5"
-    elif engine_capacity <= 4.0:
+    elif engine <= 4.0:
         return "3.6-4.0"
     else:
         return "4.1+"
@@ -96,7 +102,7 @@ def predict_price_ensemble(input_data, artifacts, weight_0=0.3, weight_2r=0.7):
             "Mark": input_data["mark"].replace("-", " ").title(),
             "Manifactured year": input_data["Year_of_manufacture"],
             "Imported year": input_data["Year_of_entry"],
-            "Motor range": map_engine_capacity(float(input_data["Engine_capacity"])),
+            "Motor range": map_engine_capacity(input_data["Engine_capacity"]),
             "engine": input_data["Engine"],
             "gearBox": input_data["Gearbox"],
             "khurd": input_data["Hurd"],

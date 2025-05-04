@@ -27,8 +27,8 @@ export class CarsDto {
   gearbox?: string;
   @ApiProperty()
   hurd?: string;
-  @ApiProperty()
-  type?: string;
+  // @ApiProperty()
+  // type?: string;
   @ApiProperty()
   color?: string;
   @ApiProperty()

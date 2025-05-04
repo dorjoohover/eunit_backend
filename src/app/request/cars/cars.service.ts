@@ -44,7 +44,7 @@ export class CarsService {
       Year_of_entry: dto.entry, //int
       Gearbox: dto.gearbox, //string
       Hurd: dto.hurd, //string
-      Type: dto.type, //string
+      // Type: dto.type, //string
       Color: dto.color, //string
       Engine: dto.engine, //string
       Interior_color: dto.interior, //string

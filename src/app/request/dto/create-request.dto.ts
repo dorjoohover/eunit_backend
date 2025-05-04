@@ -18,7 +18,7 @@ export class CarsDto {
   @ApiProperty()
   mark?: string;
   @ApiProperty()
-  capacity?: number;
+  capacity?: string;
   @ApiProperty()
   manufacture?: number;
   @ApiProperty()

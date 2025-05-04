@@ -96,7 +96,7 @@ def predict_price_ensemble(input_data, artifacts, weight_0=0.3, weight_2r=0.7):
             "Mark": input_data["mark"].replace("-", " ").title(),
             "Manifactured year": input_data["Year_of_manufacture"],
             "Imported year": input_data["Year_of_entry"],
-            "Motor range": map_engine_capacity(input_data["Engine_capacity"]),
+            "Motor range": map_engine_capacity(float(input_data["Engine_capacity"])),
             "engine": input_data["Engine"],
             "gearBox": input_data["Gearbox"],
             "khurd": input_data["Hurd"],

@@ -32,7 +32,6 @@ export class AuthGuard implements CanActivate {
     const token = authHeader.split(' ')[1];
     try {
       const res = await this.service.verifyRefreshToken(token);
-      console.log(res)
       if (res == null) {
         // throw new HttpException('', HttpStatus.BAD_REQUEST);
         return false

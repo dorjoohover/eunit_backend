@@ -78,7 +78,7 @@ export const reportDescription = (
     mark?: string;
     manufacture?: number;
     entry?: number;
-    capacity?: number;
+    capacity?: string;
     engine?: string;
   },
 ) => {

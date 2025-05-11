@@ -12,11 +12,11 @@ import { DataSource } from 'typeorm';
         try {
           const dataSource = new DataSource({
             type: 'postgres',
-            host: '46.202.189.34',
-            // host: 'localhost',
+            // host: '46.202.189.34',
+            host: 'localhost',
             port: 5432,
-            username: 'dorjoo',
-            // username: 'postgres',
+            // username: 'dorjoo',
+            username: 'postgres',
             password: 'root',
             database: 'eunit',
             entities: [__dirname + '/../**/*.entity{.ts,.js}'],

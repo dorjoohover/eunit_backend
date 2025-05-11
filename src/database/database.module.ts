@@ -18,7 +18,8 @@ import { DataSource } from 'typeorm';
             username: 'dorjoo',
             // username: 'postgres',
             password: 'root',
-            database: 'eunit',
+            // database: 'eunit',
+            database: 'dev',
             entities: [__dirname + '/../**/*.entity{.ts,.js}'],
             synchronize: true,
           });

@@ -39,7 +39,7 @@ export class PdfService {
 
     try {
       const date = new Date(dto.data.createdAt);
-      header(doc, date);
+      header(doc, date, dto.info);
       await this.realstate.template(doc, dto);
       return doc
     } catch (error) {

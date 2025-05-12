@@ -127,11 +127,15 @@ export class CarsService {
       });
     });
   }
-  public getPriceRange(price: number, step: number = 10000): string {
-    if (price <= step) return `0-${step}`;
+  public getPriceRange(
+    price: number,
+    step: number = 5000,
+    maxCap: number = 500000,
+  ): string {
+    if (price >= maxCap) return `${maxCap - step}-${maxCap}`;
 
-    const lower = Math.floor((price - 1) / step) * step + 1;
-    const upper = lower + step - 1;
+    const lower = Math.floor(price / step) * step;
+    const upper = lower + step;
     return `${lower}-${upper}`;
   }
 

@@ -59,9 +59,14 @@ export class RealstatePdf {
     doc
       .fillColor(colors.black)
       .fontSize(fz.md)
-      .text('Зах зээлийн үнэ цэний лавлагаа'.toUpperCase(), {
-        align: 'center',
-      });
+      .text(
+        !dto.info.usage || dto.info.usage == 30
+          ? 'Зах зээлийн үнэ цэний лавлагаа'.toUpperCase()
+          : 'ББСБ-Д ЗОРИУЛСАН ХӨРӨНГИЙН ҮНЭЛГЭЭ',
+        {
+          align: 'center',
+        },
+      );
     doc.y += 30;
     doc.fontSize(fz.sm).text('Ерөнхий мэдээлэл');
     doc.y += 10;
@@ -326,7 +331,7 @@ export class RealstatePdf {
     );
     doc.image(
       assetPath('stamp0'),
-      doc.page.width / 3 *2,
+      (doc.page.width / 3) * 2,
       doc.page.height - 25 - copyrightHeight - footerHeight - 150,
       {
         width: 80,

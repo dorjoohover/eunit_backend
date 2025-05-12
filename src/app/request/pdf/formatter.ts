@@ -134,10 +134,10 @@ export const dateFormatter = (date: Date): string => {
   return `${year}.${month}.${day}`;
 };
 
-export const header = (doc: PDFKit.PDFDocument, date: Date) => {
+export const header = (doc: PDFKit.PDFDocument, date: Date, info: any) => {
   doc.fontSize(10);
 
-  doc.image(assetPath('logo'), marginX, marginY, {
+  doc.image(assetPath(info?.org == 'eunit' || !info?.org ? 'logo' : info.org), marginX, marginY, {
     width: 60,
   });
   doc

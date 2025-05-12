@@ -26,7 +26,7 @@ export class RealstatePdf {
       .fontSize(fz.xl)
       .font(font.bold)
       .widthOfString('Лавлагаа');
-    doc.y += 75;
+    doc.y += 37.5;
     let y = doc.y;
     let grad = doc.linearGradient(
       marginX,
@@ -66,9 +66,14 @@ export class RealstatePdf {
     doc.fontSize(fz.sm).text('Ерөнхий мэдээлэл');
     doc.y += 10;
     doc.x += 20;
-    let lastname = dto.user?.lastname;
+    let lastname = dto.info?.lastname ?? dto.user?.lastname;
     if (lastname) lastname.substring(0, 1).toUpperCase() + '.';
-    if (dto.user?.lastname || dto.user?.firstname) {
+    if (
+      dto.user?.lastname ||
+      dto.user?.firstname ||
+      dto.info?.lastname ||
+      dto.info?.firstname
+    ) {
       doc
         .font(font.thin)
         .fontSize(fz.xs)
@@ -78,7 +83,7 @@ export class RealstatePdf {
         })
         .font(font.normal)
         .text(
-          `${lastname}${dto.user?.firstname ? ` ${firstLetterUpper(dto.user?.firstname)}` : ''}`,
+          `${lastname}${dto.info?.firstname ? ` ${firstLetterUpper(dto.info?.firstname)}` : dto.user?.firstname ? ` ${firstLetterUpper(dto.user?.firstname)}` : ''}`,
           {
             continued: true,
             underline: true,
@@ -317,6 +322,24 @@ export class RealstatePdf {
       doc.page.height - 25 - copyrightHeight - footerHeight - 20 - 30,
       {
         align: 'right',
+      },
+    );
+    doc.image(
+      assetPath('stamp0'),
+      doc.page.width / 3 *2,
+      doc.page.height - 25 - copyrightHeight - footerHeight - 150,
+      {
+        width: 80,
+        height: 80,
+      },
+    );
+    doc.image(
+      assetPath('stamp1'),
+      doc.x,
+      doc.page.height - 25 - copyrightHeight - footerHeight - 80,
+      {
+        width: 120,
+        height: 120,
       },
     );
   }

@@ -26,6 +26,7 @@ export type PdfType = {
   // avg?: number;
   // };
   user: UserEntity;
+  info?: any
   category: number;
   location?: LocationEntity;
 };

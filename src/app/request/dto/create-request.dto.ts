@@ -62,6 +62,14 @@ export class CreateRequestDto extends CarsDto {
   @ApiProperty()
   location: number;
   @ApiProperty()
+  usage: number;
+  @ApiProperty()
+  lastname: string;
+  @ApiProperty()
+  firstname: string;
+  @ApiProperty()
+  org: string;
+  @ApiProperty()
   startDate?: Date;
   @ApiProperty()
   endDate?: Date;

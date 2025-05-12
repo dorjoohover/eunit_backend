@@ -30,6 +30,14 @@ export class RequestEntity {
   payment: number;
   @Column({ nullable: true })
   code: string;
+  @Column({ nullable: true })
+  lastname: string;
+  @Column({ nullable: true })
+  firstname: string;
+  @Column({ nullable: true })
+  org: string;
+  @Column({ nullable: true })
+  usage: number;
 
   // realstate
   @Column({ nullable: true })

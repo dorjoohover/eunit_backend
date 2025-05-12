@@ -111,7 +111,9 @@ export class RequestService extends BaseService {
       console.log(dto, email, user);
       const point =
         dto.service == ServiceType.REVIEW
-          ? 2000
+          ? dto.usage == 30 || !dto.usage
+            ? 2000
+            : 5000
           : dto.service == ServiceType.DATA
             ? dto.count * 100
             : 20000;
@@ -269,6 +271,12 @@ export class RequestService extends BaseService {
           interior: service.interior,
           mileage: service.mileage,
           conditions: service.conditions,
+        },
+        info: {
+          lastname: service.lastname,
+          firstname: service.firstname,
+          usage: service.usage,
+          org: service.org,
         },
         user: service.user,
         category: service.category,

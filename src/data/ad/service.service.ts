@@ -20,7 +20,6 @@ export class ServiceService extends BaseService {
   }
 
   public async calculate(dto: ServiceDto) {
-    console.log(dto);
     let body: any = {};
     let res: any = { code: dto.code };
     if (dto.type == ServiceDataType.APARTMENT) {

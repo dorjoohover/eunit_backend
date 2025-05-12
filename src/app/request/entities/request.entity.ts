@@ -56,7 +56,7 @@ export class RequestEntity {
   brand: string;
   @Column({ nullable: true })
   mark: string;
-  @Column({  nullable: true })
+  @Column({ nullable: true })
   capacity: string;
   @Column({ nullable: true })
   manufacture: number;
@@ -80,6 +80,12 @@ export class RequestEntity {
   mileage: number;
   @Column({ nullable: true })
   conditions: string;
+  @Column({ nullable: true, type: 'numeric' })
+  result?: number;
+  @Column({ nullable: true, type: 'numeric' })
+  min?: number;
+  @Column({ nullable: true, type: 'numeric' })
+  max?: number;
   @ManyToOne(() => UserEntity, (user) => user.requests, {
     onDelete: 'CASCADE',
   })

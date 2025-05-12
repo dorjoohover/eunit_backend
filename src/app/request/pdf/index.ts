@@ -38,13 +38,13 @@ export class PdfService {
     const doc = await this.createDefaultPdf();
 
     try {
-      const date = new Date(dto.data.createdAt);
-      header(doc, date, dto.info);
+      const date = new Date(dto.service.createdAt);
+      header(doc, date, dto.service);
       await this.realstate.template(doc, dto);
       return doc
     } catch (error) {
       console.log(error);
-      throw new Error('Failed to generate PDF');
+      throw new Error('Алдаа гарлаа');
     }
   }
 }

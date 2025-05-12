@@ -9,6 +9,8 @@ import {
   Request,
   Res,
   Query,
+  HttpException,
+  HttpStatus,
 } from '@nestjs/common';
 import { RequestService } from './request.service';
 import { CreateRequestDto } from './dto/create-request.dto';
@@ -17,6 +19,7 @@ import { ApiBearerAuth, ApiParam, ApiQuery } from '@nestjs/swagger';
 import { Public } from 'src/auth/guards/jwt/auth-guard';
 import { Response } from 'express';
 import fs from 'fs';
+import { Role } from 'src/auth/guards/role/role.enum';
 
 @Controller('request')
 export class RequestController {
@@ -50,12 +53,19 @@ export class RequestController {
   ) {
     return this.requestService.checkPayment(+id, code, user['id']);
   }
-  @Public()
+  // @Public()
   @Get('service/pdf/:id')
   @ApiParam({ name: 'id' })
-  async requestPdf(@Res() res: Response, @Param('id') id: string) {
-    // const role = user?.['role'];
+  async requestPdf(
+    @Res() res: Response,
+    @Param('id') id: string,
+    @Request() { user },
+  ) {
     try {
+      const service = await this.requestService.find(+id);
+      if (user['role'] != Role.Admin && +user['id'] != service.user.id) {
+        throw new HttpException('Хандах эрхгүй байна.', HttpStatus.BAD_REQUEST);
+      }
       const doc = await this.requestService.getPdf(+id);
 
       const fileName = encodeURIComponent('Value Report.pdf');
@@ -95,9 +105,13 @@ export class RequestController {
     return this.requestService.findByUser(user['id'], +page, +limit);
   }
   // @ApiBearerAuth('access-token')
-  @Public()
+  // @Public()
   @Get('service/:id')
-  findOne(@Param('id') id: string) {
+  async findOne(@Param('id') id: string, @Request() { user }) {
+    const service = await this.requestService.find(+id);
+    if (user['role'] != Role.Admin && +user['id'] != service.user.id) {
+      throw new HttpException('Хандах эрхгүй байна.', HttpStatus.BAD_REQUEST);
+    }
     return this.requestService.findOne(+id);
   }
 

@@ -22,7 +22,6 @@ export class AuthService {
     private configService: ConfigService,
   ) {
     if (!admin.apps.length) {
-      console.log(process.env.FIREBASE_PROJECT_ID);
       this.app = admin.initializeApp({
         credential: admin.credential.cert({
           projectId: process.env.FIREBASE_PROJECT_ID as string,

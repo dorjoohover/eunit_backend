@@ -57,7 +57,6 @@ export class QpayService {
         .toPromise();
       const tokenData = response.data;
       this.accessToken = tokenData.access_token;
-      console.log(tokenData);
       this.expiresAt = now;
 
       return this.accessToken;
@@ -91,7 +90,6 @@ export class QpayService {
 
   async createPayment(amount: number, invoiceId: string, userId: number) {
     const { token } = await this.loginQpay();
-    console.log(token);
     const response = await this.httpService
       .post(
         `${this.baseUrl}/invoice`,

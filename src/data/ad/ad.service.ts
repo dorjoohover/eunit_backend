@@ -47,7 +47,6 @@ export class AdService extends BaseService {
       join(process.cwd(), 'src/excel', 'suljee.json'),
       JSON.stringify(togtool),
     );
-    console.log(togtool);
 
     // const ads = this.excel.readExcel(
     //   '',
@@ -111,7 +110,6 @@ export class AdService extends BaseService {
       1,
       'src/excel/Data_unegui_12.09_last_v_1.xlsx',
     );
-    console.log(ads[0]);
     try {
       const uniqueAds = [
         ...new Map(
@@ -224,7 +222,6 @@ export class AdService extends BaseService {
         date: new Date(date),
         paymentMethod: leasing,
       };
-      console.log(dto);
       if (dto.unitPrice != null && dto.area && dto.location && dto.uneguiId) {
         await this.dao.create(dto);
       }

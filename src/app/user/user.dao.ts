@@ -105,7 +105,6 @@ export class UserDao {
   };
 
   getByEmail = async (phone: string) => {
-    console.log(phone);
     let res = await this.db.findOne({
       where: {
         phone: phone,

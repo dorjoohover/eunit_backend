@@ -60,9 +60,9 @@ export class RealstatePdf {
       .fillColor(colors.black)
       .fontSize(fz.md)
       .text(
-        !dto.info.usage || dto.info.usage == 30
+        !dto.service.usage || dto.service.usage == 30
           ? 'Зах зээлийн үнэ цэний лавлагаа'.toUpperCase()
-          : dto.info.usage == 10
+          : dto.service.usage == 10
             ? 'Даатгалын байгууллагад зориулсан үнэ цэнийн лавлагаа'
             : 'ББСБ-Д ЗОРИУЛСАН үнэ цэнийн лавлагаа',
         {
@@ -73,13 +73,13 @@ export class RealstatePdf {
     doc.fontSize(fz.sm).text('Ерөнхий мэдээлэл');
     doc.y += 10;
     doc.x += 20;
-    let lastname = dto.info?.lastname ?? dto.user?.lastname;
+    let lastname = dto.service?.lastname ?? dto.service.user?.lastname;
     if (lastname) lastname.substring(0, 1).toUpperCase() + '.';
     if (
-      dto.user?.lastname ||
-      dto.user?.firstname ||
-      dto.info?.lastname ||
-      dto.info?.firstname
+      dto.service.user?.lastname ||
+      dto.service.user?.firstname ||
+      dto.service?.lastname ||
+      dto.service?.firstname
     ) {
       doc
         .font(font.thin)
@@ -90,7 +90,7 @@ export class RealstatePdf {
         })
         .font(font.normal)
         .text(
-          `${lastname}${dto.info?.firstname ? ` ${firstLetterUpper(dto.info?.firstname)}` : dto.user?.firstname ? ` ${firstLetterUpper(dto.user?.firstname)}` : ''}`,
+          `${lastname}${dto.service?.firstname ? ` ${firstLetterUpper(dto.service?.firstname)}` : dto.service.user?.firstname ? ` ${firstLetterUpper(dto.service.user?.firstname)}` : ''}`,
           {
             continued: true,
             underline: true,
@@ -98,7 +98,7 @@ export class RealstatePdf {
         )
         .text(' ', { underline: false, continued: true });
     }
-    if (dto.user?.email)
+    if (dto.service.user?.email)
       doc
         .fontSize(fz.xs)
         .font(font.thin)
@@ -107,7 +107,7 @@ export class RealstatePdf {
           underline: false,
         })
         .font(font.normal)
-        .text(`${dto.user.email}`, {
+        .text(`${dto.service.user.email}`, {
           underline: true,
           continued: true,
         })
@@ -116,7 +116,7 @@ export class RealstatePdf {
           underline: false,
         });
 
-    if (dto.user?.phone)
+    if (dto.service.user?.phone)
       doc
         .font(font.thin)
         .fontSize(fz.xs)
@@ -124,20 +124,20 @@ export class RealstatePdf {
           continued: true,
         })
         .font(font.normal)
-        .text(`${formatPhoneNumber(dto.user.phone)}`, {
+        .text(`${formatPhoneNumber(dto.service.user.phone)}`, {
           underline: true,
         });
     doc.text('', { continued: false, underline: false });
-    doc.y += dto.user?.phone ? 10 : 20;
+    doc.y += dto.service.user?.phone ? 10 : 20;
     let x = doc.x;
-    if (dto.data.area != null) {
+    if (dto.service.area != null) {
       doc.image(assetPath('icons/apartment'), x, doc.y, {
         width: 15,
         height: 15,
       });
       doc.text('Орон сууц', x + 18, doc.y);
     }
-    if (dto.category == SERVICE.CAR) {
+    if (dto.service.category == SERVICE.CAR) {
       SVGtoPDF(doc, svgs('car', 20, 20), x, doc.y, { width: 18, height: 18 });
 
       doc.text('Автомашин', x + 18, doc.y);
@@ -145,13 +145,13 @@ export class RealstatePdf {
 
     doc.y += 10;
 
-    if (dto.location) {
+    if (dto.service.location) {
       doc.image(assetPath('icons/location'), x, doc.y, {
         width: 15,
         height: 15,
       });
       doc.text(
-        `${dto.location.city} хот, ${dto.location.district} дүүрэг, ${dto.location.khoroo}-р хороо, ${dto.location.town} хотхон`,
+        `${dto.service.location.city} хот, ${dto.service.location.district} дүүрэг, ${dto.service.location.khoroo}-р хороо, ${dto.service.location.town} хотхон`,
         x + 18,
         doc.y,
       );
@@ -161,7 +161,7 @@ export class RealstatePdf {
     doc.fontSize(fz.sm).font(font.bold).text('Тооцоолол');
     doc.x += 20;
     doc.y += 10;
-    if (dto.data.area != null) {
+    if (dto.service.area != null) {
       doc
         .font(font.thin)
         .fontSize(fz.xs)
@@ -170,7 +170,7 @@ export class RealstatePdf {
         })
         .font(font.bold)
         .fillColor(colors.blue)
-        .text(`₮${money(dto.data.min.toString())}`, { continued: true })
+        .text(`₮${money(dto.service.min.toString())}`, { continued: true })
         .font(font.thin)
         .fillColor(colors.black)
         .text(`-оос `, {
@@ -178,7 +178,7 @@ export class RealstatePdf {
         })
         .font(font.bold)
         .fillColor(colors.blue)
-        .text(`₮${money(dto.data.max.toString())}`, {
+        .text(`₮${money(dto.service.max.toString())}`, {
           continued: true,
         })
         .fillColor(colors.black)
@@ -191,21 +191,22 @@ export class RealstatePdf {
         })
         .font(font.bold)
         .fillColor(colors.blue)
-        .text(`₮${money(dto.data.avg.toString())}`);
+        .text(`₮${money(dto.service.result.toString())}`);
       doc.y += 10;
-      console.log(dto.data);
       doc
         .fillColor(colors.black)
         .font(font.thin)
-        .text(`Таны ${dto.data.area} м.кв орон сууцны нийт үнэ:`, {
+        .text(`Таны ${dto.service.area} м.кв орон сууцны нийт үнэ:`, {
           continued: true,
         })
         .font(font.bold)
         .fillColor(colors.blue)
-        .text(`${money(`${dto.data.avg * dto.data.area}`, '₮', 100000)}`);
+        .text(
+          `${money(`${dto.service.result * dto.service.area}`, '₮', 100000)}`,
+        );
       doc.y += 15;
     }
-    if (dto.category == SERVICE.CAR) {
+    if (dto.service.category == SERVICE.CAR) {
       doc
         .font(font.thin)
         .fontSize(fz.xs)
@@ -214,7 +215,7 @@ export class RealstatePdf {
         })
         .font(font.bold)
         .fillColor(colors.blue)
-        .text(`₮${money(dto.data.price.toString())}`);
+        .text(`₮${money(dto.service.result.toString())}`);
       doc.y += 10;
     }
     doc.x = marginX;
@@ -227,28 +228,28 @@ export class RealstatePdf {
       .font(font.thin)
       .text(
         reportDescription(
-          `${dto.user?.lastname ?? ''} ${
-            dto.user?.firstname ??
-            (dto?.user?.lastname == null
-              ? dto.user?.phone
-                ? formatPhoneNumber(dto.user?.phone)
-                : (dto.user?.email ?? '')
+          `${dto.service.user?.lastname ?? ''} ${
+            dto.service.user?.firstname ??
+            (dto?.service.user?.lastname == null
+              ? dto.service.user?.phone
+                ? formatPhoneNumber(dto.service.user?.phone)
+                : (dto.service.user?.email ?? '')
               : '')
           }`,
-          dto.category,
-          dto.data.area,
-          dto.data.avg,
-          dto.location,
+          dto.service.category,
+          dto.service.area,
+          dto.service.result,
+          dto.service.location,
           {
-            floor: dto.data.floor,
-            no: dto.data.no,
-            room: dto.data.room,
-            brand: dto.data.brand,
-            capacity: dto.data.capacity,
-            mark: dto.data.mark,
-            manufacture: dto.data.manufacture,
-            engine: dto.data.engine,
-            entry: dto.data.entry,
+            floor: dto.service.floor,
+            no: dto.service.no,
+            room: dto.service.room,
+            brand: dto.service.brand,
+            capacity: dto.service.capacity,
+            mark: dto.service.mark,
+            manufacture: dto.service.manufacture,
+            engine: dto.service.engine,
+            entry: dto.service.entry,
           },
         ),
         {
@@ -259,9 +260,9 @@ export class RealstatePdf {
       .fillColor(colors.blue)
       .text(
         `${price(
-          dto.data.area != null ? SERVICE.REALSTATE : SERVICE.CAR,
-          dto.data.price,
-          dto.data.area * dto.data.avg,
+          dto.service.area != null ? SERVICE.REALSTATE : SERVICE.CAR,
+          dto.service.result,
+          dto.service.area * dto.service.result,
         )} төгрөг`,
         {
           continued: true,
@@ -272,7 +273,7 @@ export class RealstatePdf {
       .text(
         ` орчим үнэтэй байна. Энэхүү тооцоолол нь өгөгдөлд суурилж тооцоолсон бөгөөд ±5%-ийн хооронд хэлбэлзэх боломжтой.`,
       );
-    if (dto.category == SERVICE.CAR) {
+    if (dto.service.category == SERVICE.CAR) {
       doc.x = marginX;
       doc.y += 10;
       doc
@@ -283,12 +284,12 @@ export class RealstatePdf {
       doc.y += 10;
       doc.x += 20;
       Object.entries(Utils.carFields).map(([key, value], i) => {
-        return this.carField(doc, key, value, dto.data[key], i);
+        return this.carField(doc, key, value, dto.service[key], i);
       });
       doc.x = marginX;
     }
 
-    const date = new Date(dto.data.createdAt);
+    const date = new Date(dto.service.createdAt);
     date.setDate(date.getDate() + 7);
     doc.fontSize(fz.xs);
     const d = `Хүчинтэй хугацаа дуусах огноо: ${dateFormatter(date)}`;
@@ -331,7 +332,7 @@ export class RealstatePdf {
         align: 'right',
       },
     );
-    if (dto.info.usage && dto.info.usage != 30) {
+    if (dto.service.usage && dto.service.usage != 30) {
       doc.image(
         assetPath('stamp0'),
         (doc.page.width / 3) * 2,

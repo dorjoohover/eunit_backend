@@ -12,7 +12,6 @@ export class RequestDao {
   }
 
   create = async (dto: CreateRequestDto) => {
-    console.log(dto)
     try {
       const res = this.db.create({
         ...dto,
@@ -84,6 +83,24 @@ export class RequestDao {
     });
     res.code = code;
     await this.db.save(res);
+  };
+
+  updateResult = async (
+    id: number,
+    value: number,
+    min?: number,
+    max?: number,
+  ) => {
+    try {
+      await this.db.update(id, {
+        result: value,
+        min: min ?? null,
+        max: max ?? null,
+      });
+      return true;
+    } catch (error) {
+      return false;
+    }
   };
 
   updateStatus = async (id: number, status: number) => {

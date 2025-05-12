@@ -20,7 +20,6 @@ export class AuthController {
   @Get('phone-login')
   async phoneLogin(@Request() { user }) {
     if (!user.registered) {
-      console.log(user['phone'] ?? user['email'], user['email']);
       await this.service.register(
         {
           email: user['email'] ?? null,
@@ -43,7 +42,6 @@ export class AuthController {
     //     HttpStatus.CONFLICT,
     //   );
     // }
-    console.log(user['phone'] ?? user['email'], user['email']);
     const res = await this.service.register(
       dto,
       user['phone'] ?? null,

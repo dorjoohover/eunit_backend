@@ -108,7 +108,6 @@ export class RequestService extends BaseService {
   }
   public async create(dto: CreateRequestDto, email: string, user: number) {
     try {
-      console.log(dto, email, user);
       const point =
         dto.service == ServiceType.REVIEW
           ? dto.usage == 30 || !dto.usage
@@ -184,7 +183,6 @@ export class RequestService extends BaseService {
   public async checkPayment(id: number, code: string, user: string) {
     const payment = await this.qpay.checkPayment(code);
 
-    console.log(payment, user);
     if (payment.paid_amount) {
       await this.dao.updateStatus(id, PaymentStatus.SUCCESS);
       const res = await this.transactionService.create({
@@ -194,7 +192,6 @@ export class RequestService extends BaseService {
         request: id,
         message: 'Худалдан авалт хийсэн.',
       });
-      console.log(payment.paid_amount, user, id, res);
       return true;
     }
     return false;
@@ -203,29 +200,15 @@ export class RequestService extends BaseService {
   async findAll() {
     const res = await this.dao.findAll();
     return res;
-    // const responses = [];
-    // const { data, ...body } = res;
-    // for (const r of data) {
-    //   console.log(r)
-    //   responses.push({
-    //     id: r.id,
-    //     user: r.user,
-    //     price: r.transactions?.[0]?.point ?? 0,
-    //     method: r.transactions?.[0]?.paymentType,
-    //     date: r.createdAt,
-    //     type: r.service,
-    //   });
-    // }
-    // return {
-    //   data: responses,
-    //   ...body,
-    // };
   }
 
   async findByUser(id: number, page: number, limit = 10) {
     return await this.dao.findByUser(id, page, limit);
   }
-
+  
+  async find(id: number) {
+    return await this.dao.findOne(id)
+  }
   async findAllUser(user: number) {
     return await this.dao.findAllUser(user);
   }
@@ -236,6 +219,11 @@ export class RequestService extends BaseService {
       throw new HttpException('Хайлт олдсонгүй.', HttpStatus.BAD_REQUEST);
     if (service.status != PaymentStatus.SUCCESS)
       throw new HttpException('Төлбөр төлөөгүй байна.', HttpStatus.BAD_REQUEST);
+    if (service.result)
+      return {
+        service,
+        result: { min: service.min, max: service.max, result: service.result },
+      };
     if (service.category == SERVICE.CAR) {
       const res = await this.cars.calculate({
         brand: service.brand,
@@ -253,33 +241,13 @@ export class RequestService extends BaseService {
         mileage: service.mileage,
         conditions: service.conditions,
       });
+      const price = res * 0.95;
+      await this.dao.updateResult(id, price);
       return {
-        data: {
-          price: res * 0.95,
-          createdAt: service.createdAt,
-          brand: service.brand,
-          capacity: service.capacity,
-          color: service.color,
-          mark: service.mark,
-          manufacture: service.manufacture,
-          gearbox: service.gearbox,
-          engine: service.engine,
-          entry: service.entry,
-          hurd: service.hurd,
-          // type: service.type,
-          drive: service.drive,
-          interior: service.interior,
-          mileage: service.mileage,
-          conditions: service.conditions,
+        service,
+        result: {
+          result: price,
         },
-        info: {
-          lastname: service.lastname,
-          firstname: service.firstname,
-          usage: service.usage,
-          org: service.org,
-        },
-        user: service.user,
-        category: service.category,
       };
     }
     const location = await this.locationDao.findById(service.location.id);
@@ -292,18 +260,15 @@ export class RequestService extends BaseService {
       startDate: service.startDate,
       paid: true,
     })) as { min: number; max: number; avg: number };
+    await this.dao.updateResult(id, res.avg, res.min, res.max);
     return {
-      data: {
-        ...res,
-        area: service.area,
-        createdAt: service.createdAt,
-        no: service.no,
-        room: service.room,
-        floor: service.floor,
+      service,
+      location,
+      result: {
+        min: res.min,
+        max: res.max,
+        result: res.avg,
       },
-      user: service.user,
-      location: location,
-      category: service.category,
     };
   }
 

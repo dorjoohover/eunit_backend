@@ -23,7 +23,6 @@ export class TransactionService extends BaseService {
   }
   public async create(dto: CreateTransactionDto) {
     try {
-      console.log(dto);
       const user = await this.userService.getUser(dto.user as string);
       const date = new Date();
       const right = user.endDate > date;
@@ -43,7 +42,6 @@ export class TransactionService extends BaseService {
           request: dto.request,
           user: user.id,
         });
-        console.log(transaction);
         return transaction.id;
       }
       const remitterPoint = user.wallet + dto.point;

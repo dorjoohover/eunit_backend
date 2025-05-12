@@ -3,6 +3,7 @@ import fs from 'fs';
 import { UserEntity } from 'src/app/user/entities/user.entity';
 import { LocationEntity } from 'src/data/location/entities/location.entity';
 import { SERVICE } from 'src/base/constants';
+import { RequestEntity } from '../entities/request.entity';
 export const marginX = 40;
 export const marginY = 30;
 
@@ -14,20 +15,12 @@ export const colors = {
 };
 
 export type PdfType = {
-  data: any;
-  // {
-  // area?: number;
-  // createdAt: Date;
-  // no?: string;
-  // room?: number;
-  // floor?: number;
-  // min?: number;
-  // max?: number;
-  // avg?: number;
-  // };
-  user: UserEntity;
-  info?: any
-  category: number;
+  service: RequestEntity;
+  result: {
+    result: number;
+    min?: number;
+    max?: number;
+  };
   location?: LocationEntity;
 };
 export const assetPath = (p: string, a = 'png') => {
@@ -134,12 +127,21 @@ export const dateFormatter = (date: Date): string => {
   return `${year}.${month}.${day}`;
 };
 
-export const header = (doc: PDFKit.PDFDocument, date: Date, info: any) => {
+export const header = (
+  doc: PDFKit.PDFDocument,
+  date: Date,
+  request: RequestEntity,
+) => {
   doc.fontSize(10);
 
-  doc.image(assetPath(info?.org == 'eunit' || !info?.org ? 'logo' : info.org), marginX, marginY, {
-    width: 60,
-  });
+  doc.image(
+    assetPath(request?.org == 'eunit' || !request?.org ? 'logo' : request.org),
+    marginX,
+    marginY,
+    {
+      width: 60,
+    },
+  );
   doc
     .fontSize(fz.xs)
     .font(font.bold)

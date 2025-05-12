@@ -255,7 +255,7 @@ export class RequestService extends BaseService {
       });
       return {
         data: {
-          price: res,
+          price: res * 0.95,
           createdAt: service.createdAt,
           brand: service.brand,
           capacity: service.capacity,

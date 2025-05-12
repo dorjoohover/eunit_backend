@@ -93,7 +93,11 @@ export class CarsService {
     return new Promise((resolve, reject) => {
       const env = { ...process.env, PYTHONIOENCODING: 'utf-8' };
       // const py = spawn('python', ['src/app/request/cars/predict.py'], { env });
-      const py = spawn('/home/hstgr-dev-srv654666/htdocs/dev.srv654666.hstgr.cloud/backend/venv/bin/python', ['src/app/request/cars/predict.py'], { env });
+      const py = spawn(
+        '/home/hstgr-dev-srv654666/htdocs/dev.srv654666.hstgr.cloud/backend/venv/bin/python',
+        ['src/app/request/cars/predict.py'],
+        { env },
+      );
 
       let result = '';
 
@@ -123,6 +127,13 @@ export class CarsService {
       });
     });
   }
+  public getPriceRange(price: number, step: number = 10000): string {
+    if (price <= step) return `0-${step}`;
+
+    const lower = Math.floor((price - 1) / step) * step + 1;
+    const upper = lower + step - 1;
+    return `${lower}-${upper}`;
+  }
 
   public async calculate(dto: CarsDto): Promise<number> {
     const input = {
@@ -137,7 +148,7 @@ export class CarsService {
       Engine: dto.engine,
       Interior_color: dto.interior,
       Drive: dto.drive,
-      Mileage: dto.mileage,
+      Mileage: this.getPriceRange(dto.mileage),
       Conditions: dto.conditions,
     };
 

@@ -329,24 +329,26 @@ export class RealstatePdf {
         align: 'right',
       },
     );
-    doc.image(
-      assetPath('stamp0'),
-      (doc.page.width / 3) * 2,
-      doc.page.height - 25 - copyrightHeight - footerHeight - 150,
-      {
-        width: 80,
-        height: 80,
-      },
-    );
-    doc.image(
-      assetPath('stamp1'),
-      doc.x,
-      doc.page.height - 25 - copyrightHeight - footerHeight - 80,
-      {
-        width: 120,
-        height: 120,
-      },
-    );
+    if (dto.info.usage && dto.info.usage != 30) {
+      doc.image(
+        assetPath('stamp0'),
+        (doc.page.width / 3) * 2,
+        doc.page.height - 25 - copyrightHeight - footerHeight - 150,
+        {
+          width: 80,
+          height: 80,
+        },
+      );
+      doc.image(
+        assetPath('stamp1'),
+        doc.x,
+        doc.page.height - 25 - copyrightHeight - footerHeight - 80,
+        {
+          width: 120,
+          height: 120,
+        },
+      );
+    }
   }
 
   async carField(

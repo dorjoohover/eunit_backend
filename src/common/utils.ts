@@ -144,7 +144,7 @@ export class Utils {
     hurd: 'Хүрд',
     gearbox: 'Хурдны хайрцаг',
     interior: 'Салоны өнгө',
-    type: 'Төрөл',
+    // type: 'Төрөл',
     drive: 'Хөтлөгч',
     conditions: 'Нөхцөл',
   };

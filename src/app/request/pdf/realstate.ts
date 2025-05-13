@@ -271,7 +271,7 @@ export class RealstatePdf {
       .font(font.thin)
       .fillColor(colors.black)
       .text(
-        ` орчим үнэтэй байна. Энэхүү тооцоолол нь өгөгдөлд суурилж тооцоолсон бөгөөд ±5%-ийн хооронд хэлбэлзэх боломжтой.`,
+        ` орчим үнэтэй байна. Энэхүү тооцоолол нь өгөгдөлд суурилж тооцоолсон бөгөөд ±${dto.service.location ? '5' : '10'}%-ийн хооронд хэлбэлзэх боломжтой.`,
       );
     if (dto.service.category == SERVICE.CAR) {
       doc.x = marginX;

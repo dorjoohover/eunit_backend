@@ -205,9 +205,9 @@ export class RequestService extends BaseService {
   async findByUser(id: number, page: number, limit = 10) {
     return await this.dao.findByUser(id, page, limit);
   }
-  
+
   async find(id: number) {
-    return await this.dao.findOne(id)
+    return await this.dao.findOne(id);
   }
   async findAllUser(user: number) {
     return await this.dao.findAllUser(user);
@@ -241,7 +241,7 @@ export class RequestService extends BaseService {
         mileage: service.mileage,
         conditions: service.conditions,
       });
-      const price = res * 0.95;
+      const price = res * (service.usage == 30 || !service.usage ? 1 : 0.95);
       await this.dao.updateResult(id, price);
       return {
         service,

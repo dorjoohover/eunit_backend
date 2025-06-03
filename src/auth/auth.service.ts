@@ -114,7 +114,7 @@ export class AuthService {
         email: email,
         name,
         profile,
-        wallet: 2000,
+        wallet: 0,
         // role: 10,
       });
     }

@@ -222,9 +222,9 @@ export class RequestService extends BaseService {
   async findByUser(id: number, page: number, limit = 10) {
     return await this.dao.findByUser(id, page, limit);
   }
-  
+
   async find(id: number) {
-    return await this.dao.findOne(id)
+    return await this.dao.findOne(id);
   }
   async findAllUser(user: number) {
     return await this.dao.findAllUser(user);
@@ -241,6 +241,7 @@ export class RequestService extends BaseService {
         service,
         result: { min: service.min, max: service.max, result: service.result },
       };
+<<<<<<< HEAD
 <<<<<<< HEAD
     if (service.category == SERVICE.CAR) {
       const res = await this.cars.calculate({
@@ -266,6 +267,11 @@ export class RequestService extends BaseService {
     if (service.category == SERVICE.CAR && service.platform) {
       const res = await this.platform.getUsage(service.platform);
 >>>>>>> 75fee9b (a)
+=======
+
+    if (service.category == SERVICE.CAR && service.platform) {
+      const res = await this.platform.getUsage(service.platform);
+>>>>>>> main
       return {
         service,
         result: res,

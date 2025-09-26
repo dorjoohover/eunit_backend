@@ -17,6 +17,8 @@ import { PdfService } from './pdf';
 import { RealstatePdf } from './pdf/realstate';
 import { MailerService } from '@nestjs-modules/mailer';
 import { CarsService } from './cars/cars.service';
+import { PlatformService } from '../platform/platform.service';
+import { PlatformAuthService } from '../platform/platform.auth.service';
 
 @Module({
   imports: [HttpModule],
@@ -37,6 +39,8 @@ import { CarsService } from './cars/cars.service';
     RealstatePdf,
     QpayService,
     CarsService,
+    PlatformService,
+    PlatformAuthService,
     // MailerService,
   ],
 })

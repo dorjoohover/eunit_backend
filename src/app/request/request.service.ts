@@ -23,6 +23,8 @@ import { QpayService } from '../payment/qpay.service';
 import { PdfService } from './pdf';
 import { MailerService } from '@nestjs-modules/mailer';
 import { CarsService } from './cars/cars.service';
+import axios from 'axios';
+import { PlatformService } from '../platform/platform.service';
 const fonts = {
   Roboto: {
     normal: 'src/fonts/Roboto-Regular.ttf',
@@ -42,6 +44,7 @@ export class RequestService extends BaseService {
     private pdfService: PdfService,
     private mailService: MailerService,
     private cars: CarsService,
+    private platform: PlatformService,
   ) {
     super();
   }
@@ -122,8 +125,21 @@ export class RequestService extends BaseService {
         ...dto,
         location: +dto.location,
         user: user,
+
         status: PaymentStatus.PENDING,
       });
+
+      if (dto.category == SERVICE.CAR) {
+        const platform = await this.platform.sendUsage(
+          dto.value,
+          dto.category,
+          dto.vehicle,
+        );
+        console.log('update', platform);
+        console.log(res, platform.payload);
+        await this.dao.updatePlatform(res, platform.payload);
+        console.log(true);
+      }
 
       if (dto.payment == PaymentType.POINT) {
         const transaction = await this.transactionService.create({
@@ -149,6 +165,7 @@ export class RequestService extends BaseService {
       }
       await this.transactionService.updateRequest(success, res);
     } catch (error) {
+      console.log(error.message);
       return {
         success: false,
         message: error.message,
@@ -224,6 +241,7 @@ export class RequestService extends BaseService {
         service,
         result: { min: service.min, max: service.max, result: service.result },
       };
+<<<<<<< HEAD
     if (service.category == SERVICE.CAR) {
       const res = await this.cars.calculate({
         brand: service.brand,
@@ -243,12 +261,39 @@ export class RequestService extends BaseService {
       });
       const price = res * 0.95;
       await this.dao.updateResult(id, price);
+=======
+
+    if (service.category == SERVICE.CAR && service.platform) {
+      const res = await this.platform.getUsage(service.platform);
+>>>>>>> 75fee9b (a)
       return {
         service,
-        result: {
-          result: price,
-        },
+        result: res,
       };
+      // const res = await this.cars.calculate({
+      //   brand: service.brand,
+      //   capacity: service.capacity,
+      //   color: service.color,
+      //   mark: service.mark,
+      //   manufacture: service.manufacture,
+      //   gearbox: service.gearbox,
+      //   engine: service.engine,
+      //   entry: service.entry,
+      //   hurd: service.hurd,
+      //   // type: service.type,
+      //   drive: service.drive,
+      //   interior: service.interior,
+      //   mileage: service.mileage,
+      //   conditions: service.conditions,
+      // });
+      // const price = res * (service.usage == 30 || !service.usage ? 1 : 0.95);
+      // await this.dao.updateResult(id, price);
+      // return {
+      //   service,
+      //   result: {
+      //     result: price,
+      //   },
+      // };
     }
     const location = await this.locationDao.findById(service.location.id);
 

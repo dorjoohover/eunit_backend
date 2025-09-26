@@ -12,10 +12,15 @@ export const ServiceType = {
   REVIEW: 20,
   DATA: 30,
 };
-
 export const SERVICE = {
   REALSTATE: 10,
   CAR: 20,
+};
+export const serviceValues = {
+  [SERVICE.CAR]: 'CAR',
+  [SERVICE.REALSTATE]: 'REALSTATE',
+  CAR: SERVICE.CAR,
+  REALSTATE: SERVICE.REALSTATE,
 };
 
 export const Status = {
@@ -110,3 +115,9 @@ export const NutagDevsgerBuschlel = {
   Говьсүмбэр: 0.67,
   'Өмнөговь аймгийн Цогтцэций, Ханбогд сум, Дорноговь аймгийн Замын-үүд сум': 0.69,
 };
+
+export function isValidCarNumber(input: string): boolean {
+  // Монгол үсэг: А-Я, Ц-Ө гэх мэт (тэмдэгт хувилбар хамаарна)
+  const regex = /^[0-9]{4}[А-Я]{3}$/;
+  return regex.test(input.toUpperCase());
+}

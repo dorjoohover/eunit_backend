@@ -20,6 +20,7 @@ export type PdfType = {
     result: number;
     min?: number;
     max?: number;
+    estimatedPrice?: number;
   };
   location?: LocationEntity;
 };

@@ -17,7 +17,8 @@ export class RequestEntity {
   createdAt: Date;
   @Column()
   service: number;
-
+  @Column({ nullable: true })
+  platform: string;
   @Column({ nullable: true })
   category: number;
   @Column({ nullable: true })

@@ -130,11 +130,7 @@ export class RequestService extends BaseService {
       });
 
       if (dto.category == SERVICE.CAR) {
-        const platform = await this.platform.sendUsage(
-          dto.value,
-          dto.category,
-          dto.vehicle,
-        );
+        const platform = await this.platform.sendUsage(dto.value, dto.category);
         console.log('update', platform);
         console.log(res, platform.payload);
         await this.dao.updatePlatform(res, platform.payload);
@@ -241,37 +237,9 @@ export class RequestService extends BaseService {
         service,
         result: { min: service.min, max: service.max, result: service.result },
       };
-<<<<<<< HEAD
-<<<<<<< HEAD
-    if (service.category == SERVICE.CAR) {
-      const res = await this.cars.calculate({
-        brand: service.brand,
-        capacity: service.capacity,
-        color: service.color,
-        mark: service.mark,
-        manufacture: service.manufacture,
-        gearbox: service.gearbox,
-        engine: service.engine,
-        entry: service.entry,
-        hurd: service.hurd,
-        // type: service.type,
-        drive: service.drive,
-        interior: service.interior,
-        mileage: service.mileage,
-        conditions: service.conditions,
-      });
-      const price = res * 0.95;
-      await this.dao.updateResult(id, price);
-=======
 
     if (service.category == SERVICE.CAR && service.platform) {
       const res = await this.platform.getUsage(service.platform);
->>>>>>> 75fee9b (a)
-=======
-
-    if (service.category == SERVICE.CAR && service.platform) {
-      const res = await this.platform.getUsage(service.platform);
->>>>>>> main
       return {
         service,
         result: res,

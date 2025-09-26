@@ -18,6 +18,7 @@ import { AppExcel } from './common/app.excel';
 import { AuthGuard } from './auth/guards/jwt/auth-guard';
 import { EmailModule } from './auth/guards/email.module';
 import { QpayModule } from './app/qpay/qpay.module';
+import { InfoModule } from './app/info/info.module';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { QpayModule } from './app/qpay/qpay.module';
     RequestModule,
     LocationModule,
     AdModule,
+    InfoModule,
   ],
   controllers: [AppController],
   providers: [

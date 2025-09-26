@@ -161,6 +161,7 @@ export class RealstatePdf {
     doc.fontSize(fz.sm).font(font.bold).text('Тооцоолол');
     doc.x += 20;
     doc.y += 10;
+    let estimatedPrice = dto.result.estimatedPrice.toString();
     if (dto.service.area != null) {
       doc
         .font(font.thin)
@@ -207,6 +208,7 @@ export class RealstatePdf {
       doc.y += 15;
     }
     if (dto.service.category == SERVICE.CAR) {
+      console.log(dto.result);
       doc
         .font(font.thin)
         .fontSize(fz.xs)
@@ -215,7 +217,7 @@ export class RealstatePdf {
         })
         .font(font.bold)
         .fillColor(colors.blue)
-        .text(`₮${money(dto.service.result.toString())}`);
+        .text(`₮${money(estimatedPrice)}`);
       doc.y += 10;
     }
     doc.x = marginX;
@@ -261,7 +263,7 @@ export class RealstatePdf {
       .text(
         `${price(
           dto.service.area != null ? SERVICE.REALSTATE : SERVICE.CAR,
-          dto.service.result,
+          estimatedPrice ? +estimatedPrice : dto.service.result,
           dto.service.area * dto.service.result,
         )} төгрөг`,
         {

@@ -84,6 +84,15 @@ export class RequestDao {
     res.code = code;
     await this.db.save(res);
   };
+  updatePlatform = async (id: number, platform: string) => {
+    const res = await this.db.findOne({
+      where: {
+        id,
+      },
+    });
+    res.platform = platform;
+    await this.db.save(res);
+  };
 
   updateResult = async (
     id: number,

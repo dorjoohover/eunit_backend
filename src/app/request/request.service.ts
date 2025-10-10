@@ -111,6 +111,7 @@ export class RequestService extends BaseService {
   }
   public async create(dto: CreateRequestDto, email: string, user: number) {
     try {
+      console.log(dto)
       const point =
         dto.service == ServiceType.REVIEW
           ? dto.usage == 30 || !dto.usage

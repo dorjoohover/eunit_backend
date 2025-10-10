@@ -175,7 +175,7 @@ export class RequestService extends BaseService {
       SERVICE.CAR,
       dto.vehicle,
     );
-    console.log('asdf');
+    console.log('asdf', result);
     await this.dao.updatePlatform(id, result.payload);
     // return await this.cars.calculate(dto);
   }

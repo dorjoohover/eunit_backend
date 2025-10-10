@@ -21,6 +21,8 @@ export type PdfType = {
     min?: number;
     max?: number;
     estimatedPrice?: number;
+    vehicle?: any;
+    value?: any;
   };
   location?: LocationEntity;
 };
@@ -69,12 +71,13 @@ export const reportDescription = (
     room?: number;
     no?: string;
     floor?: number;
-    brand?: string;
-    mark?: string;
-    manufacture?: number;
-    entry?: number;
+    markName?: string;
+    modelName?: string;
+    buildYear?: number;
+    importDate?: number;
     capacity?: string;
-    engine?: string;
+    fueltype?: string;
+
   },
 ) => {
   // Таны Улаанбаатар хот, Хан уул дүүрэг, 11-р хороо, 17020, Жардин хотхон, 120-р байр, 6 дугаар давхарын 3 өрөө 80м.кв орон сууцны өнөөгийн зах зээлийн үнэ 160,950,000.00 төгрөг орчмын үнэтэй байна.
@@ -93,14 +96,14 @@ export const reportDescription = (
         }, ${l?.town}${
           !town ? ' хотхон' : ''
         },${no}${floor}${room} ${area}м.кв орон сууцны`
-      : `${d?.manufacture} онд үйлдвэрлэгдэж ${
-          d?.entry
+      : `${d?.buildYear} онд үйлдвэрлэгдэж ${
+          d?.importDate
         } онд Монгол улсад импортлогдсон ${firstLetterUpper(
-          d?.brand,
-        )} брендын ${firstLetterUpper(d?.mark)} маркын ${
+          d?.markName,
+        )} брендын ${firstLetterUpper(d?.modelName)} маркын ${
           d?.capacity
         } литрийн хөдөлгүүрийн багтаамжтай ${(
-          d?.engine ?? ''
+          d?.fueltype ?? ''
         ).toLowerCase()} машины`;
 
   return `Иргэн ${name} таны ${value} өнөөгийн зах зээлийн үнэ `;

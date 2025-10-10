@@ -133,19 +133,19 @@ export class Utils {
   }
 
   static carFields = {
-    brand: 'Бренд',
-    mark: 'Марк',
+    markName: 'Бренд',
+    modelName: 'Марк',
     capacity: 'Багтаамж',
-    color: 'Өнгө',
-    manufacture: 'Үйлдвэрлэсэн',
-    entry: 'Импортлосон',
-    mileage: 'Гүйлт',
-    engine: 'Хөдөлгүүр',
-    hurd: 'Хүрд',
+    colorName: 'Өнгө',
+    buildYear: 'Үйлдвэрлэсэн',
+    importDate: 'Импортлосон',
+    milleage: 'Гүйлт',
+    fueltype: 'Хөдөлгүүр',
+    wheelPosition: 'Хүрд',
     gearbox: 'Хурдны хайрцаг',
-    interior: 'Салоны өнгө',
+    // interior: 'Салоны өнгө',
     // type: 'Төрөл',
     drive: 'Хөтлөгч',
-    conditions: 'Нөхцөл',
+    // conditions: 'Нөхцөл',
   };
 }

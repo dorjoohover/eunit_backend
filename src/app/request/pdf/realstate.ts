@@ -207,8 +207,9 @@ export class RealstatePdf {
         );
       doc.y += 15;
     }
+    let values: any = {};
     if (dto.service.category == SERVICE.CAR) {
-      console.log(dto.result);
+      values = { ...dto.result.value, ...dto.result.vehicle };
       doc
         .font(font.thin)
         .fontSize(fz.xs)
@@ -246,12 +247,12 @@ export class RealstatePdf {
             floor: dto.service.floor,
             no: dto.service.no,
             room: dto.service.room,
-            brand: dto.service.brand,
-            capacity: dto.service.capacity,
-            mark: dto.service.mark,
-            manufacture: dto.service.manufacture,
-            engine: dto.service.engine,
-            entry: dto.service.entry,
+            modelName: values?.modelName ?? '',
+            capacity: values?.capacity ?? '',
+            markName: values?.markName ?? '',
+            buildYear: values?.buildYear ?? '',
+            fueltype: values?.fueltype ?? '',
+            importDate: values?.importDate ?? '',
           },
         ),
         {
@@ -285,8 +286,9 @@ export class RealstatePdf {
         .text('Техникийн үзүүлэлт');
       doc.y += 10;
       doc.x += 20;
+
       Object.entries(Utils.carFields).map(([key, value], i) => {
-        return this.carField(doc, key, value, dto.service[key], i);
+        return this.carField(doc, key, value, values[key], i);
       });
       doc.x = marginX;
     }

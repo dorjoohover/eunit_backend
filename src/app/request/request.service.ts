@@ -23,6 +23,8 @@ import { QpayService } from '../payment/qpay.service';
 import { PdfService } from './pdf';
 import { MailerService } from '@nestjs-modules/mailer';
 import { CarsService } from './cars/cars.service';
+import axios from 'axios';
+import { PlatformService } from '../platform/platform.service';
 const fonts = {
   Roboto: {
     normal: 'src/fonts/Roboto-Regular.ttf',
@@ -42,6 +44,7 @@ export class RequestService extends BaseService {
     private pdfService: PdfService,
     private mailService: MailerService,
     private cars: CarsService,
+    private platform: PlatformService,
   ) {
     super();
   }
@@ -124,7 +127,9 @@ export class RequestService extends BaseService {
         user: user,
         status: PaymentStatus.PENDING,
       });
-
+      if (dto.service == SERVICE.CAR) {
+        await this.calculateCar(dto, res);
+      }
       if (dto.payment == PaymentType.POINT) {
         const transaction = await this.transactionService.create({
           point: -point,
@@ -133,6 +138,8 @@ export class RequestService extends BaseService {
           message: 'Худалдан авалт хийсэн',
           request: res,
         });
+        console.log(dto);
+
         await this.dao.updateStatus(res, PaymentStatus.SUCCESS);
         return {
           res,
@@ -147,6 +154,7 @@ export class RequestService extends BaseService {
           data: qpay,
         };
       }
+
       await this.transactionService.updateRequest(success, res);
     } catch (error) {
       return {
@@ -157,8 +165,17 @@ export class RequestService extends BaseService {
     }
   }
 
-  public async calculateCar(dto: CarsDto) {
-    return await this.cars.calculate(dto);
+  public async calculateCar(dto: CreateRequestDto, id: number) {
+    const result = await this.platform.sendUsage(
+      {
+        ...dto.value,
+      },
+      SERVICE.CAR,
+      dto.vehicle,
+    );
+    console.log('asdf');
+    await this.dao.updatePlatform(id, result.payload);
+    // return await this.cars.calculate(dto);
   }
 
   public async sendPdf(id: number, email: string) {
@@ -205,9 +222,9 @@ export class RequestService extends BaseService {
   async findByUser(id: number, page: number, limit = 10) {
     return await this.dao.findByUser(id, page, limit);
   }
-  
+
   async find(id: number) {
-    return await this.dao.findOne(id)
+    return await this.dao.findOne(id);
   }
   async findAllUser(user: number) {
     return await this.dao.findAllUser(user);
@@ -215,10 +232,26 @@ export class RequestService extends BaseService {
 
   public async findOne(id: number) {
     const service = await this.dao.findOne(id);
+
     if (!service)
       throw new HttpException('Хайлт олдсонгүй.', HttpStatus.BAD_REQUEST);
     if (service.status != PaymentStatus.SUCCESS)
       throw new HttpException('Төлбөр төлөөгүй байна.', HttpStatus.BAD_REQUEST);
+    if (service.platform) {
+      const result = await this.platform.getUsage(service.platform);
+      console.log(result);
+      return {
+        service,
+        result: {
+          result: 0,
+          min: 0,
+          max: 0,
+          value: result.value,
+          vehicle: result.vehicle,
+          estimatedPrice: result.estimatedPrice,
+        },
+      };
+    }
     if (service.result)
       return {
         service,

@@ -13,18 +13,22 @@ export class PlatformService {
   ) {}
 
   async sendUsage(dto: any, service: number, vehicle: VehicleInfo) {
-    const token = await this.authService.getToken();
-    const { data } = await this.http.axiosRef.post(
-      `${process.env.PLATFORM}usage`,
-      { value: dto, service: serviceValues[service], vehicle },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
+    try {
+      const token = await this.authService.getToken();
+      const { data } = await this.http.axiosRef.post(
+        `${process.env.PLATFORM}usage`,
+        { value: dto, service: serviceValues[service], vehicle },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         },
-      },
-    );
+      );
 
-    return data;
+      return data;
+    } catch (error) {
+      console.log(error);
+    }
   }
   async getUsage(platform: string) {
     const token = await this.authService.getToken();

@@ -124,11 +124,11 @@ export class RequestService extends BaseService {
       let success = null;
       const res = await this.dao.create({
         ...dto,
-        location: +dto.location,
+        // location: +dto.location,
         user: user,
         status: PaymentStatus.PENDING,
       });
-      if (dto.service == SERVICE.CAR) {
+      if (dto.category == SERVICE.CAR) {
         await this.calculateCar(dto, res);
       }
       if (dto.payment == PaymentType.POINT) {

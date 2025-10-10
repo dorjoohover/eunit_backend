@@ -158,6 +158,7 @@ export class RequestService extends BaseService {
 
       await this.transactionService.updateRequest(success, res);
     } catch (error) {
+      console.log(error)
       return {
         success: false,
         message: error.message,

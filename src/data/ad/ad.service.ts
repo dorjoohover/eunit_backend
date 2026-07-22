@@ -22,6 +22,7 @@ import { join } from 'path';
 
 import { NotApartmentIndex } from 'src/base/cost.index';
 import { ServiceDao } from './service.dao';
+import suljee from '../../excel/suljee.json';
 @Injectable()
 export class AdService extends BaseService {
   constructor(
@@ -36,17 +37,34 @@ export class AdService extends BaseService {
     return 'This action adds a new ad';
   }
 
+  private getRealEstateWorkbookPath() {
+    return (
+      this.excel.resolveExistingPath(
+        'src/excel/Data_unegui_12.09_last_v_1.xlsx',
+      ) ??
+      this.excel.resolveExistingPath(
+        'src/excel/Data_unegui_12.01_last_v_1.xlsx',
+      ) ??
+      'src/excel/Data_unegui_12.09_last_v_1.xlsx'
+    );
+  }
+
   public async createConstant() {
-    const togtool = this.excel.readExcel(
-      '',
-      '',
-      9,
+    const workbookPath = this.excel.resolveExistingPath(
       'src/excel/baiguullagad-zoriulsan-uilchilgee.xlsx',
     );
+
+    if (!workbookPath) {
+      return suljee;
+    }
+
+    const togtool = this.excel.readExcel('', '', 9, workbookPath);
     await writeFile(
       join(process.cwd(), 'src/excel', 'suljee.json'),
       JSON.stringify(togtool),
     );
+
+    return togtool;
 
     // const ads = this.excel.readExcel(
     //   '',
@@ -97,19 +115,10 @@ export class AdService extends BaseService {
     // } catch (error) {}
   }
   public async createDataExcelLocation() {
-    const locations = this.excel.readExcel(
-      '',
-      '',
-      2,
-      'src/excel/Data_unegui_12.09_last_v_1.xlsx',
-    );
+    const workbookPath = this.getRealEstateWorkbookPath();
+    const locations = this.excel.readExcel('', '', 2, workbookPath);
 
-    const ads = this.excel.readExcel(
-      '',
-      '',
-      1,
-      'src/excel/Data_unegui_12.09_last_v_1.xlsx',
-    );
+    const ads = this.excel.readExcel('', '', 1, workbookPath);
     try {
       const uniqueAds = [
         ...new Map(
@@ -119,15 +128,15 @@ export class AdService extends BaseService {
           ]),
         ).values(),
       ];
-      uniqueAds.map(async (ad) => {
+      for (const ad of uniqueAds) {
         const body = {
           city: 'Улаанбаатар',
           district: ad['Дүүрэг'],
           name: ad['Байршил'],
         };
         await this.locationDao.create(body);
-      });
-      locations.map(async (location) => {
+      }
+      for (const location of locations) {
         const lat = location['Lng'];
         const lng = location['Lat_1'];
         const district = location['Дүүрэг'];
@@ -147,26 +156,17 @@ export class AdService extends BaseService {
           name,
           zipcode,
         };
-        this.locationDao.create(body);
-      });
+        await this.locationDao.create(body);
+      }
     } catch (error) {}
   }
   public async createDataExcel() {
-    const ads = this.excel.readExcel(
-      '',
-      '',
-      0,
-      'src/excel/Data_unegui_12.09_last_v_1.xlsx',
-    );
-    const ads1 = this.excel.readExcel(
-      '',
-      '',
-      1,
-      'src/excel/Data_unegui_12.09_last_v_1.xlsx',
-    );
+    const workbookPath = this.getRealEstateWorkbookPath();
+    const ads = this.excel.readExcel('', '', 0, workbookPath);
+    const ads1 = this.excel.readExcel('', '', 1, workbookPath);
     // without town
     const startDate = new Date(1900, 0, 1);
-    ads.map(async (ad) => {
+    for (const ad of ads) {
       const buildingProcess = ad['buildingProcess'];
       const id = ad['id'];
       const title = ad['title'];
@@ -226,8 +226,8 @@ export class AdService extends BaseService {
         await this.dao.create(dto);
       }
       // return res;
-    });
-    ads1.map(async (ad) => {
+    }
+    for (const ad of ads1) {
       const buildingProcess = ad['buildingProcess'];
       const id = ad['id'];
 
@@ -284,7 +284,7 @@ export class AdService extends BaseService {
         await this.dao.create(dto);
       }
       // return res;
-    });
+    }
 
     // const locations = this.excel.readExcel(
     //   '',

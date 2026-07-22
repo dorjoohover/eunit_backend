@@ -1,9 +1,10 @@
 import { Global, Module } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { DataSource } from 'typeorm';
 
 @Global()
 @Module({
+  imports: [ConfigModule],
   providers: [
     {
       provide: DataSource,
@@ -12,16 +13,14 @@ import { DataSource } from 'typeorm';
         try {
           const dataSource = new DataSource({
             type: 'postgres',
-            host: '46.202.189.34',
-            // host: 'localhost',
-            port: 5432,
-            username: 'dorjoo',
-            // username: 'postgres',
-            password: 'root',
-            database: 'eunit',
-            // database: 'dev',
+            host: configService.get<string>('DB_HOST', 'localhost'),
+            port: Number(configService.get<string>('DB_PORT', '5432')),
+            username: configService.get<string>('DB_USERNAME', 'dorjoo'),
+            password: configService.get<string>('DB_PASSWORD', 'dorjooX0'),
+            database: configService.get<string>('DB_NAME', 'eunit'),
             entities: [__dirname + '/../**/*.entity{.ts,.js}'],
-            synchronize: true,
+            synchronize:
+              configService.get<string>('DB_SYNCHRONIZE', 'true') === 'true',
           });
 
           return dataSource.initialize();

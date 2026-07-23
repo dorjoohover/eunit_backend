@@ -94,7 +94,7 @@ export class CarsService {
       const env = { ...process.env, PYTHONIOENCODING: 'utf-8' };
       // const py = spawn('python', ['src/app/request/cars/predict.py'], { env });
       const py = spawn(
-        '/home/hstgr-dev-srv654666/htdocs/dev.srv654666.hstgr.cloud/backend/venv/bin/python',
+        '/home/dorjoo/core/venv/bin/python',
         ['src/app/request/cars/predict.py'],
         { env },
       );

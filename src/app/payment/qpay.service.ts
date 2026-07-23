@@ -106,7 +106,7 @@ export class QpayService {
           allow_exceed: false,
           maximum_amount: null,
           note: null,
-          callback_url: 'https://srv654666.hstgr.cloud/api/v1/qpay/callback',
+          callback_url: 'https://eunit.mn/api/v1/qpay/callback',
         },
         {
           headers: {

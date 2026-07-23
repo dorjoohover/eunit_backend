@@ -168,7 +168,7 @@ export class RequestService extends BaseService {
           to: email,
           subject: 'Тайлан хүлээн авах',
           html: `<div>
-      <p>Та тайлангаа <a href=https://srv666826.hstgr.cloud/api/v1/request/service/pdf/${id}>эндээс</a> татаж авна уу.</p>
+      <p>Та тайлангаа <a href=https://eunit.mn/api/v1/request/service/pdf/${id}>эндээс</a> татаж авна уу.</p>
       <p>Тайлан pdf хэлбэрээр татагдах болно.</p>
        <p>Асууж, тодруулах зүйл байвал <a href=mailto:info@eunit.mn>info@eunit.mn</a> хаягаар, <a href=tel:976-9599 2333>976-9599 2333</a> дугаараар холбогдоорой. </p>
        <p>Манайхаар үйлчлүүлж байгаад тань баярлалаа.</p>

@@ -161,7 +161,7 @@ export class RealstatePdf {
     doc.fontSize(fz.sm).font(font.bold).text('Тооцоолол');
     doc.x += 20;
     doc.y += 10;
-    let estimatedPrice = dto.result.estimatedPrice.toString();
+    let estimatedPrice = (dto.result.estimatedPrice ?? 0).toString();
     if (dto.service.area != null) {
       doc
         .font(font.thin)
@@ -171,7 +171,7 @@ export class RealstatePdf {
         })
         .font(font.bold)
         .fillColor(colors.blue)
-        .text(`₮${money(dto.service.min.toString())}`, { continued: true })
+        .text(`₮${money((dto.service.min ?? 0).toString())}`, { continued: true })
         .font(font.thin)
         .fillColor(colors.black)
         .text(`-оос `, {
@@ -179,7 +179,7 @@ export class RealstatePdf {
         })
         .font(font.bold)
         .fillColor(colors.blue)
-        .text(`₮${money(dto.service.max.toString())}`, {
+        .text(`₮${money((dto.service.max ?? 0).toString())}`, {
           continued: true,
         })
         .fillColor(colors.black)
@@ -192,7 +192,7 @@ export class RealstatePdf {
         })
         .font(font.bold)
         .fillColor(colors.blue)
-        .text(`₮${money(dto.service.result.toString())}`);
+        .text(`₮${money((dto.service.result ?? 0).toString())}`);
       doc.y += 10;
       doc
         .fillColor(colors.black)

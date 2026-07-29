@@ -250,7 +250,7 @@ export class RequestService extends BaseService {
           max: 0,
           value: result.value,
           vehicle: result.vehicle,
-          estimatedPrice: result.estimatedPrice,
+          estimatedPrice: result.estimatedPrice ?? 0,
         },
       };
     }

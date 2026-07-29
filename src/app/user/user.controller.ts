@@ -20,7 +20,7 @@ import { Public } from 'src/auth/guards/jwt/auth-guard';
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
-
+  @Public()
   @Post()
   create(@Body() createUserDto: CreateUserDto) {
     return this.userService.create(createUserDto);

@@ -1,6 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Between, DataSource, IsNull, Like, Not, Repository } from 'typeorm';
+import * as bcrypt from 'bcrypt';
 import { UserEntity } from './entities/user.entity';
 import { CreateUserDto, UserFindDto } from './dto/create-user.dto';
 import { CLIENT } from 'src/base/constants';
@@ -57,9 +58,17 @@ export class UserDao {
         ],
       });
       if (u) throw new HttpException('Бүртгэлтэй хэрэглэгч', 400);
+
+      const hashedPassword = user.password
+        ? await bcrypt.hash(user.password, 10)
+        : user.password;
+
       const res = this.db.create({
         ...user,
-        role: user.role == undefined ? CLIENT : user.role,
+        password: hashedPassword,
+        // role-ийг үргэлж Client болгоно — admin эрхийг энэ (нээлттэй)
+        // замаар олгуулахгүй, зөвхөн DB-ээр гараар олгоно.
+        role: CLIENT,
         wallet: 0,
       });
       await this.db.save(res);
@@ -77,9 +86,15 @@ export class UserDao {
 
   updateUser = async (user: CreateUserDto, id: number) => {
     const res = await this.getUserInfo(id);
-    await this.db.update(id, {
-      ...user,
-    });
+    // role-ийг энэ (өөрийгөө засах) замаар өөрчлүүлэхийг зөвшөөрөхгүй —
+    // эс тэгвэл ямар ч нэвтэрсэн хэрэглэгч role:10 (Admin) илгээгээд
+    // өөрийгөө admin болгож чадна.
+    const { role, password, ...rest } = user;
+    const payload: Record<string, any> = { ...rest };
+    if (password) {
+      payload.password = await bcrypt.hash(password, 10);
+    }
+    await this.db.update(id, payload);
     // await this.db.save({
     //   ...res,
     //   lastname: user.lastname ?? res.lastname,

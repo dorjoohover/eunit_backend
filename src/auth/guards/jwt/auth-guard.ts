@@ -37,7 +37,10 @@ export class AuthGuard implements CanActivate {
         return false
       }
       const user = await this.service.getUser(res.email);
-      request.user = user;
+      // password hash-ийг request.user-ээс хасна — эс тэгвэл findMe гэх мэт
+      // "@Request() { user }"-ийг шууд буцаадаг route-уудаар алдагдана.
+      const { password, ...safeUser } = user ?? {};
+      request.user = safeUser;
 
       return true;
     } catch (error) {

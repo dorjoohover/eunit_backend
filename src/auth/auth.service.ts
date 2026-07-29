@@ -13,6 +13,7 @@ import { LoginUserDto, RegisterUserDto } from './auth.dto';
 
 import { ConfigService } from '@nestjs/config';
 import * as admin from 'firebase-admin';
+import * as bcrypt from 'bcrypt';
 @Injectable()
 export class AuthService {
   private app: admin.app.App;
@@ -108,40 +109,33 @@ export class AuthService {
   }
   async validateUser(dto: LoginUserDto): Promise<any> {
     const { password, email, name, profile } = dto;
-    let user = await this.usersService.getUser(email);
+    const user = await this.usersService.getUser(email);
+
     if (!user) {
-      user = await this.usersService.create({
-        email: email,
+      // Шинэ хэрэглэгч — үргэлж Client эрхтэй үүснэ (role-ийг
+      // UserDao.add дотор шууд CLIENT болгодог), нууц үгийг өгсөн бол
+      // hash хийж хадгална.
+      const created = await this.usersService.create({
+        email,
         name,
         profile,
         wallet: 0,
-        // role: 10,
+        password,
       });
+      return created;
     }
 
-    let isMatch = false;
-    // if (user) {
-    //   if (password != null && password != undefined) {
-    //     isMatch = await bcrypt.compare(password, user.password);
-    //   } else {
-    //     isMatch = true;
-    //   }
-    // } else {
-    //   if (password == null || password == undefined) {
-    //     await this.usersService.create({
-    //       email: email,
-    //       name,
-    //       profile,
-    //       // role: 10,
-    //     });
-    //     return true;
-    //   }
-    // }
-    // if (user && isMatch == true) {
-    //   const { password, ...result } = user;
-    //   return result;
-    // }
-    return user;
+    if (!password || !user.password) {
+      return null;
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return null;
+    }
+
+    const { password: _pw, ...result } = user;
+    return result;
   }
 
   async getUser(email: string) {

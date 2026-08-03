@@ -14,7 +14,7 @@ export class UserDao {
   }
 
   async findAll() {
-    return await this.db.find()
+    return await this.db.find();
   }
 
   find = async (dto: UserFindDto) => {
@@ -120,27 +120,19 @@ export class UserDao {
   };
 
   getByEmail = async (phone: string) => {
-    let res = await this.db.findOne({
-      where: {
-        phone: phone,
-      },
-    });
-    if (!res)
-      res = await this.db.findOne({
-        where: {
+    return await this.db.findOne({
+      where: [
+        {
           email: phone,
         },
-      });
-    if (!res) {
-      if (!isNaN(parseInt(phone))) {
-        res = await this.db.findOne({
-          where: {
-            id: +phone,
-          },
-        });
-      }
-    }
-    return res;
+        {
+          phone: phone,
+        },
+        {
+          id: +phone,
+        },
+      ],
+    });
   };
 
   getUserInfo = async (id: any) => {

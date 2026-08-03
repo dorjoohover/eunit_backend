@@ -126,7 +126,17 @@ export class AuthService {
       return created;
     }
 
-    if (!password || !user.password) {
+    // Хэрэглэгч ямар ч нууц үг тохируулаагүй бол (жишээ нь web-ийн
+    // Google/утасны дугаараар бүртгүүлсэн хэрэглэгчид — тэдэнд password
+    // огт байдаггүй) — Google/Firebase аль хэдийн баталгаажуулсан identity
+    // тул нууц үг шаардахгүйгээр нэвтрүүлнэ. Харин нууц үгтэй болсон
+    // (жишээ нь admin) бүртгэлд заавал зөв нууц үг шаардана.
+    if (!user.password) {
+      const { password: _pw, ...result } = user;
+      return result;
+    }
+
+    if (!password) {
       return null;
     }
 

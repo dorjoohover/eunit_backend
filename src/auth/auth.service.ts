@@ -144,6 +144,7 @@ export class AuthService {
 
   async login(user: any) {
     const result = await this.validateUser(user);
+    console.log('login result', result);
     if (!result) {
       throw new UnauthorizedException();
     }

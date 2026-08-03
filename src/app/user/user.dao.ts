@@ -1,6 +1,14 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Between, DataSource, IsNull, Like, Not, Repository } from 'typeorm';
+import {
+  Between,
+  DataSource,
+  FindOptionsWhere,
+  IsNull,
+  Like,
+  Not,
+  Repository,
+} from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { UserEntity } from './entities/user.entity';
 import { CreateUserDto, UserFindDto } from './dto/create-user.dto';
@@ -120,19 +128,13 @@ export class UserDao {
   };
 
   getByEmail = async (phone: string) => {
-    console.log(phone)
+    console.log(phone);
+    const conditions: any = [{ email: phone }, { phone: phone }];
+    if (!isNaN(Number(phone))) {
+      conditions.push({ id: +phone });
+    }
     return await this.db.findOne({
-      where: [
-        {
-          email: phone,
-        },
-        {
-          phone: phone,
-        },
-        {
-          id: +phone,
-        },
-      ],
+      where: conditions,
     });
   };
 

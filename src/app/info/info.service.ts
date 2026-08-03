@@ -18,6 +18,7 @@ export class InfoService {
           },
         },
       );
+      console.log(res.data.vehicle);
       return res.data;
     } catch (error) {
       console.log(error);

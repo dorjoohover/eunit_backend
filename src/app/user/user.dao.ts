@@ -128,7 +128,6 @@ export class UserDao {
   };
 
   getByEmail = async (phone: string) => {
-    console.log(phone);
     const conditions: any = [{ email: phone }, { phone: phone }];
     if (!isNaN(Number(phone))) {
       conditions.push({ id: +phone });

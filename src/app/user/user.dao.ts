@@ -120,6 +120,7 @@ export class UserDao {
   };
 
   getByEmail = async (phone: string) => {
+    console.log(phone)
     return await this.db.findOne({
       where: [
         {
